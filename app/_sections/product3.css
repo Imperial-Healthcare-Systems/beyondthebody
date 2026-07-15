@@ -1,0 +1,99 @@
+/* =================================================================
+   §8 · THE COLLECTION — alternating slanted editorial catalogue.
+   Image ⟷ text zigzag, parallelogram media, ⚥ roundels at the seams.
+   Light register (ivory). Order: Mon Amour · Heartthrob · Desir · Don Amour.
+   No section header/footer — the global nav carries "THE COLLECTION"
+   and "JOIN THE HOUSE" (1:1 with the supplied reference).
+   ================================================================= */
+
+.col {
+  position: relative; overflow: hidden;
+  background: var(--ivory); color: var(--oxblood);
+  padding: clamp(74px, 11vh, 150px) clamp(20px, 5vw, 80px) clamp(70px, 10vh, 140px);
+}
+
+/* grid of rows */
+.col__grid { max-width: 1260px; margin: 0 auto; }
+
+.col__row {
+  position: relative; display: grid; align-items: center;
+  gap: clamp(26px, 4vw, 76px);
+}
+.col__row--left  { grid-template-columns: 1.14fr .86fr; }
+.col__row--right { grid-template-columns: .86fr 1.14fr; }
+.col__row + .col__row { margin-top: clamp(-26px, -2.6vw, -54px); }  /* interlock */
+
+/* which column holds media vs text */
+.col__row--left  .col__media { grid-column: 1; }
+.col__row--left  .col__text  { grid-column: 2; }
+.col__row--right .col__media { grid-column: 2; }
+.col__row--right .col__text  { grid-column: 1; grid-row: 1; }
+
+/* slanted media (parallelogram) */
+.col__media {
+  position: relative; margin: 0; aspect-ratio: 16 / 10; overflow: hidden;
+  background: var(--ivory-2);
+  box-shadow: 0 40px 80px -30px rgba(78, 33, 45, .28);
+}
+.col__row--left  .col__media { clip-path: polygon(0 0, 100% 0, 86% 100%, 0 100%); }
+.col__row--right .col__media { clip-path: polygon(14% 0, 100% 0, 100% 100%, 0 100%); }
+.col__media img {
+  position: absolute; inset: -6% 0; width: 100%; height: 112%;
+  object-fit: cover; object-position: center; will-change: transform;
+}
+
+/* text block */
+.col__text { display: flex; flex-direction: column; align-items: flex-start; }
+.col__no {
+  font-family: var(--ff-exp); text-transform: uppercase; letter-spacing: .3em;
+  font-size: clamp(.58rem, .74vw, .68rem); color: var(--rose-taupe);
+}
+.col__rule { width: 46px; height: 1px; background: rgba(78, 33, 45, .3); margin: clamp(14px, 1.6vw, 20px) 0 clamp(18px, 2vw, 26px); }
+.col__name {
+  font-family: var(--ff-display); font-weight: 400; letter-spacing: -.015em;
+  font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 1.02; color: var(--oxblood); margin: 0;
+}
+.col__tag {
+  margin: clamp(8px, 1vw, 12px) 0 clamp(22px, 2.6vw, 34px);
+  font-family: var(--ff-body); font-size: clamp(.92rem, 1.15vw, 1.05rem); color: var(--oxblood-2);
+}
+.col__plabel {
+  font-family: var(--ff-exp); text-transform: uppercase; letter-spacing: .26em;
+  font-size: clamp(.52rem, .66vw, .6rem); color: var(--rose-taupe); margin-bottom: clamp(10px, 1.2vw, 14px);
+}
+.col__profile {
+  margin: 0 0 clamp(22px, 2.6vw, 34px); max-width: 32ch;
+  font-family: var(--ff-body); font-size: clamp(.82rem, 1vw, .92rem); line-height: 1.75; color: rgba(78, 33, 45, .82);
+}
+.col__discover { color: var(--oxblood); }
+
+/* ⚥ roundel at each seam */
+.col__mark {
+  position: absolute; bottom: clamp(-26px, -2.4vw, -42px); left: 50%; transform: translateX(-50%);
+  z-index: 5; width: clamp(56px, 5.4vw, 74px); aspect-ratio: 1; border-radius: 50%;
+  background: var(--ivory); border: 1px solid rgba(78, 33, 45, .24);
+  display: grid; place-items: center; box-shadow: 0 12px 30px -12px rgba(78, 33, 45, .3);
+}
+.col__glyph {
+  width: 46%; aspect-ratio: 1; background-color: var(--oxblood); opacity: .9;
+  -webkit-mask: url("/brand/btb-mark.png") center / contain no-repeat;
+          mask: url("/brand/btb-mark.png") center / contain no-repeat;
+}
+
+/* -------- mobile · unstack to a clean single column -------- */
+@media (max-width: 860px) {
+  .col__row, .col__row--left, .col__row--right { grid-template-columns: 1fr; gap: clamp(20px, 4vw, 30px); }
+  .col__row + .col__row { margin-top: clamp(48px, 9vh, 84px); }
+  .col__row--left .col__media, .col__row--right .col__media,
+  .col__row--left .col__text, .col__row--right .col__text { grid-column: 1; }
+  .col__row--right .col__text { grid-row: 2; }        /* image first, then text */
+  /* no slant on mobile — the column is clean. NOT !important: GSAP animates the
+     wipe inline and must be able to win, ending on a rectangle (see CLIP_END_FLAT
+     in ProductTouch3.tsx). This declaration stays the base / reduced-motion state. */
+  .col__media { clip-path: none; aspect-ratio: 4 / 3; }
+  .col__mark { bottom: clamp(-40px, -7vw, -30px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .col__media img { will-change: auto; }
+}

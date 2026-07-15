@@ -1,0 +1,74 @@
+/* =================================================================
+   §7 · WHAT THE HOUSE HOLDS TO — quiet negation → resolve, then a
+   four-value grid. Light warm ground, restrained editorial.
+   ================================================================= */
+
+.hv {
+  position: relative; overflow: hidden;
+  background: var(--ivory); color: var(--oxblood);
+  padding: clamp(96px, 16vh, 200px) var(--pad);
+}
+.hv__inner { max-width: 1200px; margin-inline: auto; }
+
+.hv__eyebrow {
+  font-family: var(--ff-exp); text-transform: uppercase; letter-spacing: .3em;
+  font-size: clamp(.62rem, .8vw, .74rem); color: var(--rose-taupe);
+}
+
+/* -------- statement -------- */
+.hv__statement {
+  margin-top: clamp(24px, 4vh, 44px);
+  max-width: min(820px, 100%);
+}
+.hv__negation {
+  font-family: var(--ff-display); font-weight: 400; font-style: italic;
+  font-size: clamp(1.1rem, 2vw, 1.6rem); line-height: 1.35; color: var(--rose-taupe);
+  max-width: 20ch;
+}
+.hv__neg { display: inline-block; }
+.hv__resolve {
+  margin-top: clamp(12px, 1.8vh, 22px);
+  font-family: var(--ff-display); font-weight: 400;
+  font-size: clamp(2rem, 4.8vw, 3.8rem); line-height: 1.04; letter-spacing: -.02em;
+  color: var(--oxblood); will-change: transform, filter;
+}
+.hv__resolve-line { display: block; }
+.hv__resolve-em { font-style: italic; color: var(--oxblood-2); }
+
+/* -------- value grid -------- */
+.hv__grid {
+  margin-top: clamp(56px, 9vh, 108px);
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: clamp(28px, 3vw, 52px);
+}
+.hv__tile { position: relative; padding-top: clamp(20px, 2.4vh, 30px); }
+.hv__tile-rule {
+  position: absolute; top: 0; left: 0; width: 100%; height: 1px;
+  background: var(--oxblood); opacity: .22;
+}
+.hv__n {
+  display: block; font-family: var(--ff-exp); letter-spacing: .12em;
+  font-size: .64rem; color: var(--rose-taupe); margin-bottom: clamp(12px, 1.6vw, 18px);
+}
+.hv__title {
+  font-family: var(--ff-display); font-weight: 400;
+  font-size: clamp(1.12rem, 1.5vw, 1.45rem); line-height: 1.14; letter-spacing: -.01em;
+  color: var(--oxblood); margin-bottom: clamp(10px, 1.2vw, 14px);
+}
+.hv__body {
+  font-family: var(--ff-body); font-weight: 400;
+  font-size: clamp(.86rem, 1vw, .96rem); line-height: 1.5; color: var(--oxblood-2);
+  max-width: 32ch;
+}
+
+@media (max-width: 900px) {
+  .hv__grid { grid-template-columns: repeat(2, 1fr); gap: clamp(30px, 5vw, 46px); }
+}
+@media (max-width: 540px) {
+  .hv__grid { grid-template-columns: 1fr; }
+  .hv__statement { max-width: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hv__resolve { will-change: auto; }
+}

@@ -1,0 +1,91 @@
+/* =================================================================
+   §10 · CIRCULAR CLOSE — the valedictory bookend to §1.
+   A wide cinematic band: figure walking away into warm doorway light.
+   Dark register (ivory type on a warm-shadowed image), one Fraunces
+   line + a made-in accent held in the calm, shadowed left third.
+   Mirrors the hero's grain + scrim + line-mask reveal to close the loop.
+   ================================================================= */
+.cc {
+  position: relative;
+  min-height: clamp(560px, 82svh, 900px);
+  overflow: hidden;
+  background: var(--oxblood-deep);
+  color: var(--ivory);
+  isolation: isolate;
+  display: flex; align-items: center;
+}
+
+.cc__media { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+.cc__img {
+  position: absolute; top: -8%; left: -4%;
+  width: 108%; height: 116%; max-width: none; object-fit: cover; object-position: 62% 50%;
+  will-change: transform;
+}
+
+.cc__grain {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: .4;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+/* legibility scrim — weighted to the shadowed left third where the type sits */
+.cc__scrim {
+  position: absolute; inset: 0; z-index: 1;
+  background:
+    linear-gradient(90deg, rgba(18,4,6,.72) 0%, rgba(18,4,6,.42) 32%, transparent 62%),
+    linear-gradient(180deg, rgba(18,4,6,.34) 0%, transparent 24%),
+    linear-gradient(0deg, rgba(18,4,6,.46) 0%, transparent 30%);
+}
+
+/* the closing statement, seated in the calm left */
+.cc__inner {
+  position: relative; z-index: 3;
+  padding-inline: var(--pad);
+  display: flex; flex-direction: column; align-items: flex-start;
+  max-width: 44ch;
+}
+
+.cc__mark {
+  width: clamp(30px, 3vw, 40px); height: clamp(30px, 3vw, 40px);
+  margin-bottom: clamp(22px, 3vh, 34px);
+  background: var(--champagne);
+  -webkit-mask: url("/brand/btb-mark.png") center / contain no-repeat;
+          mask: url("/brand/btb-mark.png") center / contain no-repeat;
+  opacity: .92;
+}
+
+.cc__title {
+  margin: 0;
+  font-family: var(--ff-display); font-weight: 300; letter-spacing: -.02em;
+  font-size: clamp(2.1rem, 4.8vw, 4.1rem); line-height: 1.02; color: var(--ivory);
+}
+.cc__title .line { display: block; overflow: hidden; padding-bottom: .06em; }
+.cc__title .inner { display: block; will-change: transform; }
+
+.cc__rule {
+  height: 1px; width: clamp(64px, 8vw, 120px);
+  margin: clamp(24px, 3.4vh, 38px) 0 clamp(18px, 2.4vh, 26px);
+  background: var(--champagne); opacity: .7;
+}
+
+.cc__accent {
+  margin: 0;
+  font-family: var(--ff-exp); text-transform: uppercase;
+  letter-spacing: .28em; font-size: clamp(.58rem, .74vw, .68rem);
+  color: var(--champ-soft); line-height: 1.7; max-width: 32ch;
+}
+
+@media (max-width: 820px) {
+  .cc { min-height: 78svh; }
+  .cc__scrim {
+    background:
+      linear-gradient(90deg, rgba(18,4,6,.7) 0%, rgba(18,4,6,.4) 46%, transparent 88%),
+      linear-gradient(0deg, rgba(18,4,6,.5) 0%, transparent 34%);
+  }
+  .cc__title { font-size: clamp(2.2rem, 10vw, 3.2rem); }
+  .cc__accent { letter-spacing: .22em; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc__img { will-change: auto; }
+}

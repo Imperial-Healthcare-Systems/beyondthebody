@@ -1,0 +1,62 @@
+/* =================================================================
+   BEYOND THE BODY — Design tokens · design_system @ v0.1
+   Fonts are wired via next/font (see layout.tsx) and exposed as
+   --ff-* variables there; colour/space/motion primitives live here.
+
+   NOT a mirror of ../beyond-the-body-site/styles.css, despite what this
+   header used to claim. It is a curated SUBSET of frozen v0 plus 12
+   additions. Full delta recorded via reopen_protocol at
+   project/baselines/design_system/v0.1/. In short:
+     · every colour below marked (v0) is byte-identical to the frozen sheet
+     · tokens marked (+v0.1) do not exist in v0 — this build added them
+     · 7 v0 tokens are deliberately NOT carried: --dark --ghost --rule
+       --solid --ondark, and --him / --her (gendered tokens that contradict
+       "presence has no gender" — dropping them is the point of the redesign)
+   The live site remains the arbiter of palette/DS at the reconciliation pass.
+   ================================================================= */
+
+:root {
+  /* ---- palette (frozen v0) ---- */
+  --oxblood:      #4E212D;
+  --oxblood-2:    #3A1822;
+  --oxblood-3:    #2A1019;
+  --oxblood-deep: #1D0B12;   /* +v0.1 — not in frozen v0; the <body> ground (9 uses) */
+  --champagne:    #E2CBA6;
+  --champ-soft:   #EAD9BE;
+  --ivory:        #F5EFE4;
+  --ivory-2:      #EFE6D6;
+  --rose-taupe:   #AE8F7B;
+  --sand:         #D8C4AB;   /* +v0.1 — not in frozen v0 */
+
+  --line:         rgba(226, 203, 166, .18);  /* (v0) champagne hairline on dark */
+  --line-dark:    rgba(78, 33, 45, .14);     /* (v0) oxblood hairline on light — carried
+                                                for mirror fidelity though unused; the
+                                                light beats hand-roll rgba(78,33,45,.3) */
+
+  /* ---- type families (values assigned by next/font in layout.tsx) ---- */
+  --ff-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --ff-body:    var(--font-archivo), system-ui, -apple-system, sans-serif;
+  /* "expanded" label register comes from wide tracking + uppercase on --ff-exp */
+  --ff-exp:     var(--font-archivo), system-ui, sans-serif;
+
+  /* ---- space / rhythm ---- */
+  --pad:  clamp(20px, 5vw, 80px);
+  --maxw: 1480px;
+  --gutter: clamp(16px, 2vw, 32px);      /* +v0.1 */
+
+  /* ---- motion ---- */
+  --ease:       cubic-bezier(.22, 1, .36, 1);   /* (v0) the house easing */
+  --dur-fast:   .4s;                     /* +v0.1 */
+  --dur:        .8s;                     /* +v0.1 */
+  /* --ease-out / --ease-inout / --dur-slow were declared here and referenced by
+     nothing; removed at the v0.1 reopen rather than left as decoration. Add back
+     deliberately if a beat needs a second curve — but --ease is the house one. */
+
+  /* ---- inversion signature: page-level active theme (set by ThemeInversion) ----
+     These drive the nav + cursor + progress; each SECTION still paints its own
+     ground. Default = dark (the oxblood hero opens the page). */
+  --ui-fg:      var(--champagne);   /* nav text / cursor on current section */
+  --ui-fg-soft: var(--champ-soft);
+  --ui-muted:   var(--rose-taupe);
+  --ui-accent:  var(--champagne);
+}
