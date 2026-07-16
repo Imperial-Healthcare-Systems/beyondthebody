@@ -53,7 +53,7 @@ export default function Journal() {
           <p className="jr__eyebrow">The Journal</p>
           <h2 className="jr__headline">The things around the work.</h2>
           <p className="jr__sub">Notes on composition, provenance, and the air a scent is worn in.</p>
-          <a className="jr__cta rulelink" href="#journal">
+          <a className="jr__cta rulelink" href="/journal">
             Read
             <svg width="20" height="10" viewBox="0 0 20 10" fill="none" aria-hidden="true">
               <path d="M0 5h18M14 1l4 4-4 4" stroke="currentColor" strokeWidth="1.3" />

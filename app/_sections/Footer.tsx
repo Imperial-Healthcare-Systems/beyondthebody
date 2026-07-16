@@ -12,18 +12,38 @@
          NOTHING (big-type, wordmark, legal) is ever bisected at rest.
    Reduced-motion: no scrub, image at rest scale, everything in end-state. */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./footer.css";
 
+/* Not-yet-live links (Instagram, LinkedIn, Stockists, Press, Contact, legal). They
+   carry NO href, so they can never navigate or write "#"/"/#" into the URL — which is
+   what used to pollute the address bar and break subsequent relative resolution. The
+   default is also prevented as belt-and-suspenders, and aria-disabled marks them
+   present-but-unavailable. When a destination exists, swap these for a real href. */
+const placeholderProps = {
+  role: "link" as const,
+  "aria-disabled": true as const,
+  onClick: (e: MouseEvent) => e.preventDefault(),
+};
+const linkAttrs = (href: string) =>
+  href === "#" ? placeholderProps : { href };
+
+// Root-relative (Sprint 02, beat 0) — see Nav.tsx: bare hashes break from /journal.
+// "The Journal" is now a real page. Contact stays "#" (no page yet; placeholder).
 const MEGA = [
-  { label: "The House", href: "#origin" },
-  { label: "The Collection", href: "#collection" },
-  { label: "The Journal", href: "#journal" },
+  { label: "The House", href: "/#origin" },
+  { label: "The Collection", href: "/#collection" },
+  { label: "The Journal", href: "/journal" },
   { label: "Contact", href: "#", ext: true },
 ];
-const COLLECTION = ["Mon Amour", "Heartthrob", "Desir", "Don Amour"];
+const COLLECTION = [
+  { name: "Mon Amour", slug: "mon-amour" },
+  { name: "Heartthrob", slug: "heartthrob" },
+  { name: "Desir", slug: "desir" },
+  { name: "Don Amour", slug: "don-amour" },
+];
 const CONNECT = [
   { label: "Instagram", href: "#" },
   { label: "Stockists", href: "#" },
@@ -199,7 +219,7 @@ export default function Footer() {
               <a
                 key={l.label}
                 className={`ft__mega-link${activeNav === l.label ? " is-active" : ""}`}
-                href={l.href}
+                {...linkAttrs(l.href)}
               >
                 <span>{l.label}</span>
                 {l.ext && (
@@ -220,20 +240,20 @@ export default function Footer() {
               light, and priced to the craft, not the markup.
             </p>
             <div className="ft__social">
-              <a href="#">Instagram</a>
-              <a href="#">LinkedIn</a>
+              <a {...placeholderProps}>Instagram</a>
+              <a {...placeholderProps}>LinkedIn</a>
             </div>
           </div>
           <div className="ft__col">
             <span className="ft__ch">The Collection</span>
-            {COLLECTION.map((name) => (
-              <a key={name} className="ft__link" href="#collection">{name}</a>
+            {COLLECTION.map((p) => (
+              <a key={p.slug} className="ft__link" href={`/fragrance/${p.slug}`}>{p.name}</a>
             ))}
           </div>
           <div className="ft__col">
             <span className="ft__ch">Connect</span>
             {CONNECT.map((l) => (
-              <a key={l.label} className="ft__link" href={l.href}>{l.label}</a>
+              <a key={l.label} className="ft__link" {...linkAttrs(l.href)}>{l.label}</a>
             ))}
           </div>
         </div>
@@ -244,9 +264,9 @@ export default function Footer() {
         <span className="ft__copy">© 2026 Beyond The Body</span>
         <span className="ft__made">Built in India, with care, by Imperial Tech Innovations</span>
         <span className="ft__legal-links">
-          <a href="#">Privacy</a>
-          <a href="#">Terms</a>
-          <a href="#">Cookies</a>
+          <a {...placeholderProps}>Privacy</a>
+          <a {...placeholderProps}>Terms</a>
+          <a {...placeholderProps}>Cookies</a>
         </span>
       </div>
 

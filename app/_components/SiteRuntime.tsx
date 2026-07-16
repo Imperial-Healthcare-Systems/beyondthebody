@@ -75,14 +75,34 @@ export default function SiteRuntime() {
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
     (window as unknown as { __lenis?: Lenis }).__lenis = lenis;
+
+    // ---- cross-page hash landing (Sprint 02, beat 0) ----
+    // Arriving at /#collection from another route: the browser's native
+    // scroll-to-anchor happens while the preloader holds the scroll locked and
+    // Lenis is stopped, so it lands at the top instead. Re-run it via Lenis once
+    // scroll is actually live — after preload release if the preloader is up,
+    // else immediately (sub-routes mount no preloader). Instant, like a hash jump.
+    const initialHash = window.location.hash;
+    const landHash = () => {
+      if (initialHash.length < 2) return;
+      const target = document.querySelector(initialHash);
+      if (target) lenis.scrollTo(target as HTMLElement, { immediate: true });
+    };
+
     // The preloader mounts before this and may still be up; start held so its
     // scroll lock is honoured. Preloader calls __lenis.start() on release.
-    if (window.__btbPreloading) lenis.stop();
+    if (window.__btbPreloading) {
+      lenis.stop();
+      window.addEventListener("btb:preload-done", landHash, { once: true });
+    } else {
+      requestAnimationFrame(landHash);
+    }
 
     applyThemeFromSections();
     ScrollTrigger.refresh();
 
     return () => {
+      window.removeEventListener("btb:preload-done", landHash);
       gsap.ticker.remove(tick);
       lenis.destroy();
       // Kill ONLY what this component created. ScrollTrigger.getAll().kill()

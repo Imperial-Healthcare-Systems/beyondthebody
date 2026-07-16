@@ -1,0 +1,125 @@
+/* =================================================================
+   PDP · You may also wear — the quiet cross-sell coda.
+   Ivory ground; fixed-ratio image frames so mixed source art aligns.
+   ================================================================= */
+
+.xsell {
+  background: linear-gradient(180deg, var(--ivory) 0%, var(--ivory-2) 100%);
+  color: var(--oxblood);
+  padding: clamp(88px, 15vh, 180px) clamp(20px, 5vw, 80px) clamp(96px, 16vh, 200px);
+}
+.xsell__inner {
+  max-width: var(--maxw, 1200px);
+  margin: 0 auto;
+}
+
+/* ---- header ---- */
+.xsell__head {
+  text-align: center;
+  margin: 0 0 clamp(44px, 7vh, 84px);
+}
+.xsell__eyebrow {
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.42em;
+  font-size: clamp(0.6rem, 0.8vw, 0.7rem);
+  color: var(--rose-taupe);
+  margin: 0 0 clamp(16px, 2.4vh, 24px);
+}
+.xsell__title {
+  font-family: var(--ff-display);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1.02;
+  color: var(--oxblood);
+  margin: 0;
+}
+
+/* ---- grid ---- */
+.xsell__grid {
+  display: grid;
+  gap: clamp(24px, 4vw, 56px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 920px;
+  margin: 0 auto;
+}
+.xsell__grid[data-count="3"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: var(--maxw, 1200px);
+}
+
+/* ---- card ---- */
+.xsell__card {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.xsell__frame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--ivory-2);
+  border-radius: 2px;
+}
+.xsell__frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.xsell__card:hover .xsell__frame img,
+.xsell__card:focus-visible .xsell__frame img {
+  transform: scale(1.05);
+}
+
+.xsell__meta {
+  padding: clamp(18px, 2.6vh, 26px) 2px 0;
+}
+.xsell__name {
+  font-family: var(--ff-display);
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+  line-height: 1.1;
+  color: var(--oxblood);
+  margin: 0;
+}
+.xsell__tag {
+  font-family: var(--ff-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(0.92rem, 1.15vw, 1.05rem);
+  color: var(--oxblood-2);
+  margin: 6px 0 0;
+}
+.xsell__price {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: clamp(0.58rem, 0.74vw, 0.66rem);
+  color: var(--oxblood);
+  margin: clamp(14px, 2vh, 20px) 0 0;
+}
+.xsell__arrow {
+  display: inline-block;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.xsell__card:hover .xsell__arrow,
+.xsell__card:focus-visible .xsell__arrow {
+  transform: translate(3px, -3px);
+}
+
+/* ---------- mobile ---------- */
+@media (max-width: 720px) {
+  .xsell__grid,
+  .xsell__grid[data-count="3"] {
+    grid-template-columns: 1fr;
+    max-width: 420px;
+    gap: clamp(32px, 8vh, 48px);
+  }
+}

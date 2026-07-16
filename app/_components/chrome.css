@@ -69,10 +69,27 @@
 }
 .nav__cta:hover { transform: translateY(-2px); background: color-mix(in srgb, currentColor 12%, transparent); }
 
+/* bag — inverts with the theme via --ui-fg; count badge is an outline so it reads on
+   both grounds (champagne-on-oxblood and oxblood-on-ivory). */
+.nav__bag {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 0; cursor: pointer; color: var(--ui-fg); padding: 2px;
+}
+.nav__bag svg { display: block; transition: transform .4s var(--ease); }
+.nav__bag:hover svg { transform: translateY(-1px); }
+.nav__bagcount {
+  position: absolute; top: -4px; right: -6px;
+  min-width: 15px; height: 15px; padding: 0 3px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid currentColor; border-radius: 100px;
+  font-family: var(--ff-exp); font-size: .52rem; line-height: 1;
+}
+
 @media (max-width: 820px) {
   .nav { padding: 20px var(--pad); }
   .nav__menulabel, .nav__link { display: none; }
   .nav__cta { padding: 9px 16px; }
+  .nav__links { gap: 16px; }
 }
 @media (max-width: 520px) {
   .nav__cta { display: none; }

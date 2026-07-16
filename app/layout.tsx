@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Fraunces, Archivo } from "next/font/google";
 import "./globals.css";
 import "./_components/chrome.css";
+import { CartProvider } from "./_components/CartProvider";
+import CartDrawer from "./_components/CartDrawer";
 
 /* Frozen DS type: Fraunces (display), Archivo (body), Archivo Expanded (eyebrow/labels). */
 const fraunces = Fraunces({
@@ -38,7 +40,12 @@ export default function RootLayout({
       data-ui-theme="dark"
       className={`${fraunces.variable} ${archivo.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <CartProvider>
+          {children}
+          <CartDrawer />
+        </CartProvider>
+      </body>
     </html>
   );
 }

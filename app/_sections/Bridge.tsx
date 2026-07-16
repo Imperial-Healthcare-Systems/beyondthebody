@@ -84,7 +84,7 @@ export default function Bridge() {
             <span className="inner">— the last thing remembered.</span>
           </span>
         </h2>
-        <a className="rulelink bridge__link" href="#origin">
+        <a className="rulelink bridge__link" href="/#origin">
           Read the house
           <svg width="20" height="10" viewBox="0 0 20 10" fill="none" aria-hidden="true">
             <path d="M0 5h18M14 1l4 4-4 4" stroke="currentColor" strokeWidth="1.4" />

@@ -1,0 +1,204 @@
+/* =================================================================
+   PDP · Hero / buy panel. Ivory ground; gallery (left) scrolls, buy
+   panel (right) sticks on desktop. Shares the house palette/type.
+   ================================================================= */
+
+.pdp {
+  position: relative;
+  background: linear-gradient(180deg, var(--ivory) 0%, var(--ivory-2) 100%);
+  color: var(--oxblood);
+  padding: clamp(120px, 17vh, 190px) clamp(20px, 5vw, 80px) clamp(72px, 11vh, 150px);
+}
+.pdp__wrap {
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+.pdp__crumb {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.6rem;
+  color: var(--rose-taupe);
+  margin-bottom: clamp(30px, 5vh, 56px);
+}
+.pdp__crumb a {
+  color: inherit;
+}
+.pdp__crumb a:hover {
+  color: var(--oxblood);
+}
+
+/* two columns, top-aligned. (No sticky panel: the gallery isn't tall enough to give one
+   real range, and the page is built from full-width section bands, so a buy panel can't
+   follow past the hero. A slim sticky add-to-bag bar can be added later if wanted.) */
+.pdp__hero {
+  display: grid;
+  grid-template-columns: 1.06fr 0.94fr;
+  gap: clamp(32px, 5vw, 96px);
+  align-items: start;
+}
+
+/* gallery — one main image + a thumbnail strip. Centred + capped so a tall portrait
+   render stays a "little" shorter and the column reads deliberate, not oversized. */
+.pdp__gallery {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(14px, 1.6vw, 20px);
+}
+.pdp__main {
+  position: relative;
+  margin: 0;
+  width: 100%;
+  max-width: 520px;
+  aspect-ratio: 4 / 5; /* fallback; PdpHero sets each image's real ratio inline */
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--sand);
+  box-shadow: 0 50px 90px -40px rgba(78, 33, 45, 0.32);
+}
+.pdp__main img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  will-change: transform;
+  animation: pdpFade 0.55s var(--ease);
+}
+@keyframes pdpFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.pdp__thumbs {
+  display: flex;
+  gap: clamp(10px, 1vw, 14px);
+  width: 100%;
+  max-width: 520px;
+}
+.pdp__thumb {
+  width: clamp(64px, 6vw, 86px);
+  aspect-ratio: 3 / 4;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: var(--sand);
+  cursor: pointer;
+  opacity: 0.58;
+  transition: opacity 0.4s var(--ease), border-color 0.4s var(--ease);
+}
+.pdp__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.pdp__thumb:hover {
+  opacity: 0.85;
+}
+.pdp__thumb.is-active {
+  opacity: 1;
+  border-color: var(--oxblood);
+}
+
+/* buy panel — sticky on desktop. Robust by construction: the grid is `align-items:
+   start` and this item is `align-self: start`, so it is never stretched to the row
+   height (which would leave nothing to travel). It sticks whenever the gallery column
+   is taller — true for any normal render — and simply scrolls (never overlaps/jumps)
+   when it isn't, so a shorter or extra admin-added image can't break it. The real
+   historical culprit was `body { overflow-x: hidden }`; that's now `clip`. */
+.pdp__buy {
+  position: sticky;
+  top: clamp(96px, 12vh, 132px);
+  align-self: start;
+}
+.pdp__buyinner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.pdp__eyebrow {
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: clamp(0.6rem, 0.8vw, 0.7rem);
+  color: var(--rose-taupe);
+  margin: 0 0 clamp(16px, 2.4vh, 22px);
+}
+.pdp__name {
+  font-family: var(--ff-display);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  font-size: clamp(2.6rem, 5vw, 4rem);
+  line-height: 1;
+  color: var(--oxblood);
+  margin: 0;
+}
+.pdp__tag {
+  font-family: var(--ff-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.1rem, 1.7vw, 1.45rem);
+  color: var(--oxblood-2);
+  margin: 12px 0 clamp(30px, 4.4vh, 42px);
+}
+
+/* AddToBag sits here; give it room, then the spec list */
+.pdp__buyinner .buy {
+  width: 100%;
+}
+.pdp__spec {
+  list-style: none;
+  margin: clamp(28px, 4vh, 40px) 0 0;
+  padding: clamp(24px, 3.4vh, 34px) 0 0;
+  border-top: 1px solid rgba(78, 33, 45, 0.16);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: clamp(0.58rem, 0.74vw, 0.66rem);
+  color: var(--oxblood-2);
+}
+.pdp__spec li {
+  position: relative;
+  padding-left: 18px;
+}
+.pdp__spec li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 6px;
+  height: 1px;
+  background: var(--rose-taupe);
+}
+
+/* ---------- mobile ---------- */
+@media (max-width: 860px) {
+  .pdp__hero {
+    grid-template-columns: 1fr;
+    gap: clamp(30px, 6vh, 44px);
+  }
+  .pdp__buy {
+    position: static; /* single column — nothing to stick against */
+  }
+  .pdp__main,
+  .pdp__thumbs {
+    max-width: none; /* let the image use the full column on small screens */
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pdp__frame img {
+    will-change: auto;
+  }
+}

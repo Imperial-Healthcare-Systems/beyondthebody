@@ -14,6 +14,7 @@ import "./product3.css";
 
 type Signature = {
   no: string;
+  slug: string; // → /fragrance/[slug]; must match products-data slugs
   name: string;
   tag: string;
   profile: string;
@@ -24,6 +25,7 @@ type Signature = {
 const COLLECTION: Signature[] = [
   {
     no: "01",
+    slug: "mon-amour",
     name: "Mon Amour",
     tag: "Love, remembered.",
     profile: "Pear Blossom · Red Berries · Italian Mandarin · Gardenia · Jasmine · Frangipani · Brown Sugar · Patchouli",
@@ -32,6 +34,7 @@ const COLLECTION: Signature[] = [
   },
   {
     no: "02",
+    slug: "heartthrob",
     name: "Heartthrob",
     tag: "Magnetism, refined.",
     profile: "Bergamot · Lemon Zest · Artemisia · Mint · Lavender · Pineapple · Green Notes · Geranium · Sandalwood · Tonka Bean · Cedar · Iso E Super · Amberwood",
@@ -40,6 +43,7 @@ const COLLECTION: Signature[] = [
   },
   {
     no: "03",
+    slug: "desir",
     name: "Desir",
     tag: "Desire, distilled.",
     profile: "Pear · Pink Pepper · Orange Blossom · Coffee · Jasmine · Bitter Almond · Cedar · Vanilla · Cashmere Wood · Patchouli",
@@ -48,6 +52,7 @@ const COLLECTION: Signature[] = [
   },
   {
     no: "04",
+    slug: "don-amour",
     name: "Don Amour",
     tag: "A love worn in silence.",
     profile: "Ambroxan · Bergamot · Orris Root · Jasmine · Woody Notes · Amber · Musk · Cashalox · Patchouli",
@@ -134,7 +139,7 @@ export default function ProductTouch3() {
               <p className="col__tag">{p.tag}</p>
               <span className="col__plabel">Scent Profile</span>
               <p className="col__profile">{p.profile}</p>
-              <a className="col__discover rulelink" href={`#${p.name.toLowerCase().replace(/\s+/g, "-")}`}>
+              <a className="col__discover rulelink" href={`/fragrance/${p.slug}`}>
                 Discover
                 <svg width="20" height="10" viewBox="0 0 20 10" fill="none" aria-hidden="true">
                   <path d="M0 5h18M14 1l4 4-4 4" stroke="currentColor" strokeWidth="1.3" />

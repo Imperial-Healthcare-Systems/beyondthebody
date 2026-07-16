@@ -17,13 +17,16 @@ const OUT = resolve(__dirname, "../../working/V/screenshots");
 const base = "http://localhost:3000";
 const args = process.argv.slice(2);
 const home = args.includes("--home");
+const journal = args.includes("--journal");   // the /journal index (Sprint 02)
+const fragrance = args.includes("--fragrance"); // a /fragrance/<slug> PDP (Sprint 03)
 const key = args.find((a) => !a.startsWith("--"));
-if (!home && !key) {
-  console.error("usage: node scripts/shoot-through.mjs <beatKey> | --home");
+if (!home && !journal && !fragrance && !key) {
+  console.error("usage: node scripts/shoot-through.mjs <beatKey> | --home | --journal | --fragrance <slug>");
   process.exit(2);
 }
-const route = home ? "/" : `/preview/${key}`;
-const name = home ? "home-through" : key;
+const slug = fragrance ? key || "don-amour" : null;
+const route = fragrance ? `/fragrance/${slug}` : journal ? "/journal" : home ? "/" : `/preview/${key}`;
+const name = fragrance ? `fragrance-${slug}` : journal ? "journal-index" : home ? "home-through" : key;
 
 await mkdir(OUT, { recursive: true });
 const browser = await chromium.launch();
@@ -35,7 +38,9 @@ const browser = await chromium.launch();
 // per-beat shots stay at 2 since they're short. checkTruncation() below asserts
 // this rather than trusting it.
 const MAX_DEVICE_PX = 16384;
-const dsf = home ? 1 : 2;
+// Whole-page routes (home, /journal) go at dSF 1 — the tall footer reveal pushes
+// them past Chromium's 16384 device-px cap at dSF 2. Short per-beat previews stay at 2.
+const dsf = home || journal || fragrance ? 1 : 2;
 
 const shots = [
   { label: "desktop", width: 1440, height: 900 },

@@ -1,0 +1,223 @@
+/* Cart drawer — slides in from the right. Mirrors the menu drawer's motion so the two
+   feel of one house. Ivory panel, oxblood ink. */
+
+.cart {
+  position: fixed;
+  inset: 0;
+  z-index: 210; /* above nav (100) and menu drawer (200) */
+  visibility: hidden;
+  pointer-events: none;
+}
+.cart.is-open {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.cart__scrim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: rgba(18, 4, 6, 0.5);
+  opacity: 0;
+  transition: opacity 0.5s var(--ease);
+  cursor: pointer;
+}
+.cart.is-open .cart__scrim {
+  opacity: 1;
+}
+
+.cart__panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(92vw, 428px);
+  display: flex;
+  flex-direction: column;
+  background: var(--ivory);
+  color: var(--oxblood);
+  transform: translateX(100%);
+  transition: transform 0.6s var(--ease);
+  box-shadow: -40px 0 90px -40px rgba(29, 11, 18, 0.5);
+}
+.cart.is-open .cart__panel {
+  transform: translateX(0);
+}
+
+.cart__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(22px, 3vh, 32px) clamp(22px, 3vw, 34px);
+  border-bottom: 1px solid rgba(78, 33, 45, 0.14);
+}
+.cart__title {
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: 0.72rem;
+}
+.cart__close {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.cart__close span {
+  position: absolute;
+  left: 3px;
+  top: 12px;
+  width: 20px;
+  height: 1.5px;
+  background: var(--oxblood);
+}
+.cart__close span:first-child {
+  transform: rotate(45deg);
+}
+.cart__close span:last-child {
+  transform: rotate(-45deg);
+}
+
+/* empty state */
+.cart__empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px;
+  text-align: center;
+}
+.cart__empty p {
+  margin: 0;
+  font-family: var(--ff-display);
+  font-weight: 300;
+  font-size: 1.4rem;
+}
+.cart__emptysub {
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: 0.6rem;
+  color: var(--rose-taupe);
+}
+
+/* line items */
+.cart__list {
+  flex: 1;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: clamp(8px, 1.5vh, 16px) clamp(22px, 3vw, 34px);
+}
+.cart__item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: clamp(18px, 2.4vh, 24px) 0;
+  border-bottom: 1px solid rgba(78, 33, 45, 0.12);
+}
+.cart__itemhead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.cart__name {
+  font-family: var(--ff-display);
+  font-weight: 300;
+  font-size: 1.2rem;
+}
+.cart__remove {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--ff-body);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--rose-taupe);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.cart__remove:hover {
+  color: var(--oxblood);
+}
+.cart__size {
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.58rem;
+  color: var(--rose-taupe);
+}
+.cart__itemfoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+.cart__qty {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(78, 33, 45, 0.2);
+  border-radius: 2px;
+}
+.cart__qty button {
+  width: 30px;
+  height: 32px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--oxblood);
+}
+.cart__qty span {
+  min-width: 20px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+.cart__price {
+  font-family: var(--ff-body);
+  font-size: 0.95rem;
+}
+
+/* footer */
+.cart__foot {
+  padding: clamp(20px, 3vh, 30px) clamp(22px, 3vw, 34px) clamp(24px, 3.4vh, 34px);
+  border-top: 1px solid rgba(78, 33, 45, 0.14);
+}
+.cart__subtotal {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  font-family: var(--ff-display);
+  font-weight: 300;
+  font-size: 1.15rem;
+}
+.cart__checkout {
+  width: 100%;
+  padding: 16px;
+  background: var(--oxblood);
+  color: var(--ivory);
+  border: 0;
+  border-radius: 2px;
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.68rem;
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.cart__note {
+  margin: 12px 0 0;
+  text-align: center;
+  font-family: var(--ff-body);
+  font-size: 0.72rem;
+  color: var(--rose-taupe);
+}

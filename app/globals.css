@@ -17,7 +17,10 @@ body {
   background: var(--oxblood-deep);
   color: var(--ivory);
   line-height: 1.5;
-  overflow-x: hidden;
+  /* clip (not hidden): clips horizontal overflow WITHOUT making <body> a scroll
+     container — `overflow-x: hidden` forces overflow-y to `auto`, which silently
+     breaks every `position: sticky` descendant (e.g. the PDP buy panel). */
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-synthesis: none;
