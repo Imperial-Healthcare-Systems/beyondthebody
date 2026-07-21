@@ -1,14 +1,29 @@
-/* Buy control — restrained editorial ecommerce. Sits on a light (ivory) buy panel;
-   colours resolve from --oxblood ink so it can move to a dark panel by overriding
-   --buy-fg / --buy-line on an ancestor if needed. */
+/* Buy control — restrained editorial ecommerce.
+   This is NOT chrome: it renders inside <section class="pdp" data-theme="light">
+   (PdpHero.tsx), so it paints from the SECTION tokens (--ink / --accent /
+   --accent-ink) and inherits that section's ground in whichever scheme is active.
+   The local --buy-* vars are kept — they are used repeatedly — but every value is
+   now derived from a token, so an ancestor can still retint the whole control. */
 
 .buy {
-  --buy-fg: var(--oxblood);
-  --buy-line: rgba(78, 33, 45, 0.22);
+  --buy-fg: var(--ink);
+  /* was rgba(78,33,45,.22); --hairline is .16 and --hairline-2 is .30, so neither
+     preserves the light weight. Mixing the ink at the original 22% resolves to
+     exactly rgba(78,33,45,.22) on ivory and to bone/22% on a night ground. */
+  --buy-line: color-mix(in srgb, var(--ink) 22%, transparent);
+  /* inactive size label; lifted slightly on night, where the ink is already softer */
+  --buy-dim: 0.62;
+  /* the CTA's hover fill — one step deeper than --accent in light, one step brighter
+     in dark (champagne darkening on night would collide with --accent-ink) */
+  --buy-cta-hover: var(--oxblood-2);
   display: flex;
   flex-direction: column;
   gap: clamp(18px, 2.4vh, 26px);
   color: var(--buy-fg);
+}
+:root[data-scheme="dark"] .buy {
+  --buy-dim: 0.72;
+  --buy-cta-hover: var(--champ-soft);
 }
 
 .buy__price {
@@ -40,15 +55,15 @@
   letter-spacing: 0.16em;
   font-size: clamp(0.6rem, 0.78vw, 0.7rem);
   color: var(--buy-fg);
-  opacity: 0.62;
+  opacity: var(--buy-dim);
   transition: background 0.4s var(--ease), opacity 0.4s var(--ease);
 }
 .buy__size + .buy__size {
   border-left: 1px solid var(--buy-line);
 }
 .buy__size.is-active {
-  background: var(--oxblood);
-  color: var(--ivory);
+  background: var(--accent);
+  color: var(--accent-ink);
   opacity: 1;
 }
 
@@ -99,8 +114,8 @@
   justify-content: center;
   gap: 12px;
   padding: clamp(13px, 1.6vw, 17px) clamp(22px, 2.4vw, 30px);
-  background: var(--oxblood);
-  color: var(--ivory);
+  background: var(--accent);
+  color: var(--accent-ink);
   border: 0;
   border-radius: 2px;
   font-family: var(--ff-exp);
@@ -110,7 +125,7 @@
   transition: background 0.5s var(--ease), transform 0.5s var(--ease);
 }
 .buy__add:hover {
-  background: var(--oxblood-2);
+  background: var(--buy-cta-hover);
 }
 .buy__add svg {
   transition: transform 0.5s var(--ease);

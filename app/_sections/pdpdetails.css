@@ -3,10 +3,17 @@
    Two columns: label + "how it wears" note (left) · ruled spec rows (right).
    ================================================================= */
 
+/* --sand is a PRIMITIVE and deliberately not --ground: this band is warmer and a step
+   deeper than the ivory beats either side of it, and no light semantic equals #D8C4AB.
+   The literal is kept so the light scheme is byte-identical; on the night ramp the same
+   "a step up from the beats around it" role is carried by --ground-3. */
 .det {
   background: var(--sand);
-  color: var(--oxblood);
+  color: var(--ink);
   padding: clamp(88px, 15vh, 190px) clamp(20px, 5vw, 80px);
+}
+:root[data-scheme="dark"] .det {
+  background: var(--ground-3);
 }
 .det__inner {
   max-width: var(--maxw, 1200px);
@@ -27,7 +34,7 @@
   text-transform: uppercase;
   letter-spacing: 0.42em;
   font-size: clamp(0.6rem, 0.8vw, 0.7rem);
-  color: var(--rose-taupe);
+  color: var(--ink-muted);
   margin: 0 0 clamp(20px, 3vh, 30px);
 }
 .det__title {
@@ -36,7 +43,7 @@
   letter-spacing: -0.02em;
   font-size: clamp(2rem, 4vw, 3.2rem);
   line-height: 1.02;
-  color: var(--oxblood);
+  color: var(--ink);
   margin: 0;
 }
 .det__wear {
@@ -44,7 +51,7 @@
   font-weight: 400;
   font-size: clamp(0.92rem, 1.1vw, 1.02rem);
   line-height: 1.85;
-  color: var(--oxblood-2);
+  color: var(--ink-2);
   margin: clamp(26px, 3.6vh, 38px) 0 0;
   max-width: 34ch;
   text-wrap: pretty;
@@ -53,7 +60,7 @@
 /* ---- spec rows (right) ---- */
 .det__list {
   margin: 0;
-  border-top: 1px solid rgba(78, 33, 45, 0.16);
+  border-top: 1px solid var(--hairline);
 }
 .det__row {
   display: grid;
@@ -61,7 +68,7 @@
   gap: clamp(16px, 3vw, 44px);
   align-items: baseline;
   padding: clamp(20px, 3vh, 30px) 0;
-  border-bottom: 1px solid rgba(78, 33, 45, 0.16);
+  border-bottom: 1px solid var(--hairline);
   margin: 0;
 }
 .det__label {
@@ -69,7 +76,7 @@
   text-transform: uppercase;
   letter-spacing: 0.24em;
   font-size: clamp(0.56rem, 0.72vw, 0.64rem);
-  color: var(--rose-taupe);
+  color: var(--ink-muted);
   margin: 0;
 }
 .det__value {
@@ -78,7 +85,7 @@
   letter-spacing: -0.01em;
   font-size: clamp(1.15rem, 1.7vw, 1.55rem);
   line-height: 1.4;
-  color: var(--oxblood-2);
+  color: var(--ink-2);
   margin: 0;
   text-wrap: pretty;
 }

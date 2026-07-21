@@ -3,8 +3,8 @@
    ================================================================= */
 
 .story {
-  background: linear-gradient(180deg, var(--ivory) 0%, var(--ivory-2) 100%);
-  color: var(--oxblood);
+  background: linear-gradient(180deg, var(--ground) 0%, var(--ground-2) 100%);
+  color: var(--ink);
   padding: clamp(100px, 17vh, 210px) clamp(20px, 5vw, 80px);
 }
 .story__inner {
@@ -17,7 +17,7 @@
   text-transform: uppercase;
   letter-spacing: 0.42em;
   font-size: clamp(0.6rem, 0.8vw, 0.7rem);
-  color: var(--rose-taupe);
+  color: var(--ink-muted);
   margin: 0 0 clamp(32px, 5vh, 52px);
 }
 .story__body {
@@ -26,7 +26,7 @@
   letter-spacing: -0.01em;
   font-size: clamp(1.4rem, 2.5vw, 2.05rem);
   line-height: 1.5;
-  color: var(--oxblood-2);
+  color: var(--ink-2);
   margin: 0;
   text-wrap: pretty;
 }
@@ -39,5 +39,5 @@
   font-style: italic;
   font-weight: 300;
   font-size: clamp(1.05rem, 1.6vw, 1.35rem);
-  color: var(--oxblood);
+  color: var(--ink);
 }

@@ -6,6 +6,73 @@
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* Chrome that lives OUTSIDE any [data-theme] section — nav, drawer, cart,
+   preloader, cursor, <body> itself — still needs the semantic contract. Seed
+   it at :root from the "dark beat" values, which is what the body ground has
+   always been. Any section then shadows these for its own subtree.
+   NB: this must come AFTER tokens.css so it can reference the night ramp, and
+   it is written at plain :root so the `:root[data-scheme]` blocks below win. */
+:root {
+  --ground:       var(--oxblood-deep);
+  --ground-rgb:   29 11 18;      /* = --oxblood-deep */
+  --ground-2:     var(--oxblood-3);
+  --ground-3:     var(--oxblood-2);
+  --ink:          var(--ivory);
+  --ink-2:        rgb(245 239 228 / .82);
+  --ink-muted:    var(--rose-taupe);
+  --accent:       var(--champagne);
+  --accent-ink:   var(--oxblood);
+  --hairline:     rgb(226 203 166 / .18);
+  --hairline-2:   rgb(226 203 166 / .34);
+  --shadow:       rgb(29 11 18 / .50);
+  --shadow-2:     rgb(29 11 18 / .42);
+  --rim:          inset 0 1px 0 rgb(226 203 166 / .08);
+  --scrim:        18 4 6;
+  --bloom:        226 203 166;
+  --film-blend:     overlay;
+  --film-blend-mul: multiply;
+  --film-op:      1;
+  --grade-blend:  multiply;
+  --img-dim:      1;
+  --img-sat:      1;
+
+  /* the two surfaces the site chrome paints — a drawer/cart panel is an ivory
+     card in the light scheme and a lifted night panel in the dark one */
+  --panel:        var(--ivory);
+  --panel-ink:    var(--oxblood);
+  --panel-ink-2:  var(--oxblood-2);
+  --panel-line:   rgb(78 33 45 / .16);
+  --overlay-scrim: rgb(18 4 6 / .5);
+}
+:root[data-scheme="dark"] {
+  --ground:       var(--night-0);
+  --ground-rgb:   13 7 6;        /* = --night-0 */
+  --ground-2:     var(--night-1);
+  --ground-3:     var(--night-2);
+  --ink:          var(--bone-bright);
+  --ink-2:        rgb(239 228 212 / .78);
+  --hairline:     rgb(226 203 166 / .12);
+  --hairline-2:   rgb(226 203 166 / .24);
+  --shadow:       rgb(5 3 2 / .7);
+  --shadow-2:     rgb(5 3 2 / .55);
+  --rim:          inset 0 1px 0 rgb(239 228 212 / .06);
+  --scrim:        7 4 3;
+  --film-blend:     soft-light;
+  --film-blend-mul: screen;
+  --film-op:      .5;
+  --grade-blend:  screen;
+  --img-dim:      .82;
+  --img-sat:      .92;
+
+  --panel:        var(--night-2);
+  --panel-ink:    var(--bone);
+  --panel-ink-2:  var(--champ-soft);
+  --panel-line:   rgb(226 203 166 / .14);
+  /* a heavier scrim on night: a .5 veil over an already-dark page reads as
+     "nothing happened", so the modal state needs to actually recede */
+  --overlay-scrim: rgb(5 3 2 / .72);
+}
+
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
@@ -14,8 +81,8 @@ html {
 
 body {
   font-family: var(--ff-body);
-  background: var(--oxblood-deep);
-  color: var(--ivory);
+  background: var(--ground);
+  color: var(--ink);
   line-height: 1.5;
   /* clip (not hidden): clips horizontal overflow WITHOUT making <body> a scroll
      container — `overflow-x: hidden` forces overflow-y to `auto`, which silently
@@ -30,7 +97,7 @@ body {
 img, picture, video, canvas { max-width: 100%; display: block; }
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
-::selection { background: var(--champagne); color: var(--oxblood); }
+::selection { background: var(--accent); color: var(--accent-ink); }
 
 h1, h2, h3 {
   font-family: var(--ff-display);
@@ -63,8 +130,8 @@ h1, h2, h3 {
               color .4s var(--ease), box-shadow .5s var(--ease), border-color .4s var(--ease);
   position: relative; overflow: hidden;
 }
-.btn--solid { background: var(--champagne); color: var(--oxblood); }
-.btn--solid:hover { transform: translateY(-3px); box-shadow: 0 18px 40px -16px rgba(226,203,166,.55); }
+.btn--solid { background: var(--accent); color: var(--accent-ink); }
+.btn--solid:hover { transform: translateY(-3px); box-shadow: 0 18px 40px -16px rgb(var(--bloom) / .55); }
 .btn--ghost { border: 1px solid currentColor; color: var(--ui-fg-soft); }
 .btn--ghost:hover { transform: translateY(-3px); background: color-mix(in srgb, currentColor 8%, transparent); }
 

@@ -1,6 +1,7 @@
 /* =================================================================
    PDP · The Blueprint — the "why 25% Eau de Parfum" + Value tail.
-   Dark oxblood ground. A distinction pull-quote, then a 3-up points
+   data-theme="dark" ground (oxblood in the light scheme, the DEEPEST night
+   register in the dark one). A distinction pull-quote, then a 3-up points
    grid, then a 2-up value grid, hairline-ruled. Denser register than
    the editorial top, held restrained by space + type discipline.
    ================================================================= */
@@ -8,8 +9,8 @@
 .bp {
   position: relative;
   isolation: isolate;
-  background: var(--oxblood-deep); /* fallback + reduced-motion ground */
-  color: var(--ivory);
+  background: var(--ground); /* fallback + reduced-motion ground */
+  color: var(--ink);
   padding: clamp(92px, 16vh, 200px) clamp(20px, 5vw, 80px);
   overflow: hidden;
 }
@@ -27,9 +28,9 @@
   z-index: 1;
   background: linear-gradient(
       100deg,
-      rgba(20, 5, 8, 0.72) 0%,
-      rgba(20, 5, 8, 0.5) 42%,
-      rgba(20, 5, 8, 0.42) 100%
+      rgb(var(--scrim) / 0.72) 0%,
+      rgb(var(--scrim) / 0.5) 42%,
+      rgb(var(--scrim) / 0.42) 100%
     );
   pointer-events: none;
 }
@@ -49,7 +50,7 @@
   text-transform: uppercase;
   letter-spacing: 0.42em;
   font-size: clamp(0.6rem, 0.8vw, 0.7rem);
-  color: var(--champagne);
+  color: var(--accent);
   margin: 0 0 clamp(20px, 3vh, 30px);
 }
 .bp__title {
@@ -68,6 +69,8 @@
   font-size: clamp(1.25rem, 2.3vw, 1.9rem);
   line-height: 1.5;
   letter-spacing: -0.01em;
+  /* deliberate primitive: no semantic equals --champ-soft, and the accent register on
+     every dark ground (both schemes) is champagne, so it stays correct either way. */
   color: var(--champ-soft);
   max-width: 26ch;
   margin: clamp(40px, 6vh, 76px) 0 clamp(56px, 8vh, 104px);
@@ -81,7 +84,11 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(28px, 4vw, 64px);
-  border-top: 1px solid var(--line-dark, rgba(226, 203, 166, 0.22));
+  /* BUGFIX (dark-mode migration): was `var(--line-dark, rgba(226,203,166,.22))`.
+     --line-dark IS defined — rgba(78,33,45,.14), the OXBLOOD hairline meant for LIGHT
+     grounds — so the champagne fallback never applied and this rule was near-invisible
+     on this dark beat. --hairline resolves per register and is the correct token. */
+  border-top: 1px solid var(--hairline);
   padding-top: clamp(40px, 5vh, 64px);
 }
 .bp__pointlabel {
@@ -89,7 +96,7 @@
   text-transform: uppercase;
   letter-spacing: 0.24em;
   font-size: clamp(0.62rem, 0.82vw, 0.72rem);
-  color: var(--champagne);
+  color: var(--accent);
   margin: 0 0 clamp(16px, 2.2vh, 22px);
 }
 .bp__pointbody {
@@ -97,7 +104,7 @@
   font-weight: 400;
   font-size: clamp(0.92rem, 1.1vw, 1.02rem);
   line-height: 1.8;
-  color: rgba(245, 239, 228, 0.82);
+  color: var(--ink-2);
   margin: 0;
   text-wrap: pretty;
 }
@@ -111,14 +118,14 @@
   text-transform: uppercase;
   letter-spacing: 0.42em;
   font-size: clamp(0.6rem, 0.8vw, 0.7rem);
-  color: var(--rose-taupe);
+  color: var(--ink-muted);
   margin: 0 0 clamp(28px, 4vh, 44px);
 }
 .bp__valuegrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(28px, 5vw, 88px);
-  border-top: 1px solid var(--line-dark, rgba(226, 203, 166, 0.22));
+  border-top: 1px solid var(--hairline); /* same --line-dark bugfix as .bp__grid above */
   padding-top: clamp(36px, 5vh, 56px);
   max-width: 72ch;
 }

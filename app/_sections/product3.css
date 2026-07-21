@@ -4,11 +4,18 @@
    Light register (ivory). Order: Mon Amour · Heartthrob · Desir · Don Amour.
    No section header/footer — the global nav carries "THE COLLECTION"
    and "JOIN THE HOUSE" (1:1 with the supplied reference).
+
+   Dark scheme: data-theme="light", so this beat stays one of the page's
+   "open" ones — the LIFTED register rather than ivory. The catalogue renders
+   are high-key (pale sky, white blossom, champagne highlights) and would
+   glare against night, so the media img carries the --img-dim/--img-sat
+   grade. Safe here: ProductTouch3.tsx tweens only clipPath/scale, never
+   filter.
    ================================================================= */
 
 .col {
   position: relative; overflow: hidden;
-  background: var(--ivory); color: var(--oxblood);
+  background: var(--ground); color: var(--ink);
   padding: clamp(74px, 11vh, 150px) clamp(20px, 5vw, 80px) clamp(70px, 10vh, 140px);
 }
 
@@ -32,50 +39,60 @@
 /* slanted media (parallelogram) */
 .col__media {
   position: relative; margin: 0; aspect-ratio: 16 / 10; overflow: hidden;
-  background: var(--ivory-2);
-  box-shadow: 0 40px 80px -30px rgba(78, 33, 45, .28);
+  background: var(--ground-2);
+  box-shadow: 0 40px 80px -30px var(--shadow-2), var(--rim);
 }
 .col__row--left  .col__media { clip-path: polygon(0 0, 100% 0, 86% 100%, 0 100%); }
 .col__row--right .col__media { clip-path: polygon(14% 0, 100% 0, 100% 100%, 0 100%); }
 .col__media img {
   position: absolute; inset: -6% 0; width: 100%; height: 112%;
   object-fit: cover; object-position: center; will-change: transform;
+  filter: brightness(var(--img-dim)) saturate(var(--img-sat));
 }
 
 /* text block */
 .col__text { display: flex; flex-direction: column; align-items: flex-start; }
 .col__no {
   font-family: var(--ff-exp); text-transform: uppercase; letter-spacing: .3em;
-  font-size: clamp(.58rem, .74vw, .68rem); color: var(--rose-taupe);
+  font-size: clamp(.58rem, .74vw, .68rem); color: var(--ink-muted);
 }
-.col__rule { width: 46px; height: 1px; background: rgba(78, 33, 45, .3); margin: clamp(14px, 1.6vw, 20px) 0 clamp(18px, 2vw, 26px); }
+.col__rule { width: 46px; height: 1px; background: var(--hairline-2); margin: clamp(14px, 1.6vw, 20px) 0 clamp(18px, 2vw, 26px); }
 .col__name {
   font-family: var(--ff-display); font-weight: 400; letter-spacing: -.015em;
-  font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 1.02; color: var(--oxblood); margin: 0;
+  font-size: clamp(1.9rem, 3vw, 2.7rem); line-height: 1.02; color: var(--ink); margin: 0;
 }
 .col__tag {
   margin: clamp(8px, 1vw, 12px) 0 clamp(22px, 2.6vw, 34px);
-  font-family: var(--ff-body); font-size: clamp(.92rem, 1.15vw, 1.05rem); color: var(--oxblood-2);
+  font-family: var(--ff-body); font-size: clamp(.92rem, 1.15vw, 1.05rem); color: var(--ink-2);
 }
 .col__plabel {
   font-family: var(--ff-exp); text-transform: uppercase; letter-spacing: .26em;
-  font-size: clamp(.52rem, .66vw, .6rem); color: var(--rose-taupe); margin-bottom: clamp(10px, 1.2vw, 14px);
+  font-size: clamp(.52rem, .66vw, .6rem); color: var(--ink-muted); margin-bottom: clamp(10px, 1.2vw, 14px);
 }
 .col__profile {
   margin: 0 0 clamp(22px, 2.6vw, 34px); max-width: 32ch;
-  font-family: var(--ff-body); font-size: clamp(.82rem, 1vw, .92rem); line-height: 1.75; color: rgba(78, 33, 45, .82);
+  font-family: var(--ff-body); font-size: clamp(.82rem, 1vw, .92rem); line-height: 1.75;
+  /* was the literal rgba(78,33,45,.82). --ink-2 is a SOLID (oxblood-2) and would
+     have darkened this body copy, so the alpha is preserved against --ink
+     instead: in the light scheme --ink is #4E212D, so this resolves back to
+     exactly rgba(78,33,45,.82); on night it becomes bone at the same 82%. */
+  color: color-mix(in srgb, var(--ink) 82%, transparent);
 }
-.col__discover { color: var(--oxblood); }
+.col__discover { color: var(--ink); }
 
 /* ⚥ roundel at each seam */
 .col__mark {
   position: absolute; bottom: clamp(-26px, -2.4vw, -42px); left: 50%; transform: translateX(-50%);
   z-index: 5; width: clamp(56px, 5.4vw, 74px); aspect-ratio: 1; border-radius: 50%;
-  background: var(--ivory); border: 1px solid rgba(78, 33, 45, .24);
-  display: grid; place-items: center; box-shadow: 0 12px 30px -12px rgba(78, 33, 45, .3);
+  background: var(--ground); border: 1px solid color-mix(in srgb, var(--ink) 24%, transparent);
+  display: grid; place-items: center;
+  /* .30 matches no hairline/shadow token exactly, so the drop stays a literal
+     (harmless on night — a faint warm halo) and the rim is appended to carry
+     the roundel's depth once the shadow stops reading. */
+  box-shadow: 0 12px 30px -12px rgba(78, 33, 45, .3), var(--rim);
 }
 .col__glyph {
-  width: 46%; aspect-ratio: 1; background-color: var(--oxblood); opacity: .9;
+  width: 46%; aspect-ratio: 1; background-color: var(--ink); opacity: .9;
   -webkit-mask: url("/brand/btb-mark.png") center / contain no-repeat;
           mask: url("/brand/btb-mark.png") center / contain no-repeat;
 }

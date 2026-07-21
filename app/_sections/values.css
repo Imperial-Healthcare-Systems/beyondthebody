@@ -3,16 +3,20 @@
    four-value grid. Light warm ground, restrained editorial.
    ================================================================= */
 
+/* No colour literals here — the section paints entirely through semantics, so it
+   follows the scheme without a single override. NOTE: Values.tsx tweens
+   `filter: blur()` on .hv__resolve via GSAP, so no CSS `filter` is declared on
+   that element (an inline GSAP filter would fight it). */
 .hv {
   position: relative; overflow: hidden;
-  background: var(--ivory); color: var(--oxblood);
+  background: var(--ground); color: var(--ink);
   padding: clamp(96px, 16vh, 200px) var(--pad);
 }
 .hv__inner { max-width: 1200px; margin-inline: auto; }
 
 .hv__eyebrow {
   font-family: var(--ff-exp); text-transform: uppercase; letter-spacing: .3em;
-  font-size: clamp(.62rem, .8vw, .74rem); color: var(--rose-taupe);
+  font-size: clamp(.62rem, .8vw, .74rem); color: var(--ink-muted);
 }
 
 /* -------- statement -------- */
@@ -22,7 +26,7 @@
 }
 .hv__negation {
   font-family: var(--ff-display); font-weight: 400; font-style: italic;
-  font-size: clamp(1.1rem, 2vw, 1.6rem); line-height: 1.35; color: var(--rose-taupe);
+  font-size: clamp(1.1rem, 2vw, 1.6rem); line-height: 1.35; color: var(--ink-muted);
   max-width: 20ch;
 }
 .hv__neg { display: inline-block; }
@@ -30,12 +34,16 @@
   margin-top: clamp(12px, 1.8vh, 22px);
   font-family: var(--ff-display); font-weight: 400;
   font-size: clamp(2rem, 4.8vw, 3.8rem); line-height: 1.04; letter-spacing: -.02em;
-  color: var(--oxblood); will-change: transform, filter;
+  color: var(--ink); will-change: transform, filter;
 }
 .hv__resolve-line { display: block; }
-.hv__resolve-em { font-style: italic; color: var(--oxblood-2); }
+.hv__resolve-em { font-style: italic; color: var(--ink-2); }
 
-/* -------- value grid -------- */
+/* -------- value grid --------
+   The tile rule paints --ink at .22 opacity: that is 78 33 45 / .22 in light,
+   which sits between --hairline (.16) and --hairline-2 (.30), so the opacity
+   mechanic is kept rather than folded onto a hairline token. --ink carries it
+   correctly to bone on night. */
 .hv__grid {
   margin-top: clamp(56px, 9vh, 108px);
   display: grid; grid-template-columns: repeat(4, 1fr);
@@ -44,20 +52,20 @@
 .hv__tile { position: relative; padding-top: clamp(20px, 2.4vh, 30px); }
 .hv__tile-rule {
   position: absolute; top: 0; left: 0; width: 100%; height: 1px;
-  background: var(--oxblood); opacity: .22;
+  background: var(--ink); opacity: .22;
 }
 .hv__n {
   display: block; font-family: var(--ff-exp); letter-spacing: .12em;
-  font-size: .64rem; color: var(--rose-taupe); margin-bottom: clamp(12px, 1.6vw, 18px);
+  font-size: .64rem; color: var(--ink-muted); margin-bottom: clamp(12px, 1.6vw, 18px);
 }
 .hv__title {
   font-family: var(--ff-display); font-weight: 400;
   font-size: clamp(1.12rem, 1.5vw, 1.45rem); line-height: 1.14; letter-spacing: -.01em;
-  color: var(--oxblood); margin-bottom: clamp(10px, 1.2vw, 14px);
+  color: var(--ink); margin-bottom: clamp(10px, 1.2vw, 14px);
 }
 .hv__body {
   font-family: var(--ff-body); font-weight: 400;
-  font-size: clamp(.86rem, 1vw, .96rem); line-height: 1.5; color: var(--oxblood-2);
+  font-size: clamp(.86rem, 1vw, .96rem); line-height: 1.5; color: var(--ink-2);
   max-width: 32ch;
 }
 

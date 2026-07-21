@@ -7,8 +7,8 @@
 .jx {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg, var(--ivory) 0%, var(--ivory-2) 46%, #ecdfcb 100%);
-  color: var(--oxblood);
+  background: linear-gradient(180deg, var(--ground) 0%, var(--ground-2) 46%, var(--ground-3) 100%);
+  color: var(--ink);
   padding: clamp(120px, 20vh, 240px) clamp(20px, 5vw, 80px) clamp(96px, 15vh, 200px);
 }
 
@@ -27,7 +27,9 @@
   display: block;
   width: clamp(40px, 6vw, 72px);
   height: 1px;
-  background: var(--rose-taupe);
+  background: var(--ink-muted);
+  /* rose-taupe at 60% still reads clearly against both the ivory and the night
+     ground — a quiet rule, not a hairline that vanishes. */
   opacity: 0.6;
   margin: 0 auto clamp(26px, 4vh, 40px);
 }
@@ -36,7 +38,7 @@
   text-transform: uppercase;
   letter-spacing: 0.42em;
   font-size: clamp(0.6rem, 0.8vw, 0.72rem);
-  color: var(--rose-taupe);
+  color: var(--ink-muted);
   margin: 0 0 clamp(20px, 3vh, 30px);
 }
 .jx__headline {
@@ -45,7 +47,7 @@
   letter-spacing: -0.02em;
   font-size: clamp(2.6rem, 6vw, 5rem);
   line-height: 1;
-  color: var(--oxblood);
+  color: var(--ink);
   margin: 0;
 }
 /* line-mask for the headline rise */
@@ -64,7 +66,7 @@
   font-family: var(--ff-body);
   font-size: clamp(1rem, 1.25vw, 1.18rem);
   line-height: 1.65;
-  color: var(--oxblood-2);
+  color: var(--ink-2);
 }
 
 /* ---------- essay list ---------- */
@@ -94,7 +96,13 @@
   overflow: hidden;
   border-radius: 2px;
   background: var(--sand);
-  box-shadow: 0 50px 90px -34px rgba(78, 33, 45, 0.34);
+  /* raised card: shadow for the light ground, rim for night */
+  box-shadow: 0 50px 90px -34px var(--shadow), var(--rim);
+}
+/* --sand is a primitive and would flash as a lit rectangle behind a loading
+   essay image on a night page; on the dark scheme the placeholder is a ground. */
+:root[data-scheme="dark"] .jx__media {
+  background: var(--ground-3);
 }
 .jx__media img {
   position: absolute;
@@ -103,6 +111,8 @@
   height: 112%;
   object-fit: cover;
   object-position: center;
+  /* editorial essay photography is shot high-key; ease it back on a night ground */
+  filter: brightness(var(--img-dim)) saturate(var(--img-sat));
   will-change: transform;
 }
 
@@ -115,7 +125,7 @@
   font-family: var(--ff-exp);
   letter-spacing: 0.3em;
   font-size: clamp(0.62rem, 0.8vw, 0.72rem);
-  color: var(--rose-taupe);
+  color: var(--ink-muted);
   margin-bottom: clamp(16px, 2.4vh, 24px);
 }
 .jx__title {
@@ -124,7 +134,7 @@
   letter-spacing: -0.015em;
   font-size: clamp(1.75rem, 3.1vw, 2.7rem);
   line-height: 1.06;
-  color: var(--oxblood);
+  color: var(--ink);
   margin: 0;
   max-width: 15ch;
 }
@@ -134,10 +144,10 @@
   font-family: var(--ff-body);
   font-size: clamp(0.95rem, 1.15vw, 1.06rem);
   line-height: 1.62;
-  color: var(--oxblood-2);
+  color: var(--ink-2);
 }
 .jx__cta {
-  color: var(--oxblood);
+  color: var(--ink);
 }
 /* the card lifts its own image a touch on hover — quiet, premium */
 .jx__essay:hover .jx__media img {

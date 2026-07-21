@@ -8,13 +8,20 @@
 .cscent {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg, #ecdfcb 0%, var(--ivory-2) 46%, var(--sand) 100%);
-  color: var(--oxblood);
+  background: linear-gradient(180deg, var(--ground-3) 0%, var(--ground-2) 46%, var(--sand) 100%);
+  color: var(--ink);
   padding: clamp(90px, 14vh, 170px) clamp(20px, 5vw, 80px) clamp(104px, 16vh, 200px);
 }
 .cscent__inner {
   max-width: 1400px;
   margin: 0 auto;
+}
+/* REDESIGNED for the dark scheme: --sand is a PRIMITIVE (always the same bright
+   warm sand), so the far end of the ground ramp would read as a lit band across
+   the bottom of a night page. On night the whole ramp is re-cut from the night
+   grounds instead — lifted at the top, settling into the section ground. */
+:root[data-scheme="dark"] .cscent {
+  background: linear-gradient(180deg, var(--ground-3) 0%, var(--ground-2) 46%, var(--ground) 100%);
 }
 
 /* ---- chapter marker ---- */
@@ -28,7 +35,7 @@
   text-transform: uppercase;
   letter-spacing: 0.4em;
   font-size: clamp(0.6rem, 0.8vw, 0.72rem);
-  color: var(--rose-taupe);
+  color: var(--ink-muted);
   margin: 0 0 clamp(22px, 3.4vh, 34px);
 }
 .cscent__title {
@@ -37,7 +44,7 @@
   letter-spacing: -0.02em;
   font-size: clamp(2.3rem, 5.2vw, 4.4rem);
   line-height: 1;
-  color: var(--oxblood);
+  color: var(--ink);
   margin: 0;
   white-space: nowrap; /* heading on one line (guarded to wrap on mobile below) */
 }
@@ -56,7 +63,7 @@
   font-family: var(--ff-body);
   font-size: clamp(1.02rem, 1.28vw, 1.2rem);
   line-height: 1.66;
-  color: var(--oxblood-2);
+  color: var(--ink-2);
 }
 
 /* ---- the four-across row ---- */
@@ -79,9 +86,10 @@
   margin: 0;
   aspect-ratio: 3 / 4;
   overflow: hidden;
-  background: var(--ivory);
+  background: var(--ground);
   border-radius: 2px;
-  box-shadow: 0 30px 70px -40px rgba(78, 33, 45, 0.34);
+  /* raised card: the drop shadow carries the light scheme, the rim carries night */
+  box-shadow: 0 30px 70px -40px var(--shadow), var(--rim);
 }
 .cscent__media img {
   position: absolute;
@@ -90,6 +98,8 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
+  /* product renders are shot high-key on a pale ground; ease them back on night */
+  filter: brightness(var(--img-dim)) saturate(var(--img-sat));
   will-change: transform;
 }
 .cscent__link:hover .cscent__media img,
@@ -112,7 +122,7 @@
   letter-spacing: -0.01em;
   font-size: clamp(1.05rem, 1.5vw, 1.35rem);
   line-height: 1.1;
-  color: var(--oxblood);
+  color: var(--ink);
 }
 .cscent__label {
   flex-shrink: 0;
@@ -120,7 +130,7 @@
   text-transform: uppercase;
   letter-spacing: 0.2em;
   font-size: clamp(0.52rem, 0.68vw, 0.6rem);
-  color: var(--rose-taupe);
+  color: var(--ink-muted);
 }
 
 /* wishlist heart — cosmetic save toggle, top-right of the frame */
@@ -134,7 +144,7 @@
   place-items: center;
   border-radius: 50%;
   color: var(--ivory);
-  background: rgba(30, 12, 17, 0.28);
+  background: rgba(30, 12, 17, 0.28);   /* light scheme: dark frost over a pale render */
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   transition: transform 0.4s var(--ease), background 0.4s var(--ease), color 0.4s var(--ease);
@@ -145,6 +155,16 @@
 }
 .cscent__save.is-saved {
   color: var(--champagne);
+}
+/* REDESIGNED for the dark scheme: a dark frost over a night ground disappears —
+   there is nothing left for it to sit against. Invert the chip on night into a
+   warm bone veil so it still reads as a raised control over the render. */
+:root[data-scheme="dark"] .cscent__save {
+  color: var(--ink);
+  background: rgb(232 221 205 / 0.14);
+}
+:root[data-scheme="dark"] .cscent__save:hover {
+  background: rgb(232 221 205 / 0.22);
 }
 
 /* ---- responsive ---- */

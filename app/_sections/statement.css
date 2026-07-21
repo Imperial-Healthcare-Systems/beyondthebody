@@ -4,34 +4,56 @@
    slow dust motes. Light register.
    ================================================================= */
 
+/* --bs-pool: the bottom-left corner pool. Oxblood (344 deg) in light where it
+   sits on ivory; re-cut warm on night so it does not read purple against the
+   ember ramp. See tokens.css -> HUE RULE. */
 .bs {
+  --bs-pool: rgba(78, 33, 45, .10);
+  /* the far end of the ground ramp: --ground-3 on this beat is #ECDFCB, not
+     --sand, so the stop is held as a local var rather than silently repainted. */
+  --bs-g2: var(--sand);
   position: relative; overflow: hidden;
   min-height: 100vh; display: flex; align-items: center; justify-content: center;
   padding: clamp(120px, 20vh, 220px) var(--pad);
-  color: var(--oxblood);
+  color: var(--ink);
   background:
-    radial-gradient(120% 90% at 80% 8%, rgba(226, 203, 166, .40), transparent 54%),
-    radial-gradient(90% 80% at 8% 96%, rgba(78, 33, 45, .10), transparent 60%),
-    linear-gradient(158deg, var(--ivory) 0%, var(--ivory-2) 52%, var(--sand) 100%);
+    radial-gradient(120% 90% at 80% 8%, rgb(var(--bloom) / .40), transparent 54%),
+    radial-gradient(90% 80% at 8% 96%, var(--bs-pool), transparent 60%),
+    linear-gradient(158deg, var(--ground) 0%, var(--ground-2) 52%, var(--bs-g2) 100%);
 }
+:root[data-scheme="dark"] .bs { --bs-g2: var(--night-4); --bs-pool: rgb(122 62 44 / .12); }
 
 /* a soft shaft of window light, raked across the frame — pushed a touch:
-   wider, brighter, a hair more defined so the emptiness reads as lit, not blank */
+   wider, brighter, a hair more defined so the emptiness reads as lit, not blank.
+   On the night AD the beam is the gift of the section — kept verbatim in
+   geometry, but the bone is pulled well back (.72 → .26) so a full-strength
+   ivory shaft doesn't blow a hole through the dark ground. */
 .bs__shaft {
+  --bs-beam: rgba(245, 239, 228, .72);
   position: absolute; z-index: 0; pointer-events: none;
   top: -30%; right: 4%; width: clamp(260px, 34vw, 540px); height: 160%;
   transform: rotate(14deg); transform-origin: top center; will-change: transform;
-  background: linear-gradient(180deg, rgba(245, 239, 228, 0) 0%, rgba(245, 239, 228, .72) 45%, rgba(245, 239, 228, 0) 100%);
+  background: linear-gradient(180deg, rgba(245, 239, 228, 0) 0%, var(--bs-beam) 45%, rgba(245, 239, 228, 0) 100%);
   filter: blur(26px); opacity: .95;
 }
+:root[data-scheme="dark"] .bs__shaft { --bs-beam: rgb(232 221 205 / .26); }
 
 /* slow dust motes — a few more, a touch more present */
 .bs__motes { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+/* the glow dot: same size/blur/animation in both schemes; on night the core is
+   softened to bone and the layer opacity eased so the motes read as dust caught
+   in the beam rather than as hot specular pinpricks. */
 .bs__mote {
+  --bs-mote-core: rgba(245, 239, 228, .95);
+  --bs-mote-op: .62;
   position: absolute; width: 5px; height: 5px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(245, 239, 228, .95), rgba(226, 203, 166, 0) 70%);
-  filter: blur(.5px); opacity: .62;
+  background: radial-gradient(circle, var(--bs-mote-core), rgb(var(--bloom) / 0) 70%);
+  filter: blur(.5px); opacity: var(--bs-mote-op);
   animation: bs-float 14s ease-in-out infinite;
+}
+:root[data-scheme="dark"] .bs__mote {
+  --bs-mote-core: rgb(232 221 205 / .8);
+  --bs-mote-op: .5;
 }
 .bs__mote:nth-child(1) { left: 24%; top: 30%; animation-duration: 15s; animation-delay: -2s; }
 .bs__mote:nth-child(2) { left: 68%; top: 22%; animation-duration: 19s; animation-delay: -6s; transform: scale(.7); }
@@ -54,7 +76,7 @@
   position: absolute; z-index: 0; pointer-events: none; display: none;
   left: 50%; top: 66%; transform: translateX(-50%);
   width: min(900px, 84%); height: 1px;
-  background: linear-gradient(90deg, rgba(226, 203, 166, 0), rgba(226, 203, 166, .55) 20%, rgba(226, 203, 166, .55) 80%, rgba(226, 203, 166, 0));
+  background: linear-gradient(90deg, rgb(var(--bloom) / 0), rgb(var(--bloom) / .55) 20%, rgb(var(--bloom) / .55) 80%, rgb(var(--bloom) / 0));
   opacity: .5;
 }
 .bs[data-fx="line"] .bs__horizon,
@@ -64,14 +86,15 @@
 .bs__contour {
   position: absolute; z-index: 0; pointer-events: none; display: none;
   top: 0; right: 0; width: clamp(300px, 36vw, 560px); height: auto;
-  color: var(--oxblood); opacity: .07;
+  color: var(--ink); opacity: .07;
 }
 .bs__contour path { stroke: currentColor; stroke-width: 1.2; fill: none; }
 .bs[data-fx="contour"] .bs__contour,
 .bs[data-fx="all"] .bs__contour { display: block; }
 
 .bs__grain {
-  position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: .22; mix-blend-mode: multiply;
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  opacity: calc(.22 * var(--film-op)); mix-blend-mode: var(--film-blend-mul);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
 }
 
@@ -84,14 +107,14 @@
 .bs__statement {
   font-family: var(--ff-display); font-weight: 400;
   font-size: clamp(1.9rem, 4.6vw, 4rem); line-height: 1.16; letter-spacing: -.018em;
-  color: var(--oxblood); text-wrap: balance;
+  color: var(--ink); text-wrap: balance;
 }
 .bs__w { display: inline-block; will-change: transform; }
-.bs__em { font-style: italic; color: var(--oxblood-2); }
+.bs__em { font-style: italic; color: var(--ink-2); }
 
 .bs__attr {
   font-family: var(--ff-exp); text-transform: uppercase; letter-spacing: .28em;
-  font-size: clamp(.62rem, .82vw, .76rem); color: var(--rose-taupe);
+  font-size: clamp(.62rem, .82vw, .76rem); color: var(--ink-muted);
 }
 
 @media (max-width: 640px) {

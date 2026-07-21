@@ -1,12 +1,13 @@
 /* =================================================================
-   PDP · Hero / buy panel. Ivory ground; gallery (left) scrolls, buy
-   panel (right) sticks on desktop. Shares the house palette/type.
+   PDP · Hero / buy panel. data-theme="light" (ivory in the light scheme, the
+   LIFTED night register in the dark one); gallery (left) scrolls, buy panel
+   (right) sticks on desktop. Shares the house palette/type.
    ================================================================= */
 
 .pdp {
   position: relative;
-  background: linear-gradient(180deg, var(--ivory) 0%, var(--ivory-2) 100%);
-  color: var(--oxblood);
+  background: linear-gradient(180deg, var(--ground) 0%, var(--ground-2) 100%);
+  color: var(--ink);
   padding: clamp(120px, 17vh, 190px) clamp(20px, 5vw, 80px) clamp(72px, 11vh, 150px);
 }
 .pdp__wrap {
@@ -22,14 +23,14 @@
   text-transform: uppercase;
   letter-spacing: 0.18em;
   font-size: 0.6rem;
-  color: var(--rose-taupe);
+  color: var(--ink-muted);
   margin-bottom: clamp(30px, 5vh, 56px);
 }
 .pdp__crumb a {
   color: inherit;
 }
 .pdp__crumb a:hover {
-  color: var(--oxblood);
+  color: var(--ink);
 }
 
 /* two columns, top-aligned. (No sticky panel: the gallery isn't tall enough to give one
@@ -58,8 +59,12 @@
   aspect-ratio: 4 / 5; /* fallback; PdpHero sets each image's real ratio inline */
   overflow: hidden;
   border-radius: 2px;
+  /* --sand is the placeholder behind the render, not a ground; kept literal so the
+     light scheme is byte-identical, re-pointed at --ground-2 on the night ramp below. */
   background: var(--sand);
-  box-shadow: 0 50px 90px -40px rgba(78, 33, 45, 0.32);
+  /* .32 is a hair softer than --shadow (.34), so the literal stays; --rim rides along
+     and is `0 0 0 0 transparent` in the light beat, i.e. no light-scheme change. */
+  box-shadow: 0 50px 90px -40px rgba(78, 33, 45, 0.32), var(--rim);
 }
 .pdp__main img {
   position: absolute;
@@ -69,6 +74,8 @@
   object-fit: cover;
   object-position: center;
   will-change: transform;
+  /* the collection renders are shot high-key; eased back on night (1/1 in light) */
+  filter: brightness(var(--img-dim)) saturate(var(--img-sat));
   animation: pdpFade 0.55s var(--ease);
 }
 @keyframes pdpFade {
@@ -99,13 +106,14 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
+  filter: brightness(var(--img-dim)) saturate(var(--img-sat));
 }
 .pdp__thumb:hover {
   opacity: 0.85;
 }
 .pdp__thumb.is-active {
   opacity: 1;
-  border-color: var(--oxblood);
+  border-color: var(--accent);
 }
 
 /* buy panel — sticky on desktop. Robust by construction: the grid is `align-items:
@@ -129,7 +137,7 @@
   text-transform: uppercase;
   letter-spacing: 0.3em;
   font-size: clamp(0.6rem, 0.8vw, 0.7rem);
-  color: var(--rose-taupe);
+  color: var(--ink-muted);
   margin: 0 0 clamp(16px, 2.4vh, 22px);
 }
 .pdp__name {
@@ -138,7 +146,7 @@
   letter-spacing: -0.02em;
   font-size: clamp(2.6rem, 5vw, 4rem);
   line-height: 1;
-  color: var(--oxblood);
+  color: var(--ink);
   margin: 0;
 }
 .pdp__tag {
@@ -146,7 +154,7 @@
   font-style: italic;
   font-weight: 300;
   font-size: clamp(1.1rem, 1.7vw, 1.45rem);
-  color: var(--oxblood-2);
+  color: var(--ink-2);
   margin: 12px 0 clamp(30px, 4.4vh, 42px);
 }
 
@@ -158,7 +166,7 @@
   list-style: none;
   margin: clamp(28px, 4vh, 40px) 0 0;
   padding: clamp(24px, 3.4vh, 34px) 0 0;
-  border-top: 1px solid rgba(78, 33, 45, 0.16);
+  border-top: 1px solid var(--hairline);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -166,7 +174,7 @@
   text-transform: uppercase;
   letter-spacing: 0.16em;
   font-size: clamp(0.58rem, 0.74vw, 0.66rem);
-  color: var(--oxblood-2);
+  color: var(--ink-2);
 }
 .pdp__spec li {
   position: relative;
@@ -179,7 +187,31 @@
   top: 0.5em;
   width: 6px;
   height: 1px;
-  background: var(--rose-taupe);
+  background: var(--ink-muted);
+}
+
+/* ---------- dark scheme · the "lit plate" vitrine ----------
+   REDESIGNED, not remapped (client-approved 2026-07-21). The four client renders under
+   /products/collection/*.png are OPAQUE — each carries a baked warm-taupe photographic
+   background, they are not cut-outs. On the ivory ground that background blends away
+   invisibly; dropped on the night ramp the same rectangle reads as a glowing slab of
+   daylight, which is the single loudest "unmasked asset" tell.
+   Rather than fake a mask on art we don't own, we commit to the plate: a soft warm halo
+   bleeding off its edges plus a hairline champagne edge, so the render reads as a
+   deliberately LIT PLATE in a dark vitrine — an intentional object under a gallery lamp.
+   Purely light: no geometry, size, position, radius or motion is touched, and the whole
+   block is scoped to [data-scheme="dark"] so the light scheme is untouched. */
+:root[data-scheme="dark"] .pdp__main {
+  background: var(--ground-2);
+  box-shadow:
+    0 0 0 1px var(--hairline-2),          /* the vitrine edge */
+    0 0 48px -6px rgb(var(--bloom) / 0.16), /* near halo, bleeding off the plate */
+    0 34px 90px -40px rgb(var(--bloom) / 0.1), /* the lamp's far falloff */
+    var(--rim);
+}
+:root[data-scheme="dark"] .pdp__thumb {
+  background: var(--ground-2);
+  box-shadow: 0 0 22px -8px rgb(var(--bloom) / 0.14);
 }
 
 /* ---------- mobile ---------- */

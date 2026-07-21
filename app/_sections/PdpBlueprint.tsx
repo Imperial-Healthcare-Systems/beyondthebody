@@ -12,14 +12,26 @@ import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ChromaticWaves from "../_components/ChromaticWaves";
+import { useScheme } from "../_components/useScheme";
 import type { Product } from "./products-data";
 import { EDP_DISTINCTION, BLUEPRINT, VALUE } from "./house-copy";
 import "./pdpblueprint.css";
 
-// Dot colour for the client's Chromatic Waves bg (client-chosen 2026-07-17): a single deep
-// red #410505, a touch brighter than the near-black ground (bgColor #1E0000), so the drifting
-// marks read as tonal texture rather than the element's default rainbow.
-const WAVE_COLORS = ["#410505"];
+/* Dot colour for the client's Chromatic Waves bg (client-chosen 2026-07-17): a single deep
+   red #410505, a touch brighter than the near-black ground (bgColor #1E0000), so the drifting
+   marks read as tonal texture rather than the element's default rainbow.
+
+   Dark scheme (2026-07-21): the shader is WebGL, so its colours are uniforms — no stylesheet
+   can reach them and they would otherwise be the one surface on the site that ignores the
+   theme. In the dark scheme this beat drops to the DEEPEST register (--night-0 #0C0508), so
+   #1E0000 would suddenly sit *above* its own section and read as a lit panel. Both values are
+   deepened by the same amount to hold the client's chosen relationship (the dots stay exactly
+   as far above the ground as they are today) — the RATIO is the design, the absolute values
+   are the theme. speed / cellSize are untouched: client-chosen, not ours to tune. */
+const WAVE = {
+  light: { bg: "#1E0000", dots: ["#410505"] },
+  dark: { bg: "#120000", dots: ["#350404"] },
+} as const;
 
 export default function PdpBlueprint({ product }: { product: Product }) {
   const root = useRef<HTMLElement>(null);
@@ -30,6 +42,13 @@ export default function PdpBlueprint({ product }: { product: Product }) {
   useEffect(() => {
     setMotionOK(!window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   }, []);
+
+  /* ChromaticWaves reads its colours once, at init, into GL uniforms — it has no
+     effect watching these props. Keying the element on the scheme remounts the
+     canvas on a toggle, which is the honest way to re-colour it. Cheap: this only
+     happens when the viewer actually changes the theme. */
+  const scheme = useScheme();
+  const wave = WAVE[scheme];
 
   const points = [
     { label: BLUEPRINT.threshold.label, body: `${BLUEPRINT.threshold.lead} ${product.blueprint.thresholdTail}` },
@@ -67,7 +86,13 @@ export default function PdpBlueprint({ product }: { product: Product }) {
     <section className="bp" data-theme="dark" id="blueprint" ref={root}>
       {motionOK && (
         <div className="bp__bg" aria-hidden="true">
-          <ChromaticWaves speed={1} bgColor="#1E0000" cellSize={7} colors={WAVE_COLORS} />
+          <ChromaticWaves
+            key={scheme}
+            speed={1}
+            bgColor={wave.bg}
+            cellSize={7}
+            colors={wave.dots}
+          />
         </div>
       )}
       <div className="bp__scrim" aria-hidden="true" />

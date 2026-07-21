@@ -1,5 +1,5 @@
 /* =================================================================
-   BEYOND THE BODY — Design tokens · design_system @ v0.1
+   BEYOND THE BODY — Design tokens · design_system @ v0.2
    Fonts are wired via next/font (see layout.tsx) and exposed as
    --ff-* variables there; colour/space/motion primitives live here.
 
@@ -13,9 +13,37 @@
        --solid --ondark, and --him / --her (gendered tokens that contradict
        "presence has no gender" — dropping them is the point of the redesign)
    The live site remains the arbiter of palette/DS at the reconciliation pass.
+
+   ──────────────────────────────────────────────────────────────────
+   v0.2 (2026-07-21) — TRUE DARK MODE, as a second art direction.
+   Three layers now, and the distinction matters:
+
+     1 · PRIMITIVES  — raw brand hex. Never scheme-dependent. A primitive
+         means the same colour in both schemes; --ivory is always ivory.
+     2 · SEMANTICS   — --ground / --ink / --hairline / … . What a section
+         actually paints with. RESOLVED from two axes:
+              data-scheme  (light | dark)   ← the whole site's mode
+            × data-theme   (light | dark)   ← this section's GROUND
+     3 · CHROME      — --ui-* , driven by data-ui-theme (the section
+         currently under the nav). Unchanged in role; re-resolved per scheme.
+
+   The two-axis resolution is the whole design. The page's pacing comes from
+   alternating light/dark section grounds; a global inversion would flatten it.
+   So in dark mode the alternation SURVIVES as two tonal registers of night:
+       data-theme="light"  →  the LIFTED register  (--night-2, warm, open)
+       data-theme="dark"   →  the DEEPEST register (--night-0, closed)
+   Same rhythm, quieter amplitude. Nothing is inverted; every surface, ink,
+   hairline, shadow and blend mode is re-picked for the ground it lands on.
+
+   Sections must consume SEMANTICS, not primitives. Reaching for --ivory as a
+   background is what makes a section immune to the scheme.
    ================================================================= */
 
 :root {
+  /* =========================================================
+     1 · PRIMITIVES — brand constants, identical in both schemes
+     ========================================================= */
+
   /* ---- palette (frozen v0) ---- */
   --oxblood:      #4E212D;
   --oxblood-2:    #3A1822;
@@ -27,6 +55,36 @@
   --ivory-2:      #EFE6D6;
   --rose-taupe:   #AE8F7B;
   --sand:         #D8C4AB;   /* +v0.1 — not in frozen v0 */
+
+  /* ---- the night ramp (+v0.2) — dark-scheme grounds ----
+     Deliberately NOT neutral greys and NOT pure black.
+
+     ⚠ HUE RULE — the thing to not get wrong (corrected 2026-07-21):
+     these must satisfy R > G > B. The first cut of this ramp was derived by
+     darkening --oxblood and came out at hue 334–342°, i.e. PLUM. It looked
+     purple on the page and it was purple: oxblood is 344°, a plum-red, and it
+     is an ACCENT, not a ground. Every actual GROUND in this house — ivory 39°,
+     sand 33°, champagne 37°, rose-taupe 24° — is warm. Darkening the accent
+     gives you an aubergine page; darkening the ground family gives you the
+     house at night. The ramp below is retargeted to ~9–14° — warm ember /
+     espresso, the same room the ivory page is lit in, after dark.
+
+     Lightness is unchanged from the first cut (L 9/15/21/29/40 vs 8/12/20/27/36),
+     so the mood and the two-register spacing are identical — only the cast moved.
+     If you add a step, check it with R > G > B before committing it. */
+  --night-0:      #0D0706;   /* deepest    — data-theme="dark" ground   hue  9° */
+  --night-1:      #150D0B;   /* elevated within the deepest register    hue 12° */
+  --night-2:      #1D1310;   /* lifted     — data-theme="light" ground  hue 14° */
+  --night-3:      #271A16;   /* elevated surface / cards on the lifted  hue 14° */
+  --night-4:      #332420;   /* hover fills, chips, pressed states      hue 13° */
+
+  /* ---- inks for the night ramp (+v0.2) ----
+     Warm bone, never #FFF. Pure white on a warm near-black is the single
+     loudest "dark mode shortcut" tell: it glares, kills the warmth, and reads
+     clinical. --bone sits ~13:1 on --night-2 — well past AA, still soft. */
+  --bone:         #E8DDCD;
+  --bone-bright:  #EFE4D4;   /* primary ink on the DEEPEST register only */
+  --bone-2:       #CBBBA6;   /* secondary ink */
 
   --line:         rgba(226, 203, 166, .18);  /* (v0) champagne hairline on dark */
   --line-dark:    rgba(78, 33, 45, .14);     /* (v0) oxblood hairline on light — carried
@@ -52,10 +110,194 @@
      nothing; removed at the v0.1 reopen rather than left as decoration. Add back
      deliberately if a beat needs a second curve — but --ease is the house one. */
 
-  /* ---- inversion signature: page-level active theme (set by ThemeInversion) ----
+  /* ---- inversion signature: page-level active theme (set by SiteRuntime) ----
      These drive the nav + cursor + progress; each SECTION still paints its own
-     ground. Default = dark (the oxblood hero opens the page). */
+     ground. Default = dark (the oxblood hero opens the page). Re-resolved per
+     scheme further down — in dark mode BOTH registers are dark grounds, so the
+     chrome stays light ink throughout. */
   --ui-fg:      var(--champagne);   /* nav text / cursor on current section */
+  --ui-fg-soft: var(--champ-soft);
+  --ui-muted:   var(--rose-taupe);
+  --ui-accent:  var(--champagne);
+}
+
+/* =================================================================
+   2 · SEMANTICS — what sections actually paint with.
+   Resolved on two axes. Read the block you are editing as:
+       "<scheme> scheme, <ground> beat".
+
+   The contract (identical names in all four blocks):
+     --ground       the section's base background
+     --ground-rgb   the SAME colour as --ground, as a space-separated rgb
+                    TRIPLET, so a scrim can fade something into the current
+                    ground at an arbitrary alpha: rgb(var(--ground-rgb) / .66)
+     --ground-2     an elevated surface inside it (card, panel, drawer)
+     --ground-3     a deeper inset / the far end of a ground gradient
+     --ink          primary text
+     --ink-2        body / secondary text
+     --ink-muted    eyebrows, labels, meta, captions
+     --accent       the section's accent (oxblood on light, champagne on night)
+     --accent-ink   text that sits ON --accent (solid buttons)
+     --hairline     subtle 1px border
+     --hairline-2   a stronger rule / divider
+     --shadow       full rgba for the primary drop shadow
+     --shadow-2     a tighter, closer shadow
+     --rim          a top light-rim; on dark grounds this REPLACES the shadow
+                    as the depth cue (see note below)
+     --scrim        space-separated rgb TRIPLET for image scrims,
+                    used as rgb(var(--scrim) / .5)
+     --bloom        triplet for radial glow/bloom stops
+     --film-blend   blend mode for the feTurbulence grain films
+     --film-blend-mul  blend mode for films authored as `multiply`
+     --film-op      opacity multiplier for those films
+     --grade-blend  blend mode for warm photo GRADES (not grain)
+     --img-dim      brightness() multiplier applied to photography
+     --img-sat      saturate() multiplier applied to photography
+
+   Depth note: on a light ground, depth comes from a shadow BELOW an element.
+   On a dark ground a shadow is nearly invisible — real depth comes from a
+   light RIM along the top edge (the surface catching the room light). Both are
+   provided so a card can carry `box-shadow: var(--shadow), var(--rim)` and be
+   correct in both schemes without a media query.
+   ================================================================= */
+
+/* ---------- LIGHT SCHEME · light beat (ivory ground, oxblood ink) ---------- */
+/* This block reproduces the pre-dark-mode build byte-for-byte. If a value here
+   changes, the light site changes — that is the regression tripwire. */
+:where([data-theme="light"]) {
+  --ground:       var(--ivory);
+  --ground-rgb:   245 239 228;   /* = --ivory */
+  --ground-2:     var(--ivory-2);
+  --ground-3:     #ECDFCB;
+  --ink:          var(--oxblood);
+  --ink-2:        var(--oxblood-2);
+  --ink-muted:    var(--rose-taupe);
+  --accent:       var(--oxblood);
+  --accent-ink:   var(--ivory);
+  --hairline:     rgb(78 33 45 / .16);
+  --hairline-2:   rgb(78 33 45 / .30);
+  --shadow:       rgb(78 33 45 / .34);
+  --shadow-2:     rgb(78 33 45 / .28);
+  --rim:          0 0 0 0 transparent;
+  --scrim:        18 4 6;
+  --bloom:        226 203 166;
+  --film-blend:     overlay;
+  --film-blend-mul: multiply;
+  --film-op:      1;
+  --grade-blend:  multiply;
+  --img-dim:      1;
+  --img-sat:      1;
+}
+
+/* ---------- LIGHT SCHEME · dark beat (oxblood ground, champagne ink) ------- */
+:where([data-theme="dark"]) {
+  --ground:       var(--oxblood-deep);
+  --ground-rgb:   29 11 18;      /* = --oxblood-deep */
+  --ground-2:     var(--oxblood-3);
+  --ground-3:     var(--oxblood-2);
+  --ink:          var(--ivory);
+  --ink-2:        rgb(245 239 228 / .82);
+  --ink-muted:    var(--rose-taupe);
+  --accent:       var(--champagne);
+  --accent-ink:   var(--oxblood);
+  --hairline:     rgb(226 203 166 / .18);
+  --hairline-2:   rgb(226 203 166 / .34);
+  --shadow:       rgb(29 11 18 / .50);
+  --shadow-2:     rgb(29 11 18 / .42);
+  --rim:          inset 0 1px 0 rgb(226 203 166 / .08);
+  --scrim:        18 4 6;
+  --bloom:        226 203 166;
+  --film-blend:     overlay;
+  --film-blend-mul: multiply;
+  --film-op:      1;
+  --grade-blend:  multiply;
+  --img-dim:      1;
+  --img-sat:      1;
+}
+
+/* =================================================================
+   DARK SCHEME — the alternate art direction.
+   Both registers are night; the light/dark ALTERNATION survives as a
+   tonal rise-and-fall rather than a contrast flip.
+   ================================================================= */
+
+/* ---------- DARK SCHEME · light beat → the LIFTED register ---------- */
+/* Was ivory: the open, airy, editorial beats (Values, Bridge, Journal, the
+   PDP details…). They stay the "open" ones — lifted off the deepest ground,
+   warmer, with the softer bone ink. This is where the page breathes. */
+:root[data-scheme="dark"] :where([data-theme="light"]) {
+  --ground:       var(--night-2);
+  --ground-rgb:   29 19 16;      /* = --night-2 */
+  --ground-2:     var(--night-3);
+  --ground-3:     var(--night-4);
+  --ink:          var(--bone);
+  --ink-2:        rgb(232 221 205 / .74);
+  --ink-muted:    var(--rose-taupe);
+  --accent:       var(--champagne);
+  --accent-ink:   var(--night-0);
+  --hairline:     rgb(226 203 166 / .14);
+  --hairline-2:   rgb(226 203 166 / .26);
+  /* On night, the drop shadow does almost nothing — the rim carries the depth. */
+  --shadow:       rgb(6 3 2 / .62);
+  --shadow-2:     rgb(6 3 2 / .5);
+  --rim:          inset 0 1px 0 rgb(232 221 205 / .07);
+  --scrim:        13 7 6;
+  --bloom:        226 203 166;
+  /* Grain: `multiply` on night crushes to nothing and `overlay` flips polarity,
+     so both are re-picked to modes that LIFT texture off a dark ground. */
+  --film-blend:     soft-light;
+  --film-blend-mul: screen;
+  --film-op:      .55;
+  --grade-blend:  screen;
+  /* Photography shot for an ivory page is too hot against night; ease it back
+     a touch rather than re-grading 20 source files. */
+  --img-dim:      .88;
+  --img-sat:      .94;
+}
+
+/* ---------- DARK SCHEME · dark beat → the DEEPEST register ---------- */
+/* Was oxblood: the cinematic beats (Hero, Origin, the Blueprint, the Footer).
+   They go deeper still, so they remain the page's closed, held moments. */
+:root[data-scheme="dark"] :where([data-theme="dark"]) {
+  --ground:       var(--night-0);
+  --ground-rgb:   13 7 6;        /* = --night-0 */
+  --ground-2:     var(--night-1);
+  --ground-3:     var(--night-2);
+  --ink:          var(--bone-bright);
+  --ink-2:        rgb(239 228 212 / .78);
+  --ink-muted:    var(--rose-taupe);
+  --accent:       var(--champagne);
+  --accent-ink:   var(--night-0);
+  --hairline:     rgb(226 203 166 / .12);
+  --hairline-2:   rgb(226 203 166 / .24);
+  --shadow:       rgb(5 3 2 / .7);
+  --shadow-2:     rgb(5 3 2 / .55);
+  --rim:          inset 0 1px 0 rgb(239 228 212 / .06);
+  --scrim:        7 4 3;
+  --bloom:        226 203 166;
+  --film-blend:     soft-light;
+  --film-blend-mul: screen;
+  --film-op:      .5;
+  --grade-blend:  screen;
+  --img-dim:      .82;
+  --img-sat:      .92;
+}
+
+/* =================================================================
+   3 · CHROME — nav / cursor / rail, driven by data-ui-theme.
+   In the LIGHT scheme this is a true inversion: the chrome flips ink as it
+   crosses from an ivory beat to an oxblood one.
+   In the DARK scheme there is nothing to invert TO — every ground is night —
+   so the chrome holds light ink throughout and only shifts its warmth
+   slightly between registers. That is deliberate: a nav that flickered
+   oxblood-on-night would be unreadable.
+   ================================================================= */
+:root[data-scheme="dark"] {
+  color-scheme: dark;   /* native form controls, scrollbars, and UA widgets */
+}
+:root[data-scheme="dark"][data-ui-theme="dark"],
+:root[data-scheme="dark"][data-ui-theme="light"] {
+  --ui-fg:      var(--champagne);
   --ui-fg-soft: var(--champ-soft);
   --ui-muted:   var(--rose-taupe);
   --ui-accent:  var(--champagne);

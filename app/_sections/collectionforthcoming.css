@@ -2,14 +2,15 @@
    /collection · BEAT 3 — Chapter Two · (forthcoming).
    A quiet, shallow dark coda before the footer — understated on
    purpose (modest type, low height, no watermark). Dark ground kept,
-   flatter and calmer than a hero.
+   flatter and calmer than a hero: it sits on --ground-2, one step LIFTED
+   off the beat's base ground, which is what keeps it shallow in both schemes.
    ================================================================= */
 
 .cforth {
   position: relative;
   overflow: hidden;
-  background: var(--oxblood-3);
-  color: var(--ivory);
+  background: var(--ground-2);
+  color: var(--ink);
   padding: clamp(72px, 12vh, 132px) clamp(20px, 5vw, 80px);
 }
 
@@ -29,7 +30,7 @@
   text-transform: uppercase;
   letter-spacing: 0.38em;
   font-size: clamp(0.56rem, 0.72vw, 0.64rem);
-  color: var(--rose-taupe);
+  color: var(--ink-muted);
   margin: 0 0 clamp(20px, 3vh, 28px);
 }
 
@@ -51,14 +52,14 @@
   font-family: var(--ff-body);
   font-size: clamp(0.9rem, 1.05vw, 1rem);
   line-height: 1.62;
-  color: var(--rose-taupe);
+  color: var(--ink-muted);
 }
 
 .cforth__rule {
   display: block;
   width: clamp(32px, 4.5vw, 52px);
   height: 1px;
-  background: var(--rose-taupe);
+  background: var(--ink-muted);
   opacity: 0.55;
   margin: clamp(28px, 4vh, 40px) 0 clamp(16px, 2.2vh, 22px);
 }
@@ -68,7 +69,7 @@
   text-transform: uppercase;
   letter-spacing: 0.32em;
   font-size: clamp(0.52rem, 0.68vw, 0.6rem);
-  color: var(--rose-taupe);
+  color: var(--ink-muted);
   opacity: 0.9;
   margin: 0;
 }

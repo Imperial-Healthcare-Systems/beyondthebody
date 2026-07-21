@@ -1,5 +1,9 @@
 /* Cart drawer — slides in from the right. Mirrors the menu drawer's motion so the two
-   feel of one house. Ivory panel, oxblood ink. */
+   feel of one house.
+   This is site CHROME: it can surface over any ground, so it paints from the PANEL
+   tokens (--panel / --panel-ink / --panel-ink-2 / --panel-line / --overlay-scrim), not
+   the section tokens. Ivory panel + oxblood ink in the light scheme; a lifted night
+   panel + bone ink in the dark one. Kept in lockstep with .drawer__* in chrome.css. */
 
 .cart {
   position: fixed;
@@ -19,7 +23,7 @@
   width: 100%;
   height: 100%;
   border: 0;
-  background: rgba(18, 4, 6, 0.5);
+  background: var(--overlay-scrim);
   opacity: 0;
   transition: opacity 0.5s var(--ease);
   cursor: pointer;
@@ -36,11 +40,15 @@
   width: min(92vw, 428px);
   display: flex;
   flex-direction: column;
-  background: var(--ivory);
-  color: var(--oxblood);
+  background: var(--panel);
+  color: var(--panel-ink);
   transform: translateX(100%);
   transition: transform 0.6s var(--ease);
-  box-shadow: -40px 0 90px -40px rgba(29, 11, 18, 0.5);
+  /* On ivory the shadow does the lifting; on night a shadow against a dark page is
+     invisible, so a hairline down the panel's leading edge carries the separation
+     instead. This drawer enters from the RIGHT, so the rim is mirrored (inset 1px 0)
+     against the menu drawer's (inset -1px 0). Both ship; the inert one costs nothing. */
+  box-shadow: -40px 0 90px -40px var(--shadow), inset 1px 0 0 var(--panel-line);
 }
 .cart.is-open .cart__panel {
   transform: translateX(0);
@@ -51,7 +59,9 @@
   align-items: center;
   justify-content: space-between;
   padding: clamp(22px, 3vh, 32px) clamp(22px, 3vw, 34px);
-  border-bottom: 1px solid rgba(78, 33, 45, 0.14);
+  /* Derived from --panel-ink at the original alpha rather than --panel-line (.16), so
+     the light scheme keeps its exact .14 weight while the colour follows the panel. */
+  border-bottom: 1px solid color-mix(in srgb, var(--panel-ink) 14%, transparent);
 }
 .cart__title {
   font-family: var(--ff-exp);
@@ -73,7 +83,7 @@
   top: 12px;
   width: 20px;
   height: 1.5px;
-  background: var(--oxblood);
+  background: var(--panel-ink);
 }
 .cart__close span:first-child {
   transform: rotate(45deg);
@@ -120,7 +130,7 @@
   flex-direction: column;
   gap: 8px;
   padding: clamp(18px, 2.4vh, 24px) 0;
-  border-bottom: 1px solid rgba(78, 33, 45, 0.12);
+  border-bottom: 1px solid color-mix(in srgb, var(--panel-ink) 12%, transparent);
 }
 .cart__itemhead {
   display: flex;
@@ -145,7 +155,7 @@
   text-underline-offset: 3px;
 }
 .cart__remove:hover {
-  color: var(--oxblood);
+  color: var(--panel-ink);
 }
 .cart__size {
   font-family: var(--ff-exp);
@@ -164,7 +174,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid rgba(78, 33, 45, 0.2);
+  border: 1px solid color-mix(in srgb, var(--panel-ink) 20%, transparent);
   border-radius: 2px;
 }
 .cart__qty button {
@@ -174,7 +184,7 @@
   border: 0;
   cursor: pointer;
   font-size: 1rem;
-  color: var(--oxblood);
+  color: var(--panel-ink);
 }
 .cart__qty span {
   min-width: 20px;
@@ -189,7 +199,7 @@
 /* footer */
 .cart__foot {
   padding: clamp(20px, 3vh, 30px) clamp(22px, 3vw, 34px) clamp(24px, 3.4vh, 34px);
-  border-top: 1px solid rgba(78, 33, 45, 0.14);
+  border-top: 1px solid color-mix(in srgb, var(--panel-ink) 14%, transparent);
 }
 .cart__subtotal {
   display: flex;
@@ -203,8 +213,11 @@
 .cart__checkout {
   width: 100%;
   padding: 16px;
-  background: var(--oxblood);
-  color: var(--ivory);
+  /* The panel's own ink IS the CTA fill — oxblood-on-ivory in light, bone-on-night in
+     dark. Deliberately NOT --accent: at :root that resolves champagne, which would
+     turn the light scheme's checkout button gold. */
+  background: var(--panel-ink);
+  color: var(--panel);
   border: 0;
   border-radius: 2px;
   font-family: var(--ff-exp);
@@ -212,6 +225,7 @@
   letter-spacing: 0.2em;
   font-size: 0.68rem;
   cursor: not-allowed;
+  /* disabled state — a relative dim, so it reads the same on either panel */
   opacity: 0.55;
 }
 .cart__note {

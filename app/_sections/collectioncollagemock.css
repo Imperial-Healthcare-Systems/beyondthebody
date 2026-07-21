@@ -3,8 +3,8 @@
 .mock {
   position: relative;
   overflow: hidden;
-  background: var(--ivory);
-  color: var(--oxblood);
+  background: var(--ground);
+  color: var(--ink);
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -22,8 +22,12 @@
   grid-auto-flow: dense;
   gap: 6px;
   opacity: 0.62;
-  /* unify the mixed sources into one warm, matte grade */
-  filter: sepia(0.24) saturate(0.82) brightness(1.02) contrast(0.95);
+  /* unify the mixed sources into one warm, matte grade. The sepia/contrast pass
+     is the house look and holds in both schemes; the trailing --img-dim/--img-sat
+     pair is the scheme's own correction — a no-op (1/1) on the light page, and
+     on night it pulls the daylight grade back off the ground. */
+  filter: sepia(0.24) saturate(0.82) brightness(1.02) contrast(0.95)
+          brightness(var(--img-dim)) saturate(var(--img-sat));
 }
 .mock__tile {
   margin: 0;
@@ -39,18 +43,26 @@
 .mock__tile.s2r { grid-row: span 2; }
 .mock__tile.s2c { grid-column: span 2; }
 
-/* champagne tint for tonal cohesion */
+/* champagne tint for tonal cohesion — a warm photo GRADE, not grain, so it
+   rides --grade-blend (multiply on the ivory page, screen on night). */
 .mock__tint {
   position: absolute;
   inset: 0;
   z-index: 1;
   background: var(--champagne);
-  mix-blend-mode: multiply;
+  mix-blend-mode: var(--grade-blend);
   opacity: 0.12;
   pointer-events: none;
 }
 
-/* ivory scrim — clean, legible centre; collage bleeds in at the edges */
+/* GROUND scrim — clean, legible centre; collage bleeds in at the edges.
+   REDESIGNED: these eight stops were hard-coded ivory, i.e. the scrim painted
+   the collage out toward an ivory page edge. That is the light-dependent part —
+   on a night ground the same stops become a bright fog sitting on top of the
+   page. They now fade the collage into whatever the section's ground currently
+   is: --ground-rgb (added at v0.2 for exactly this) for the seven ivory stops,
+   and --ground-3 for the deeper closing stop, which is what #ECDFCB was. Every
+   alpha is unchanged, so the light page renders as before. */
 .mock__scrim {
   position: absolute;
   inset: 0;
@@ -58,15 +70,15 @@
   pointer-events: none;
   background:
     radial-gradient(125% 115% at 50% 44%,
-      rgba(245, 239, 228, 0.95) 0%,
-      rgba(245, 239, 228, 0.66) 34%,
-      rgba(245, 239, 228, 0.5) 66%,
-      rgba(245, 239, 228, 0.74) 100%),
+      rgb(var(--ground-rgb) / 0.95) 0%,
+      rgb(var(--ground-rgb) / 0.66) 34%,
+      rgb(var(--ground-rgb) / 0.5) 66%,
+      rgb(var(--ground-rgb) / 0.74) 100%),
     linear-gradient(180deg,
-      rgba(245, 239, 228, 0.85) 0%,
-      rgba(245, 239, 228, 0) 22%,
-      rgba(245, 239, 228, 0) 78%,
-      rgba(236, 223, 203, 0.92) 100%);
+      rgb(var(--ground-rgb) / 0.85) 0%,
+      rgb(var(--ground-rgb) / 0) 22%,
+      rgb(var(--ground-rgb) / 0) 78%,
+      color-mix(in srgb, var(--ground-3) 92%, transparent) 100%);
 }
 
 /* fine grain */
@@ -75,8 +87,8 @@
   inset: 0;
   z-index: 3;
   pointer-events: none;
-  opacity: 0.5;
-  mix-blend-mode: multiply;
+  opacity: calc(0.5 * var(--film-op));
+  mix-blend-mode: var(--film-blend-mul);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.16'/%3E%3C/svg%3E");
 }
 
@@ -103,7 +115,7 @@
   position: absolute;
   width: clamp(20px, 2.4vw, 34px);
   height: clamp(20px, 2.4vw, 34px);
-  border: 1px solid var(--rose-taupe);
+  border: 1px solid var(--ink-muted);
   opacity: 0.7;
   pointer-events: none;
 }
@@ -117,14 +129,14 @@
   text-transform: uppercase;
   letter-spacing: 0.44em;
   font-size: clamp(0.6rem, 0.8vw, 0.72rem);
-  color: var(--rose-taupe);
+  color: var(--ink-muted);
   margin: 0 0 clamp(24px, 3.5vh, 36px);
 }
 .mock__rule {
   display: block;
   width: clamp(48px, 7vw, 88px);
   height: 1px;
-  background: var(--rose-taupe);
+  background: var(--ink-muted);
   opacity: 0.6;
   margin: 0 0 clamp(30px, 4.5vh, 46px);
 }
@@ -134,7 +146,7 @@
   letter-spacing: -0.025em;
   font-size: clamp(2.8rem, 7.6vw, 6.4rem);
   line-height: 0.98;
-  color: var(--oxblood);
+  color: var(--ink);
   margin: 0;
 }
 .mock__headline .line { display: block; }
@@ -144,5 +156,5 @@
   font-family: var(--ff-body);
   font-size: clamp(1.02rem, 1.3vw, 1.22rem);
   line-height: 1.68;
-  color: var(--oxblood-2);
+  color: var(--ink-2);
 }

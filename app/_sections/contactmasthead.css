@@ -6,8 +6,8 @@
    ================================================================= */
 
 .ct {
-  background: var(--ivory);
-  color: var(--oxblood);
+  background: var(--ground);
+  color: var(--ink);
   min-height: 100svh;
 }
 .ct__inner {
@@ -29,14 +29,14 @@
   text-transform: uppercase;
   letter-spacing: 0.42em;
   font-size: clamp(0.6rem, 0.8vw, 0.7rem);
-  color: var(--rose-taupe);
+  color: var(--ink-muted);
   margin: 0;
 }
 .ct__rule {
   display: block;
   width: 54px;
   height: 1px;
-  background: color-mix(in srgb, var(--oxblood) 40%, transparent);
+  background: color-mix(in srgb, var(--ink) 40%, transparent);
   margin: clamp(22px, 3vh, 32px) 0;
 }
 .ct__headline {
@@ -60,7 +60,7 @@
   font-weight: 400;
   font-size: clamp(0.98rem, 1.2vw, 1.1rem);
   line-height: 1.85;
-  color: var(--oxblood-2);
+  color: var(--ink-2);
   margin: clamp(30px, 4.5vh, 46px) 0 0;
   max-width: 40ch;
   text-wrap: pretty;
@@ -75,7 +75,7 @@
   text-transform: uppercase;
   letter-spacing: 0.28em;
   font-size: clamp(0.56rem, 0.72vw, 0.64rem);
-  color: var(--rose-taupe);
+  color: var(--ink-muted);
   margin: 0 0 clamp(10px, 1.4vh, 14px);
 }
 .ct__email {
@@ -83,9 +83,9 @@
   font-weight: 300;
   letter-spacing: -0.01em;
   font-size: clamp(1.35rem, 2.6vw, 2.1rem);
-  color: var(--oxblood);
+  color: var(--ink);
   text-decoration: none;
-  background-image: linear-gradient(var(--oxblood), var(--oxblood));
+  background-image: linear-gradient(var(--ink), var(--ink));
   background-size: 0% 1px;
   background-position: 0 100%;
   background-repeat: no-repeat;
@@ -93,26 +93,26 @@
 }
 .ct__email:hover {
   background-size: 100% 1px;
-  color: var(--oxblood-2);
+  color: var(--ink-2);
 }
 .ct__social {
   font-family: var(--ff-display);
   font-weight: 300;
   font-size: clamp(1.1rem, 1.8vw, 1.4rem);
-  color: var(--oxblood);
+  color: var(--ink);
   margin: 0;
 }
 .ct__social a {
   color: inherit;
   text-decoration: none;
-  background-image: linear-gradient(var(--oxblood), var(--oxblood));
+  background-image: linear-gradient(var(--ink), var(--ink));
   background-size: 0% 1px;
   background-position: 0 100%;
   background-repeat: no-repeat;
   transition: background-size 0.5s var(--ease);
 }
 .ct__social a:hover { background-size: 100% 1px; }
-.ct__dot { color: var(--rose-taupe); }
+.ct__dot { color: var(--ink-muted); }
 
 /* ---- media column ---- */
 .ct__media {
@@ -127,6 +127,9 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* the draped-linen still is high-key and would glare on a night ground. Safe
+     as CSS: the GSAP intro tweens scale + clipPath on this node, never filter. */
+  filter: brightness(var(--img-dim)) saturate(var(--img-sat));
   will-change: transform;
 }
 /* warm grade toward the house palette (the source linen reads slightly cool) */
@@ -136,8 +139,19 @@
   background:
     linear-gradient(120deg, rgba(78, 33, 45, 0.22), rgba(226, 203, 166, 0.12) 55%, rgba(245, 239, 228, 0) 100%),
     radial-gradient(120% 90% at 90% 20%, rgba(245, 239, 228, 0.28), transparent 60%);
-  mix-blend-mode: multiply;
+  mix-blend-mode: var(--grade-blend);
   pointer-events: none;
+}
+/* REDESIGNED for the dark scheme: this is a warm-DARKENING grade, and
+   --grade-blend flips multiply → screen on night, where a darkening wash can
+   only wash the linen out. The night grade keeps the same 120° axis and the
+   same 90%/20% highlight but is re-cut as a plain overlay: the ground sinks the
+   near edge, a low champagne bloom warms the far one. */
+:root[data-scheme="dark"] .ct__scrim {
+  background:
+    linear-gradient(120deg, rgb(var(--ground-rgb) / 0.55), rgb(var(--bloom) / 0.05) 55%, rgb(var(--bloom) / 0) 100%),
+    radial-gradient(120% 90% at 90% 20%, rgb(var(--bloom) / 0.1), transparent 60%);
+  mix-blend-mode: normal;
 }
 
 /* ---------- tablet / mobile: stack, image below the copy ---------- */

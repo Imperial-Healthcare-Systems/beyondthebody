@@ -10,10 +10,10 @@
 
 /* ---------------- shared copy type ---------------- */
 .origin__mark { width: clamp(54px, 6vw, 82px); height: auto; display: block; }
-.origin__eyebrow { color: var(--champagne); }
+.origin__eyebrow { color: var(--accent); }
 .origin__head {
   font-family: var(--ff-display); font-size: clamp(2.2rem, 4.8vw, 4rem);
-  line-height: 1.03; color: var(--ivory); letter-spacing: -.02em;
+  line-height: 1.03; color: var(--ink); letter-spacing: -.02em;
 }
 .origin__line {
   font-family: var(--ff-display); font-style: italic; font-weight: 300;
@@ -21,20 +21,26 @@
 }
 
 /* ---------------- VARIANT A ---------------- */
+/* Ground held as a literal token: this beat paints --oxblood-2, which on this
+   data-theme resolves to --ground-3, NOT --ground — so a straight semantic swap
+   would repaint the light scheme. The night ground is set by the scheme-scoped
+   override below instead. Same for .originb. */
 .origin {
   position: relative; min-height: 100vh;
-  background: var(--oxblood-2); color: var(--ivory);
+  background: var(--oxblood-2); color: var(--ink);
   overflow: hidden; display: flex; flex-direction: column;
 }
+:root[data-scheme="dark"] .origin { background: var(--ground); }
 
 /* right-side parallax glow + grain, behind the BTB */
 .origin__glow {
   position: absolute; top: 0; bottom: 0; right: 0; z-index: 0;
   width: min(52%, 660px); pointer-events: none; will-change: transform;
-  background: radial-gradient(52% 42% at 76% 50%, rgba(226,203,166,.16), transparent 72%);
+  background: radial-gradient(52% 42% at 76% 50%, rgb(var(--bloom) / .16), transparent 72%);
 }
 .origin__glow::after {
-  content: ""; position: absolute; inset: 0; opacity: .22; mix-blend-mode: overlay;
+  content: ""; position: absolute; inset: 0;
+  opacity: calc(.22 * var(--film-op)); mix-blend-mode: var(--film-blend);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
 }
 
@@ -44,7 +50,7 @@
   z-index: 0; display: flex; flex-direction: column; align-items: center;
   font-family: var(--ff-display); font-weight: 400; line-height: .82;
   font-size: clamp(6rem, 27vh, 17rem); letter-spacing: -.03em;
-  color: rgba(226,203,166,.09); user-select: none; pointer-events: none; will-change: transform;
+  color: rgb(var(--bloom) / .09); user-select: none; pointer-events: none; will-change: transform;
 }
 .origin__btb span { display: block; }
 
@@ -69,10 +75,10 @@
   animation: codaGlow 4.5s var(--ease) infinite;
 }
 .origin__scrollline {
-  width: 1px; height: 44px; background: linear-gradient(var(--champagne), transparent);
+  width: 1px; height: 44px; background: linear-gradient(var(--accent), transparent);
   transform-origin: top; animation: originScroll 2.4s var(--ease) infinite;
 }
-@keyframes codaGlow { 0%, 100% { opacity: .55; } 50% { opacity: 1; text-shadow: 0 0 22px rgba(226,203,166,.45); } }
+@keyframes codaGlow { 0%, 100% { opacity: .55; } 50% { opacity: 1; text-shadow: 0 0 22px rgb(var(--bloom) / .45); } }
 @keyframes originScroll { 0%, 100% { transform: scaleY(.35); opacity: .4; } 50% { transform: scaleY(1); opacity: 1; } }
 
 @media (max-width: 860px) {
@@ -92,24 +98,41 @@
    parallax has real travel. */
 .originb {
   position: relative; min-height: 75vh; overflow: hidden;
-  background: var(--oxblood-2); color: var(--ivory); display: flex; flex-direction: column;
+  background: var(--oxblood-2); color: var(--ink); display: flex; flex-direction: column;
 }
+:root[data-scheme="dark"] .originb { background: var(--ground); }
 .originb__media { position: absolute; inset: 0; z-index: 0; }
 .originb__img { position: absolute; inset: -8% 0; width: 100%; height: 116%; object-fit: cover; will-change: transform; }
+/* GSAP tweens only y on .originb__img, so a CSS filter is safe; scoped to the
+   <img> so the placeholder gradient isn't dimmed twice. Both multipliers are 1
+   in the light scheme → no light-side change. */
+img.originb__img { filter: brightness(var(--img-dim)) saturate(var(--img-sat)); }
+/* The ground ramp descends #4a332c → oxblood-2 → oxblood-3. The lower two stops
+   ARE --ground-3 / --ground-2 on this beat and remap cleanly; the top stop is a
+   warm brown that matches no token, so it is a local var with a night value on
+   the same rung of the night ramp (--night-4). */
 .originb__placeholder {
+  --ob-g0: #4a332c;
   position: absolute; inset: 0;
   background:
     radial-gradient(70% 60% at 30% 40%, rgba(234,217,190,.16), transparent 60%),
-    linear-gradient(150deg, #4a332c 0%, var(--oxblood-2) 55%, var(--oxblood-3) 100%);
+    linear-gradient(150deg, var(--ob-g0) 0%, var(--ground-3) 55%, var(--ground-2) 100%);
 }
+:root[data-scheme="dark"] .originb__placeholder { --ob-g0: var(--night-4); }
+/* Scrim triplet held locally: 24 10 12 is close to --scrim (18 4 6) but not
+   equal, so the light scheme keeps its own value and only the night AD adopts
+   the deeper scheme scrim. */
 .originb__scrim {
+  --ob-scrim: 24 10 12;
   position: absolute; inset: 0; z-index: 1;
   background:
-    linear-gradient(90deg, rgba(24,10,12,.82) 0%, rgba(24,10,12,.42) 44%, transparent 74%),
-    linear-gradient(0deg, rgba(24,10,12,.5) 0%, transparent 40%);
+    linear-gradient(90deg, rgb(var(--ob-scrim) / .82) 0%, rgb(var(--ob-scrim) / .42) 44%, transparent 74%),
+    linear-gradient(0deg, rgb(var(--ob-scrim) / .5) 0%, transparent 40%);
 }
+:root[data-scheme="dark"] .originb__scrim { --ob-scrim: var(--scrim); }
 .originb__grain {
-  position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: .3; mix-blend-mode: overlay;
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  opacity: calc(.3 * var(--film-op)); mix-blend-mode: var(--film-blend);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
 }
 .originb__inner {
@@ -122,7 +145,7 @@
 .originb__chapter {
   writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg);
   font-family: var(--ff-exp); font-weight: 600; font-size: .64rem; letter-spacing: .3em;
-  text-transform: uppercase; color: var(--champagne); white-space: nowrap; flex: none;
+  text-transform: uppercase; color: var(--accent); white-space: nowrap; flex: none;
 }
 .originb__text { display: flex; flex-direction: column; gap: clamp(10px, 1.4vw, 18px); max-width: 620px; }
 .originb__text .origin__head { font-size: clamp(1.9rem, 4vw, 3.4rem); }

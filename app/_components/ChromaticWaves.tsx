@@ -289,7 +289,10 @@ interface ChromaticWavesProps {
   frequency?: number;
   speed?: number;
   bgColor?: string;
-  colors?: string[];
+  /* readonly: the palette is only ever READ here, and callers pass `as const`
+     tuples (PdpBlueprint's per-scheme wave.dots). Requiring a mutable string[]
+     rejected those and broke `next build` (TS2322). Widened 2026-07-21. */
+  colors?: readonly string[];
   cellSize?: number;
   gamma?: number;
   paletteBias?: number;

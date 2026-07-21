@@ -6,8 +6,8 @@
 .comp {
   position: relative;
   overflow: hidden;
-  background: var(--oxblood-deep);
-  color: var(--ivory);
+  background: var(--ground);
+  color: var(--ink);
   min-height: min(96vh, 940px);
   display: flex;
   align-items: center;
@@ -19,6 +19,8 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
+  /* shot for the ivory-scheme page; eased back on the night ramp (1/1 in light) */
+  filter: brightness(var(--img-dim)) saturate(var(--img-sat));
 }
 /* edge scrims so the left copy + right notes stay legible over the photo */
 .comp__scrim {
@@ -26,12 +28,12 @@
   inset: 0;
   background: linear-gradient(
     90deg,
-    rgba(20, 8, 12, 0.92) 0%,
-    rgba(20, 8, 12, 0.32) 24%,
-    rgba(20, 8, 12, 0) 40%,
-    rgba(20, 8, 12, 0) 56%,
-    rgba(20, 8, 12, 0.42) 72%,
-    rgba(20, 8, 12, 0.92) 100%
+    rgb(var(--scrim) / 0.92) 0%,
+    rgb(var(--scrim) / 0.32) 24%,
+    rgb(var(--scrim) / 0) 40%,
+    rgb(var(--scrim) / 0) 56%,
+    rgb(var(--scrim) / 0.42) 72%,
+    rgb(var(--scrim) / 0.92) 100%
   );
 }
 
@@ -58,7 +60,7 @@
   text-transform: uppercase;
   letter-spacing: 0.3em;
   font-size: clamp(0.56rem, 0.74vw, 0.66rem);
-  color: var(--champagne);
+  color: var(--accent);
   margin: 0 0 clamp(20px, 3vh, 30px);
 }
 .comp__title {
@@ -67,7 +69,7 @@
   letter-spacing: -0.02em;
   font-size: clamp(2.5rem, 5.4vw, 4.6rem);
   line-height: 0.98;
-  color: var(--ivory);
+  color: var(--ink);
   margin: 0;
 }
 .comp__sub {
@@ -77,6 +79,8 @@
   letter-spacing: 0.14em;
   font-size: clamp(0.68rem, 0.95vw, 0.82rem);
   line-height: 1.7;
+  /* deliberate primitive (as in .comp__note figcaption): no semantic equals
+     --champ-soft, and champagne is the accent register on every dark ground. */
   color: var(--champ-soft);
 }
 .comp__meta {
@@ -85,7 +89,7 @@
   text-transform: uppercase;
   letter-spacing: 0.2em;
   font-size: clamp(0.54rem, 0.7vw, 0.62rem);
-  color: var(--rose-taupe);
+  color: var(--ink-muted);
 }
 
 /* ---- notes (right) ---- */
@@ -107,7 +111,7 @@
   text-transform: uppercase;
   letter-spacing: 0.28em;
   font-size: clamp(0.54rem, 0.7vw, 0.62rem);
-  color: var(--champagne);
+  color: var(--accent);
 }
 .comp__row {
   display: flex;
@@ -126,12 +130,28 @@
   aspect-ratio: 1;
   border-radius: 50%;
   overflow: hidden;
-  background: radial-gradient(circle at 50% 38%, rgba(70, 34, 45, 0.55), rgba(18, 7, 11, 0.92));
-  border: 1px solid rgba(226, 203, 166, 0.34);
+  /* the note "well" — a warm oxblood lift falling to near-black.
+     Hue-corrected 2026-07-21: these WERE left as literals on the reasoning that a
+     well reads the same against either register. That held while the night ramp was
+     oxblood-derived; once the ramp was retargeted warm (~13°, see tokens.css → HUE
+     RULE) an oxblood well at 342° reads visibly PURPLE against it. The light scheme
+     keeps its exact values; the night scheme gets the same gesture re-cut warm. */
+  --disc-lift: rgba(70, 34, 45, 0.55);
+  --disc-fall: rgba(18, 7, 11, 0.92);
+  background: radial-gradient(circle at 50% 38%, var(--disc-lift), var(--disc-fall));
+  border: 1px solid var(--hairline-2);
   display: grid;
   place-items: center;
-  box-shadow: 0 12px 28px -14px rgba(0, 0, 0, 0.7);
+  /* was rgba(0,0,0,.7) — the one pure black left in the sheet; --shadow-2 is the
+     warm, register-aware equivalent. */
+  box-shadow: 0 12px 28px -14px var(--shadow-2);
 }
+/* warm-ember well for the night AD — same gesture, hue ~14 deg not 342 deg */
+:root[data-scheme="dark"] .comp__disc {
+  --disc-lift: rgb(96 54 38 / .50);
+  --disc-fall: rgb(14 8 6 / .94);
+}
+
 .comp__disc img {
   width: 82%;
   height: 82%;
@@ -155,7 +175,7 @@
     min-height: auto;
     flex-direction: column;
     background-image:
-      linear-gradient(rgba(20, 8, 12, 0.8), rgba(20, 8, 12, 0.88)),
+      linear-gradient(rgb(var(--scrim) / 0.8), rgb(var(--scrim) / 0.88)),
       url("/products/notes/comp-texture.jpg");
     background-size: cover;
     background-position: center;

@@ -5,13 +5,27 @@
    a legal bar that PINS at the top through a sticky image reveal whose
    giant "Beyond The Body" wordmark holds centered while the image
    scrubs 1.3 → 1. Tuned so nothing is ever bisected at rest.
+
+   Dark scheme: data-theme="dark", so the footer lands in the DEEPEST register
+   (--night-0) — the page's closing held moment, as intended. The reveal
+   photograph is already low-key (dim hall, one warm rake of light), so it takes
+   NO --img-dim grade; dimming it further would only crush it.
    ================================================================= */
 .ft {
   position: relative;
-  background: var(--oxblood-deep);
+  background: var(--ground);
   color: var(--champ-soft);
   isolation: isolate;
+
+  /* The reveal scrims + wordmark halo were authored on oxblood-deep (29 11 18),
+     which matches no --scrim value, so tokenising them directly would have
+     shifted the light build. The triplet is held locally instead: identical in
+     the light scheme, re-pointed at --scrim on night — where 29 11 18 is
+     actually LIGHTER than the --night-0 ground and the vignette would have
+     inverted into a warm glow. */
+  --ft-scrim: 29 11 18;
 }
+:root[data-scheme="dark"] .ft { --ft-scrim: var(--scrim); }
 
 /* ---------- flowing dark content ---------- */
 .ft__flow { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--pad); }
@@ -20,19 +34,19 @@
 .ft__news {
   padding: clamp(56px, 9vh, 108px) 0 clamp(40px, 5.5vh, 66px);
   display: flex; flex-direction: column; align-items: center; text-align: center;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--hairline);
 }
 .ft__mark {
   width: clamp(32px, 3.2vw, 44px); height: clamp(32px, 3.2vw, 44px);
   margin-bottom: clamp(22px, 3vh, 34px);
-  background: var(--champagne);
+  background: var(--accent);
   -webkit-mask: url("/brand/btb-mark.png") center / contain no-repeat;
           mask: url("/brand/btb-mark.png") center / contain no-repeat;
   opacity: .92;
 }
 .ft__nl-title {
   margin: 0; font-family: var(--ff-display); font-weight: 300; letter-spacing: -.02em;
-  font-size: clamp(2.4rem, 6vw, 5rem); line-height: 1; color: var(--ivory);
+  font-size: clamp(2.4rem, 6vw, 5rem); line-height: 1; color: var(--ink);
 }
 .ft__nl-title .line { display: block; overflow: hidden; padding-bottom: .08em; }
 .ft__nl-title .inner { display: block; will-change: transform; }
@@ -44,18 +58,25 @@
 .ft__nl-form { width: min(560px, 100%); }
 .ft__field {
   display: flex; align-items: center; gap: clamp(12px, 1.6vw, 22px);
-  border-bottom: 1px solid rgba(226, 203, 166, .34); padding-bottom: 10px;
+  border-bottom: 1px solid var(--hairline-2); padding-bottom: 10px;
 }
 .ft__input {
   flex: 1 1 auto; min-width: 0; background: transparent; border: 0; outline: 0;
-  color: var(--ivory); font-family: var(--ff-body);
+  color: var(--ink); font-family: var(--ff-body);
+  /* the caret follows `color` in most engines but not dependably in a
+     transparent-background field — pin it so the typing point is visible on
+     every ground. */
+  caret-color: var(--accent);
   font-size: clamp(.98rem, 1.2vw, 1.1rem); padding: 6px 2px;
 }
-.ft__input::placeholder { color: var(--rose-taupe); opacity: .85; }
-.ft__field:focus-within { border-color: var(--champagne); }
+.ft__input::placeholder { color: var(--ink-muted); opacity: .85; }
+.ft__field:focus-within { border-color: var(--accent); }
 .ft__submit {
   flex: 0 0 auto; display: inline-flex; align-items: center; gap: .7em; white-space: nowrap;
-  background: var(--champagne); color: var(--oxblood-deep); border: 0; border-radius: 999px;
+  /* --accent-ink resolves to --oxblood (not --oxblood-deep) in the light dark
+     beat, so the button's ink stays a primitive rather than shift the light
+     build; oxblood-deep on champagne reads correctly in both schemes. */
+  background: var(--accent); color: var(--oxblood-deep); border: 0; border-radius: 999px;
   cursor: pointer; font-family: var(--ff-exp); text-transform: uppercase; font-weight: 600;
   letter-spacing: .18em; font-size: .68rem;
   padding: clamp(12px, 1.3vw, 15px) clamp(20px, 2vw, 28px);
@@ -66,40 +87,40 @@
 .ft__submit:hover svg { transform: translateX(5px); }
 .ft__nl-done {
   margin: 0; font-family: var(--ff-display); font-style: italic; font-weight: 300;
-  font-size: clamp(1.2rem, 2vw, 1.6rem); color: var(--ivory);
+  font-size: clamp(1.2rem, 2vw, 1.6rem); color: var(--ink);
 }
 
 /* 1 · mega row — monogram + big-type nav */
 .ft__mega-row {
   display: grid; grid-template-columns: 1fr 1.4fr; gap: clamp(30px, 5vw, 80px);
   align-items: start; padding: clamp(40px, 6vh, 72px) 0 clamp(34px, 5vh, 58px);
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--hairline);
 }
 .ft__monogram { display: flex; flex-direction: column; align-items: flex-start; gap: clamp(18px, 2.4vh, 26px); }
 .ft__glyph {
   display: block; width: clamp(52px, 6vw, 84px); height: clamp(52px, 6vw, 84px);
-  background: var(--champagne);
+  background: var(--accent);
   -webkit-mask: url("/brand/btb-mark.png") center / contain no-repeat;
           mask: url("/brand/btb-mark.png") center / contain no-repeat;
 }
 .ft__tag {
   font-family: var(--ff-display); font-style: italic; font-weight: 300;
-  font-size: clamp(1.05rem, 1.5vw, 1.4rem); line-height: 1.3; color: var(--rose-taupe); max-width: 20ch;
+  font-size: clamp(1.05rem, 1.5vw, 1.4rem); line-height: 1.3; color: var(--ink-muted); max-width: 20ch;
 }
 
-.ft__mega { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+.ft__mega { display: flex; flex-direction: column; border-top: 1px solid var(--hairline); }
 .ft__mega-link {
   display: flex; align-items: center; justify-content: space-between;
-  padding: clamp(14px, 1.8vh, 22px) 0; border-bottom: 1px solid var(--line);
+  padding: clamp(14px, 1.8vh, 22px) 0; border-bottom: 1px solid var(--hairline);
   font-family: var(--ff-display); font-weight: 300; letter-spacing: -.01em;
   font-size: clamp(1.8rem, 4vw, 3.4rem); line-height: 1.06;
-  color: var(--ivory); opacity: .42;                 /* dim by default — but readable */
+  color: var(--ink); opacity: .42;                   /* dim by default — but readable */
   transition: opacity .6s var(--ease), color .6s var(--ease), padding-left .5s var(--ease);
 }
 /* the section currently in view shines — driven live by the scrollspy */
-.ft__mega-link.is-active { opacity: 1; color: var(--champagne); }
-.ft__mega-link:hover { opacity: 1; color: var(--champagne); padding-left: clamp(8px, 1vw, 18px); }
-.ft__mega-link .ft__ext { color: var(--rose-taupe); opacity: 0; transition: opacity .5s var(--ease); }
+.ft__mega-link.is-active { opacity: 1; color: var(--accent); }
+.ft__mega-link:hover { opacity: 1; color: var(--accent); padding-left: clamp(8px, 1vw, 18px); }
+.ft__mega-link .ft__ext { color: var(--ink-muted); opacity: 0; transition: opacity .5s var(--ease); }
 .ft__mega-link.is-active .ft__ext,
 .ft__mega-link:hover .ft__ext { opacity: 1; }
 
@@ -112,17 +133,17 @@
 .ft__blurb {
   margin: 0 0 clamp(20px, 3vh, 30px); max-width: 34ch;
   font-family: var(--ff-body); font-size: clamp(.92rem, 1.05vw, 1rem);
-  line-height: 1.65; color: var(--rose-taupe);
+  line-height: 1.65; color: var(--ink-muted);
 }
 .ft__social { display: flex; gap: clamp(18px, 2vw, 28px); }
 .ft__social a {
   font-family: var(--ff-exp); text-transform: uppercase; letter-spacing: .16em;
   font-size: .64rem; color: var(--champ-soft); transition: color var(--dur-fast) var(--ease);
 }
-.ft__social a:hover { color: var(--champagne); }
+.ft__social a:hover { color: var(--accent); }
 .ft__ch {
   font-family: var(--ff-exp); text-transform: uppercase; letter-spacing: .24em;
-  font-size: .64rem; color: var(--champagne); margin-bottom: clamp(16px, 2vh, 22px);
+  font-size: .64rem; color: var(--accent); margin-bottom: clamp(16px, 2vh, 22px);
 }
 .ft__link {
   font-family: var(--ff-body); font-size: clamp(.92rem, 1.05vw, 1rem);
@@ -145,26 +166,26 @@
    dropped, so this never did anything on desktop. */
 .ft__legal {
   box-sizing: border-box;
-  background: var(--oxblood-deep);
-  border-top: 1px solid var(--line);
+  background: var(--ground);
+  border-top: 1px solid var(--hairline);
   padding: clamp(16px, 2vh, 22px) var(--pad);
   display: flex; align-items: center; justify-content: space-between;
   gap: 14px 36px; flex-wrap: wrap;
   font-family: var(--ff-exp); text-transform: uppercase; letter-spacing: .18em;
-  font-size: .6rem; color: var(--rose-taupe);
+  font-size: .6rem; color: var(--ink-muted);
 }
 .ft__made { letter-spacing: .15em; }
 .ft__legal-links { display: inline-flex; gap: clamp(16px, 2vw, 28px); }
-.ft__legal-links a { color: var(--rose-taupe); transition: color var(--dur-fast) var(--ease); }
+.ft__legal-links a { color: var(--ink-muted); transition: color var(--dur-fast) var(--ease); }
 .ft__legal:has(a:hover) a:not(:hover) { opacity: .45; }
-.ft__legal-links a:hover { color: var(--champagne); }
+.ft__legal-links a:hover { color: var(--accent); }
 
 /* R · image band — sits UNDER the footer (contained, not full-bleed) --------- */
 .ft__reveal {
   position: relative; overflow: hidden;
   height: clamp(420px, 72vh, 780px);
   border-radius: clamp(14px, 2vw, 22px) clamp(14px, 2vw, 22px) 0 0;
-  background: var(--oxblood-3);
+  background: var(--ground-2);
 }
 .ft__sticky { position: absolute; inset: 0; overflow: hidden; }
 .ft__reveal-img {
@@ -172,28 +193,29 @@
   object-fit: cover; object-position: center; will-change: transform;
 }
 .ft__reveal-grain {
-  position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: .34;
-  mix-blend-mode: overlay;
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  opacity: calc(.34 * var(--film-op));
+  mix-blend-mode: var(--film-blend);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
 }
 .ft__reveal-scrim {
   position: absolute; inset: 0; z-index: 1;
   background:
-    linear-gradient(180deg, rgba(29,11,18,.5) 0%, transparent 22%, transparent 62%, rgba(29,11,18,.66) 100%),
-    radial-gradient(120% 80% at 50% 50%, transparent 40%, rgba(29,11,18,.42) 100%);
+    linear-gradient(180deg, rgb(var(--ft-scrim) / .5) 0%, transparent 22%, transparent 62%, rgb(var(--ft-scrim) / .66) 100%),
+    radial-gradient(120% 80% at 50% 50%, transparent 40%, rgb(var(--ft-scrim) / .42) 100%);
 }
 .ft__wordmark {
   position: absolute; inset: 0; z-index: 3;
   display: flex; align-items: center; justify-content: flex-start; gap: clamp(12px, 1.6vw, 28px);
   padding: 0 var(--pad); will-change: transform;
   font-family: var(--ff-display); font-weight: 300; letter-spacing: -.01em;
-  color: var(--ivory); white-space: nowrap;
+  color: var(--ink); white-space: nowrap;
   font-size: clamp(2rem, 7.4vw, 7.4rem); line-height: 1;
-  text-shadow: 0 4px 40px rgba(29, 11, 18, .5);
+  text-shadow: 0 4px 40px rgb(var(--ft-scrim) / .5);
 }
 .ft__wordmark-glyph {
   width: clamp(28px, 4.4vw, 88px); height: clamp(28px, 4.4vw, 88px); flex: 0 0 auto;
-  background: var(--champagne);
+  background: var(--accent);
   -webkit-mask: url("/brand/btb-mark.png") center / contain no-repeat;
           mask: url("/brand/btb-mark.png") center / contain no-repeat;
   opacity: .95;
@@ -205,6 +227,8 @@
   .ft__detail { grid-template-columns: 1fr; gap: clamp(34px, 6vh, 48px); }
   .ft__field { flex-direction: column; align-items: stretch; gap: 18px; border-bottom: 0; }
   .ft__input {
+    /* .3 sits between --hairline (.18) and --hairline-2 (.34); kept literal so
+       the light build is untouched — champagne at .3 reads on either night ground. */
     border: 1px solid rgba(226, 203, 166, .3); border-radius: 2px; padding: 14px; text-align: center;
   }
   .ft__submit { justify-content: center; width: 100%; }

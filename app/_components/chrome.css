@@ -100,33 +100,36 @@
 .drawer.is-open { visibility: visible; pointer-events: auto; }
 .drawer__scrim {
   position: absolute; inset: 0; width: 100%; height: 100%;
-  background: rgba(18,4,6,.5); opacity: 0; transition: opacity .5s var(--ease); cursor: pointer;
+  background: var(--overlay-scrim); opacity: 0; transition: opacity .5s var(--ease); cursor: pointer;
 }
 .drawer.is-open .drawer__scrim { opacity: 1; }
 .drawer__panel {
   position: absolute; top: 0; left: 0; height: 100%;
   width: min(88vw, 440px);
-  background: var(--ivory); color: var(--oxblood);
+  background: var(--panel); color: var(--panel-ink);
   display: flex; flex-direction: column;
   padding: 28px var(--pad) calc(var(--pad) + 8px);
   transform: translateX(-100%); transition: transform .55s var(--ease);
-  box-shadow: 30px 0 80px -40px rgba(42,16,25,.5);
+  /* On ivory the shadow does the lifting; on night a shadow against a dark page
+     is invisible, so a champagne hairline down the panel's leading edge carries
+     the separation instead. Both ship; the inert one costs nothing. */
+  box-shadow: 30px 0 80px -40px var(--shadow), inset -1px 0 0 var(--panel-line);
 }
 .drawer.is-open .drawer__panel { transform: translateX(0); }
 .drawer__head { display: flex; align-items: center; justify-content: space-between; }
-.drawer__head .nav__glyph { width: 40px; height: 40px; color: var(--oxblood); }
+.drawer__head .nav__glyph { width: 40px; height: 40px; color: var(--panel-ink); }
 .drawer__close { width: 42px; height: 42px; display: grid; place-items: center; position: relative; }
 .drawer__close span {
-  position: absolute; width: 20px; height: 1.6px; background: var(--oxblood);
-  transition: transform .4s var(--ease);
+  position: absolute; width: 20px; height: 1.6px; background: var(--panel-ink);
+  transition: transform .4s var(--ease), background .3s var(--ease);
 }
 .drawer__close span:first-child { transform: rotate(45deg); }
 .drawer__close span:last-child { transform: rotate(-45deg); }
-.drawer__close:hover span { background: var(--oxblood-2); }
+.drawer__close:hover span { background: var(--panel-ink-2); }
 .drawer__nav { display: flex; flex-direction: column; margin-top: 52px; }
 .drawer__nav a {
   font-family: var(--ff-display); font-size: clamp(1.8rem, 5.6vw, 2.6rem);
-  color: var(--oxblood); padding: 14px 0; width: fit-content; position: relative;
+  color: var(--panel-ink); padding: 14px 0; width: fit-content; position: relative;
   transition: transform .4s var(--ease), color .3s var(--ease);
   opacity: 0; transform: translateX(-14px);
 }
@@ -135,7 +138,7 @@
 .drawer.is-open .drawer__nav a:nth-child(2) { transition-delay: .18s; }
 .drawer.is-open .drawer__nav a:nth-child(3) { transition-delay: .24s; }
 .drawer.is-open .drawer__nav a:nth-child(4) { transition-delay: .30s; }
-.drawer__nav a:hover { transform: translateX(8px); color: var(--oxblood-2); }
+.drawer__nav a:hover { transform: translateX(8px); color: var(--panel-ink-2); }
 .drawer__foot {
   margin-top: auto;
   font-family: var(--ff-display); font-style: italic;
@@ -144,6 +147,46 @@
 @media (prefers-reduced-motion: reduce) {
   .drawer__nav a { opacity: 1; transform: none; }
 }
+
+/* ---------- APPEARANCE (light / dark) — in the drawer ---------- */
+/* Sits above the house line at the drawer's foot, separated by a hairline so
+   it reads as a setting rather than a fifth nav destination. */
+.schemetoggle {
+  margin-top: auto;
+  padding-top: 22px;
+  border-top: 1px solid var(--panel-line);
+  display: flex; flex-direction: column; gap: 12px;
+}
+.schemetoggle__label {
+  font-family: var(--ff-exp); font-weight: 600;
+  font-size: .58rem; letter-spacing: .28em; text-transform: uppercase;
+  color: var(--rose-taupe);
+}
+.schemetoggle__set { display: flex; align-items: center; gap: 20px; }
+.schemetoggle__opt {
+  font-family: var(--ff-exp); font-weight: 500;
+  font-size: .68rem; letter-spacing: .16em; text-transform: uppercase;
+  /* .62, not .5: at .5 the idle options composite to 4.24:1 on the night panel,
+     which is AA-large only — and these are .68rem uppercase labels, not large
+     text. .62 clears AA outright while still reading clearly unselected. */
+  color: var(--panel-ink); opacity: .62;
+  padding: 3px 0; position: relative;
+  transition: opacity .35s var(--ease);
+}
+.schemetoggle__opt::after {
+  content: ""; position: absolute; left: 0; bottom: 0; height: 1px; width: 100%;
+  background: currentColor; transform: scaleX(0); transform-origin: left;
+  transition: transform .45s var(--ease);
+}
+.schemetoggle__opt:hover { opacity: .8; }
+.schemetoggle__opt.is-on { opacity: 1; }
+.schemetoggle__opt.is-on::after { transform: scaleX(1); }
+/* focus must be visible on BOTH panel grounds — currentColor tracks the ink */
+.schemetoggle__opt:focus-visible {
+  outline: 1px solid currentColor; outline-offset: 5px; opacity: 1;
+}
+/* the drawer's own foot line follows the setting, so the two never collide */
+.schemetoggle + .drawer__foot { margin-top: 20px; }
 
 /* ---------- CUSTOM CURSOR ---------- */
 /* Hidden until Cursor.tsx confirms a fine+hover pointer IS inside the document (it toggles
@@ -192,6 +235,11 @@ html.btb-preloading body { overflow: hidden; }
   transition: opacity 1s var(--ease), visibility 1s;
 }
 .preloader.is-done { opacity: 0; visibility: hidden; }
+/* HOME, first visit of the session: the curtain hands over to the INTRO REEL,
+   whose ground is black. Turning the curtain black too makes that cut
+   invisible — the reel simply begins inside the same darkness. Every other
+   opening (mobile, a repeat visit, the other routes) keeps the house oxblood. */
+.preloader.is-onyx { background: #000; }
 .preloader__inner { display: flex; flex-direction: column; align-items: center; }
 .preloader__glyph {
   width: clamp(66px, 8vw, 96px); height: clamp(66px, 8vw, 96px);
@@ -220,6 +268,35 @@ html.btb-preloading body { overflow: hidden; }
 }
 @keyframes plGlyph { to { opacity: 1; transform: translateY(0); } }
 @keyframes plFade  { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+/* Reduced motion: no ⚥ choreography, no reel — but not an abrupt paint either.
+   A plain black ground dissolves off the composed page, so the opening is still
+   authored. Nothing here moves; only opacity changes. (Was display:none.) */
 @media (prefers-reduced-motion: reduce) {
-  .preloader { display: none; }
+  .preloader {
+    background: #000;
+    transition: opacity .7s linear, visibility .7s;
+  }
+  .preloader__inner { display: none; }
 }
+
+/* ---------- CHROME HOLD DURING THE INTRO REEL ----------
+   html.btb-intro is up from before first paint until the reel settles. The reel
+   owns the frame alone; the ⚥ arrives late (html.btb-intro-mark, set as the
+   column levels) and MENU / links / bag stagger in behind it once the hold
+   lifts. Only ever present on home, desktop, motion-allowed. */
+.nav__brand { transition: opacity 1.2s var(--ease); }
+.nav__menu,
+.nav__links { transition: opacity .85s var(--ease) .45s; }
+
+html.btb-intro .nav__brand,
+html.btb-intro .nav__menu,
+html.btb-intro .nav__links { opacity: 0; }
+html.btb-intro .nav__menu,
+html.btb-intro .nav__links { pointer-events: none; }
+
+/* the house mark, and only the house mark, joins the reel as it flattens */
+html.btb-intro.btb-intro-mark .nav__brand { opacity: 1; }
+
+/* the custom cursor stays out of the reel entirely */
+html.btb-intro .cursor,
+html.btb-intro .cursor__dot { opacity: 0; transition: opacity .6s var(--ease); }

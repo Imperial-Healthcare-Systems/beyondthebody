@@ -5,13 +5,14 @@
    Light register: dark oxblood text on a bone-veiled warm image.
    The imagery carries the (future) selective-colour treatment; CSS
    here holds legibility (bone scrim), grain, and the cinemagraph.
+   data-theme="dark" → the deepest register in both schemes.
    ================================================================= */
 .hero {
   position: relative;
   min-height: 100svh;
   overflow: hidden;
-  background: var(--oxblood-deep);
-  color: var(--ivory);
+  background: var(--ground);
+  color: var(--ink);
   isolation: isolate;
 }
 
@@ -24,17 +25,38 @@
   width: 108%; height: 116%; max-width: none; object-fit: cover;
   will-change: transform;
 }
+/* the real photograph is shot high-key for an ivory page; ease it back on the
+   night AD (both multipliers are 1 in the light scheme → no light-side change).
+   Scoped to the <img> so the placeholder gradient below isn't double-dimmed.
+   GSAP tweens only transform on .hero__img, so a CSS filter is safe here. */
+img.hero__img { filter: brightness(var(--img-dim)) saturate(var(--img-sat)); }
+
+/* REDESIGNED for the dark scheme (v0.2). The light-scheme ramp climbs
+   oxblood-3 → #5a2734 → #7a4250: oxblood LIGHTENING into a dusty rose, which
+   reads as depth against bone but would glow as a mid-tone haze on the night
+   ramp. On dark the two upper stops are re-voiced onto the night ramp so the
+   ground stays closed; the luminous centre is carried entirely by the champagne
+   bloom, which gains contrast for free against the deeper ground. */
 .hero__placeholder {
+  --hero-ph-mid: #5a2734;
+  --hero-ph-end: #7a4250;
   position: absolute; inset: 0;
   background:
-    radial-gradient(120% 90% at 74% 34%, rgba(226,203,166,.20), transparent 52%),
-    linear-gradient(103deg, var(--oxblood-3) 0%, #5a2734 66%, #7a4250 100%);
+    radial-gradient(120% 90% at 74% 34%, rgb(var(--bloom) / .20), transparent 52%),
+    linear-gradient(103deg, var(--ground-2) 0%, var(--hero-ph-mid) 66%, var(--hero-ph-end) 100%);
+}
+:root[data-scheme="dark"] .hero__placeholder {
+  /* Hue-corrected 2026-07-21 — was #1E1116 / #2A1B22 (337° / 332°, plum).
+     Retargeted to ~14° at the same lightness. See tokens.css → HUE RULE. */
+  --hero-ph-mid: #21140F;
+  --hero-ph-end: #2E1F19;
 }
 
 .hero__grain {
-  position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: .4;
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  opacity: calc(.4 * var(--film-op));
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
-  mix-blend-mode: overlay;
+  mix-blend-mode: var(--film-blend);
 }
 /* dialled-back scrim — light touch: just enough shadow under the nav, the
    headline (left) and the bottom row to seat the ivory type, letting the warm
@@ -42,9 +64,9 @@
 .hero__scrim {
   position: absolute; inset: 0; z-index: 1;
   background:
-    linear-gradient(180deg, rgba(18,4,6,.42) 0%, transparent 14%),
-    linear-gradient(0deg, rgba(18,4,6,.6) 0%, rgba(18,4,6,.18) 26%, transparent 46%),
-    linear-gradient(90deg, rgba(18,4,6,.4) 0%, transparent 40%);
+    linear-gradient(180deg, rgb(var(--scrim) / .42) 0%, transparent 14%),
+    linear-gradient(0deg, rgb(var(--scrim) / .6) 0%, rgb(var(--scrim) / .18) 26%, transparent 46%),
+    linear-gradient(90deg, rgb(var(--scrim) / .4) 0%, transparent 40%);
 }
 
 /* distributed bottom row */
@@ -55,12 +77,15 @@
 }
 .hero__title {
   grid-column: 1; justify-self: start;
-  font-size: clamp(2.2rem, 5.2vw, 4.6rem); line-height: 1; color: var(--ivory);
+  font-size: clamp(2.2rem, 5.2vw, 4.6rem); line-height: 1; color: var(--ink);
   letter-spacing: -.02em;
 }
 .hero__title .line { display: block; overflow: hidden; padding-bottom: .04em; }
 .hero__title .inner { display: block; will-change: transform; }
 
+/* --champ-soft kept as a primitive: it matches no semantic token exactly
+   (--ink-2 on this beat is ivory/.82) and warm champagne is correct on the
+   oxblood ground AND on both night registers. Remapping would shift light. */
 .hero__sub {
   grid-column: 2; justify-self: center; text-align: center;
   max-width: 42ch; color: var(--champ-soft);
@@ -71,7 +96,7 @@
   grid-column: 3; justify-self: end; align-self: end;
   display: inline-flex; align-items: center; gap: .6em;
   font-family: var(--ff-exp); font-weight: 600;
-  font-size: .68rem; letter-spacing: .2em; text-transform: uppercase; color: var(--champagne);
+  font-size: .68rem; letter-spacing: .2em; text-transform: uppercase; color: var(--accent);
   position: relative; padding-bottom: 4px; white-space: nowrap;
 }
 .hero__enter::after {

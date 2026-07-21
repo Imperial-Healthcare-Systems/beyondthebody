@@ -4,13 +4,22 @@
    Dark register (ivory type on a warm-shadowed image), one Fraunces
    line + a made-in accent held in the calm, shadowed left third.
    Mirrors the hero's grain + scrim + line-mask reveal to close the loop.
+
+   Dark scheme: data-theme="dark" — the DEEPEST register. This beat is the
+   page's most light-dependent asset: /sections/circular-close.png is a very
+   high-key backlit window frame whose highlights run to near-white, so on an
+   ivory page it sits flush and on a night ground it would burn as a lit
+   rectangle. Two things settle it: the --img-dim/--img-sat grade on .cc__img
+   (safe — CircularClose.tsx tweens only scale/yPercent on that element, never
+   filter), and the scrims resolving through --scrim, which deepens from
+   18 4 6 to 6 2 4 on night.
    ================================================================= */
 .cc {
   position: relative;
   min-height: clamp(560px, 82svh, 900px);
   overflow: hidden;
-  background: var(--oxblood-deep);
-  color: var(--ivory);
+  background: var(--ground);
+  color: var(--ink);
   isolation: isolate;
   display: flex; align-items: center;
 }
@@ -20,21 +29,23 @@
   position: absolute; top: -8%; left: -4%;
   width: 108%; height: 116%; max-width: none; object-fit: cover; object-position: 62% 50%;
   will-change: transform;
+  filter: brightness(var(--img-dim)) saturate(var(--img-sat));
 }
 
 .cc__grain {
-  position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: .4;
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  opacity: calc(.4 * var(--film-op));
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
-  mix-blend-mode: overlay;
+  mix-blend-mode: var(--film-blend);
 }
 
 /* legibility scrim — weighted to the shadowed left third where the type sits */
 .cc__scrim {
   position: absolute; inset: 0; z-index: 1;
   background:
-    linear-gradient(90deg, rgba(18,4,6,.72) 0%, rgba(18,4,6,.42) 32%, transparent 62%),
-    linear-gradient(180deg, rgba(18,4,6,.34) 0%, transparent 24%),
-    linear-gradient(0deg, rgba(18,4,6,.46) 0%, transparent 30%);
+    linear-gradient(90deg, rgb(var(--scrim) / .72) 0%, rgb(var(--scrim) / .42) 32%, transparent 62%),
+    linear-gradient(180deg, rgb(var(--scrim) / .34) 0%, transparent 24%),
+    linear-gradient(0deg, rgb(var(--scrim) / .46) 0%, transparent 30%);
 }
 
 /* the closing statement, seated in the calm left */
@@ -48,7 +59,7 @@
 .cc__mark {
   width: clamp(30px, 3vw, 40px); height: clamp(30px, 3vw, 40px);
   margin-bottom: clamp(22px, 3vh, 34px);
-  background: var(--champagne);
+  background: var(--accent);
   -webkit-mask: url("/brand/btb-mark.png") center / contain no-repeat;
           mask: url("/brand/btb-mark.png") center / contain no-repeat;
   opacity: .92;
@@ -57,7 +68,7 @@
 .cc__title {
   margin: 0;
   font-family: var(--ff-display); font-weight: 300; letter-spacing: -.02em;
-  font-size: clamp(2.1rem, 4.8vw, 4.1rem); line-height: 1.02; color: var(--ivory);
+  font-size: clamp(2.1rem, 4.8vw, 4.1rem); line-height: 1.02; color: var(--ink);
 }
 .cc__title .line { display: block; overflow: hidden; padding-bottom: .06em; }
 .cc__title .inner { display: block; will-change: transform; }
@@ -65,7 +76,7 @@
 .cc__rule {
   height: 1px; width: clamp(64px, 8vw, 120px);
   margin: clamp(24px, 3.4vh, 38px) 0 clamp(18px, 2.4vh, 26px);
-  background: var(--champagne); opacity: .7;
+  background: var(--accent); opacity: .7;
 }
 
 .cc__accent {
@@ -79,8 +90,8 @@
   .cc { min-height: 78svh; }
   .cc__scrim {
     background:
-      linear-gradient(90deg, rgba(18,4,6,.7) 0%, rgba(18,4,6,.4) 46%, transparent 88%),
-      linear-gradient(0deg, rgba(18,4,6,.5) 0%, transparent 34%);
+      linear-gradient(90deg, rgb(var(--scrim) / .7) 0%, rgb(var(--scrim) / .4) 46%, transparent 88%),
+      linear-gradient(0deg, rgb(var(--scrim) / .5) 0%, transparent 34%);
   }
   .cc__title { font-size: clamp(2.2rem, 10vw, 3.2rem); }
   .cc__accent { letter-spacing: .22em; }

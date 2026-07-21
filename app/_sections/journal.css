@@ -1,12 +1,18 @@
 /* =================================================================
    §9 · THE JOURNAL — editorial "Read" beat (Lemaire/Kinfolk register).
    Warm ground, a quiet text column + a large 3:2 studio image.
+
+   Dark scheme: data-theme="light" — the LIFTED register. The ground gradient
+   remaps cleanly (--ground-2 -> --ground-3 reproduce ivory-2 -> #ECDFCB
+   byte-for-byte in the light scheme). The still-life carries a blown-out
+   book page, so the media img takes the --img-dim/--img-sat grade; Journal.tsx
+   tweens only clipPath/scale, never filter.
    ================================================================= */
 
 .jr {
   position: relative; overflow: hidden;
-  background: linear-gradient(180deg, var(--ivory-2) 0%, #ecdfcb 100%);
-  color: var(--oxblood);
+  background: linear-gradient(180deg, var(--ground-2) 0%, var(--ground-3) 100%);
+  color: var(--ink);
   padding: clamp(84px, 13vh, 168px) clamp(20px, 5vw, 80px);
 }
 
@@ -20,27 +26,30 @@
 .jr__text { display: flex; flex-direction: column; align-items: flex-start; }
 .jr__eyebrow {
   font-family: var(--ff-exp); text-transform: uppercase; letter-spacing: .42em;
-  font-size: clamp(.6rem, .8vw, .72rem); color: var(--rose-taupe); margin: 0 0 clamp(22px, 3vh, 34px);
+  font-size: clamp(.6rem, .8vw, .72rem); color: var(--ink-muted); margin: 0 0 clamp(22px, 3vh, 34px);
 }
 .jr__headline {
   font-family: var(--ff-display); font-weight: 300; letter-spacing: -.02em;
-  font-size: clamp(2.2rem, 4.4vw, 3.7rem); line-height: 1.02; color: var(--oxblood);
+  font-size: clamp(2.2rem, 4.4vw, 3.7rem); line-height: 1.02; color: var(--ink);
   margin: 0; max-width: 12ch;
 }
 .jr__sub {
   margin: clamp(20px, 2.8vh, 32px) 0 clamp(30px, 4vh, 44px); max-width: 34ch;
-  font-family: var(--ff-body); font-size: clamp(.95rem, 1.2vw, 1.1rem); line-height: 1.65; color: var(--oxblood-2);
+  font-family: var(--ff-body); font-size: clamp(.95rem, 1.2vw, 1.1rem); line-height: 1.65; color: var(--ink-2);
 }
-.jr__cta { color: var(--oxblood); }
+.jr__cta { color: var(--ink); }
 
 /* image */
 .jr__media {
   position: relative; margin: 0; aspect-ratio: 3 / 2; overflow: hidden; border-radius: 2px;
-  background: var(--sand); box-shadow: 0 50px 90px -34px rgba(78, 33, 45, .34);
+  /* --sand is the pre-load / letterbox fill behind the photo; it matches no
+     semantic token, so it stays a primitive (the img covers it either way). */
+  background: var(--sand); box-shadow: 0 50px 90px -34px var(--shadow), var(--rim);
 }
 .jr__media img {
   position: absolute; inset: -6% 0; width: 100%; height: 112%;
   object-fit: cover; object-position: center; will-change: transform;
+  filter: brightness(var(--img-dim)) saturate(var(--img-sat));
 }
 .jr__caption {
   position: absolute; left: clamp(14px, 1.6vw, 22px); bottom: clamp(12px, 1.4vw, 18px);
@@ -53,6 +62,19 @@
   font-family: var(--ff-exp); text-transform: uppercase; letter-spacing: .3em;
   font-size: clamp(.5rem, .64vw, .58rem); color: var(--champagne);
   text-shadow: 0 1px 6px rgba(29, 11, 18, .45);      /* insurance over bright frames */
+}
+
+/* REDESIGNED for the dark scheme (not a remap). The chip is smoked glass: a
+   dark frost that reads because it sits on a BRIGHT frame inside a bright page.
+   On night the frame is graded down and the ground is --night-2, so a dark
+   frost has nothing to be darker than and the chip simply dissolves. The frost
+   therefore inverts — champagne (--bloom) at a low alpha, which reads as lit
+   glass over a dim photograph — and the label goes to ivory so it does not sit
+   champagne-on-champagne. Light scheme is untouched. */
+:root[data-scheme="dark"] .jr__caption {
+  background: rgb(var(--bloom) / .10);
+  border-color: rgb(var(--bloom) / .30);
+  color: var(--ivory);
 }
 
 /* -------- mobile -------- */

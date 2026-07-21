@@ -1,12 +1,12 @@
 /* =================================================================
    PDP · Assurances — certifications, rendered typographically (no raster
    badges). A lead performance figure, then two hairline-ruled label rows:
-   primary certifications, then formulation claims. Calm ivory coda.
+   primary certifications, then formulation claims. Calm data-theme="light" coda.
    ================================================================= */
 
 .assur {
-  background: var(--ivory);
-  color: var(--oxblood);
+  background: var(--ground);
+  color: var(--ink);
   padding: clamp(80px, 13vh, 168px) clamp(20px, 5vw, 80px);
   text-align: center;
 }
@@ -22,7 +22,7 @@
   letter-spacing: -0.02em;
   font-size: clamp(1.9rem, 3.6vw, 3rem);
   line-height: 1.04;
-  color: var(--oxblood);
+  color: var(--ink);
   margin: 0;
 }
 .assur__eyebrow {
@@ -30,7 +30,7 @@
   text-transform: uppercase;
   letter-spacing: 0.3em;
   font-size: clamp(0.58rem, 0.78vw, 0.68rem);
-  color: var(--rose-taupe);
+  color: var(--ink-muted);
   margin: clamp(18px, 2.6vh, 26px) 0 clamp(44px, 6vh, 72px);
 }
 
@@ -47,8 +47,8 @@
 }
 .assur__primary {
   gap: clamp(18px, 3vw, 44px);
-  border-top: 1px solid rgba(78, 33, 45, 0.16);
-  border-bottom: 1px solid rgba(78, 33, 45, 0.16);
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
   padding: clamp(26px, 3.6vh, 40px) 0;
 }
 .assur__primary .assur__item {
@@ -56,7 +56,7 @@
   font-weight: 300;
   font-size: clamp(1rem, 1.5vw, 1.3rem);
   letter-spacing: -0.01em;
-  color: var(--oxblood);
+  color: var(--ink);
 }
 
 /* ---- secondary formulation claims ---- */
@@ -69,15 +69,18 @@
   text-transform: uppercase;
   letter-spacing: 0.2em;
   font-size: clamp(0.56rem, 0.74vw, 0.66rem);
-  color: var(--rose-taupe);
+  color: var(--ink-muted);
   position: relative;
 }
-/* hairline dot separators between secondary items */
+/* hairline dot separators between secondary items — --ink-muted held back to the
+   same 60% the literal rgba(174,143,123,.6) carried; opacity on the pseudo-element
+   is equivalent here (single glyph, nothing to overlap). */
 .assur__secondary .assur__item + .assur__item::before {
   content: "·";
   position: absolute;
   left: clamp(-9px, -1.3vw, -18px);
-  color: rgba(174, 143, 123, 0.6);
+  color: var(--ink-muted);
+  opacity: 0.6;
 }
 
 @media (max-width: 640px) {

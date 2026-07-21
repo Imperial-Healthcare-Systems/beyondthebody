@@ -5,6 +5,7 @@
 
 import { useEffect, useState } from "react";
 import { useCart } from "./CartProvider";
+import SchemeToggle from "./SchemeToggle";
 
 /* Root-relative hrefs (Sprint 02, beat 0): the site is now multi-page. A bare
    "#collection" resolves against the CURRENT route, so from /journal it points at
@@ -116,6 +117,7 @@ export default function Nav() {
               </a>
             ))}
           </nav>
+          <SchemeToggle />
           <p className="drawer__foot">A house that begins with scent</p>
         </aside>
       </div>

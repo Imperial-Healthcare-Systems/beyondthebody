@@ -1,13 +1,15 @@
 /* =================================================================
    /collection · BEAT 1 — Masthead. The house statement.
    Warm ivory ground (shared with Journal/§9), oxblood ink, centred.
+   Painted from the semantic ground/ink tokens, so in the dark scheme the
+   same ramp is re-cut out of the lifted night register.
    ================================================================= */
 
 .cmast {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg, var(--ivory) 0%, var(--ivory-2) 62%, #ecdfcb 100%);
-  color: var(--oxblood);
+  background: linear-gradient(180deg, var(--ground) 0%, var(--ground-2) 62%, var(--ground-3) 100%);
+  color: var(--ink);
   min-height: 70vh;
   display: flex;
   align-items: center;
@@ -32,8 +34,8 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.5;
-  mix-blend-mode: multiply;
+  opacity: calc(0.5 * var(--film-op));
+  mix-blend-mode: var(--film-blend-mul);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.16'/%3E%3C/svg%3E");
 }
 .cmast__watermark {
@@ -45,7 +47,9 @@
   font-family: var(--ff-display);
   font-size: clamp(20rem, 46vw, 40rem);
   line-height: 1;
-  color: var(--rose-taupe);
+  color: var(--ink-muted);
+  /* rose-taupe at 5%: a ~1.6 L step below ivory, a ~2.8 L step above the night
+     ground — still a whisper in both, never invisible and never a glare. */
   opacity: 0.05;
   pointer-events: none;
   user-select: none;
@@ -64,7 +68,7 @@
   position: absolute;
   width: clamp(20px, 2.4vw, 34px);
   height: clamp(20px, 2.4vw, 34px);
-  border: 1px solid var(--rose-taupe);
+  border: 1px solid var(--ink-muted);
   opacity: 0.55;
   pointer-events: none;
 }
@@ -78,7 +82,7 @@
   text-transform: uppercase;
   letter-spacing: 0.44em;
   font-size: clamp(0.6rem, 0.8vw, 0.72rem);
-  color: var(--rose-taupe);
+  color: var(--ink-muted);
   margin: 0 0 clamp(24px, 3.5vh, 36px);
 }
 
@@ -86,7 +90,7 @@
   display: block;
   width: clamp(48px, 7vw, 88px);
   height: 1px;
-  background: var(--rose-taupe);
+  background: var(--ink-muted);
   opacity: 0.6;
   margin: 0 0 clamp(30px, 4.5vh, 46px);
 }
@@ -97,7 +101,7 @@
   letter-spacing: -0.025em;
   font-size: clamp(2.8rem, 7.6vw, 6.4rem);
   line-height: 0.98;
-  color: var(--oxblood);
+  color: var(--ink);
   margin: 0;
 }
 .cmast__headline .line {
@@ -116,7 +120,7 @@
   font-family: var(--ff-body);
   font-size: clamp(1.02rem, 1.3vw, 1.22rem);
   line-height: 1.68;
-  color: var(--oxblood-2);
+  color: var(--ink-2);
 }
 
 @media (prefers-reduced-motion: reduce) {
