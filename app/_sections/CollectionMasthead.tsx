@@ -5,7 +5,8 @@
    not the whole. Register + art direction inherit the Journal masthead (warm ivory ground,
    oxblood ink, rose-taupe eyebrow, Fraunces 300, centred, line-masked headline rise) so the
    sub-pages read as one house. Copy is drafted house-voice prose (gated per beat).
-   Motion: reveal on mount (this route has no preloader). Reduced-motion: end-state.
+   Motion: reveal held until the preloader curtain lifts (btb:preload-done), so it never
+   plays behind it. Reduced-motion: end-state.
    data-theme light → nav inverts to dark UI. */
 
 import { useEffect, useRef } from "react";
@@ -21,15 +22,21 @@ export default function CollectionMasthead() {
 
     const el = root.current;
     const q = gsap.utils.selector(el);
+    let intro: gsap.core.Timeline | null = null;
 
     const ctx = gsap.context(() => {
       gsap.set(q(".cmast__rule"), { scaleX: 0, transformOrigin: "left" });
       gsap.set(q(".cmast__eyebrow, .cmast__intro"), { opacity: 0, y: 22 });
-      gsap.set(q(".cmast__headline .inner"), { yPercent: 115 });
+      // y: 0 — see Hero.tsx: anim-initial.css mirrors this as a CSS transform,
+      // which GSAP would otherwise read as a stacked pixel offset.
+      gsap.set(q(".cmast__headline .inner"), { yPercent: 115, y: 0 });
       gsap.set(q(".cmast__corner"), { opacity: 0, scale: 0.7, transformOrigin: "center" });
       gsap.set(q(".cmast__watermark"), { opacity: 0, scale: 1.06 });
 
-      const tl = gsap.timeline({ delay: 0.15 });
+      // Paused: the route now carries a Preloader, and an unpaused timeline
+      // would run and finish behind the curtain, lifting onto a spent masthead.
+      const tl = gsap.timeline({ paused: true, delay: 0.15 });
+      intro = tl;
       tl.to(q(".cmast__eyebrow"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" })
         .to(q(".cmast__rule"), { scaleX: 1, duration: 0.9, ease: "power3.inOut" }, "-=0.4")
         .to(q(".cmast__watermark"), { opacity: 0.05, scale: 1, duration: 1.4, ease: "power2.out" }, "<")
@@ -38,7 +45,19 @@ export default function CollectionMasthead() {
         .to(q(".cmast__intro"), { opacity: 1, y: 0, duration: 0.85, ease: "power3.out" }, "-=0.6");
     }, el);
 
-    return () => ctx.revert();
+    // Play once the curtain lifts. On the isolation-preview route there is no
+    // Preloader, so nothing sets the flag and the intro plays immediately.
+    const play = () => intro?.play();
+    if (window.__btbPreloading) {
+      window.addEventListener("btb:preload-done", play, { once: true });
+    } else {
+      play();
+    }
+
+    return () => {
+      window.removeEventListener("btb:preload-done", play);
+      ctx.revert();
+    };
   }, []);
 
   return (

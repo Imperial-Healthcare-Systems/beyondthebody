@@ -32,7 +32,9 @@ export default function CollectionScent() {
     const ctx = gsap.context(() => {
       // chapter marker
       gsap.set(q(".cscent__eyebrow, .cscent__intro"), { opacity: 0, y: 22 });
-      gsap.set(q(".cscent__title .inner"), { yPercent: 115 });
+      // y: 0 — see Hero.tsx: anim-initial.css mirrors this as a CSS transform,
+      // which GSAP would otherwise read as a stacked pixel offset.
+      gsap.set(q(".cscent__title .inner"), { yPercent: 115, y: 0 });
       const mast = gsap.timeline({ scrollTrigger: { trigger: q(".cscent__head"), start: "top 82%", once: true } });
       mast
         .to(q(".cscent__eyebrow"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" })

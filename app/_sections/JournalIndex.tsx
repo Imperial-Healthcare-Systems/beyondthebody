@@ -5,8 +5,9 @@
    100% BTB). Shares the §9 tease's art direction verbatim — warm ivory ground, oxblood
    ink, rose-taupe eyebrow, Fraunces 300, 3:2 media with clip-reveal + ken-burns — so the
    home tease and this page read as one house. Copy is frozen (journal-data.ts). Motion:
-   masthead reveals on mount (no preloader on this route); each essay row clip-reveals on
-   scroll, alternating side, with parallax. Reduced-motion: end-state, no transforms. */
+   the masthead reveal is held until the preloader curtain lifts (btb:preload-done); each
+   essay row clip-reveals on scroll, alternating side, with parallax.
+   Reduced-motion: end-state, no transforms. */
 
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
@@ -24,12 +25,19 @@ export default function JournalIndex() {
     gsap.registerPlugin(ScrollTrigger);
     const el = root.current;
     const q = gsap.utils.selector(el);
+    let intro: gsap.core.Timeline | null = null;
 
     const ctx = gsap.context(() => {
-      // --- masthead: reveal on mount (this route has no preloader) ---
+      // --- masthead: held until the preloader curtain lifts ---
+      // Paused: the route now carries a Preloader, and an unpaused timeline
+      // would run and finish behind the curtain, lifting onto a spent masthead.
+      // (The essay rows below are ScrollTrigger-driven and need no gate.)
       gsap.set(q(".jx__eyebrow, .jx__intro"), { opacity: 0, y: 22 });
-      gsap.set(q(".jx__headline .inner"), { yPercent: 115 });
-      const mast = gsap.timeline({ delay: 0.15 });
+      // y: 0 — see Hero.tsx: anim-initial.css mirrors this as a CSS transform,
+      // which GSAP would otherwise read as a stacked pixel offset.
+      gsap.set(q(".jx__headline .inner"), { yPercent: 115, y: 0 });
+      const mast = gsap.timeline({ paused: true, delay: 0.15 });
+      intro = mast;
       mast
         .to(q(".jx__eyebrow"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" })
         .to(q(".jx__headline .inner"), { yPercent: 0, duration: 1.05, ease: "power4.out" }, "-=0.45")
@@ -64,7 +72,19 @@ export default function JournalIndex() {
       });
     }, el);
 
-    return () => ctx.revert();
+    // Play once the curtain lifts. On the isolation-preview route there is no
+    // Preloader, so nothing sets the flag and the intro plays immediately.
+    const play = () => intro?.play();
+    if (window.__btbPreloading) {
+      window.addEventListener("btb:preload-done", play, { once: true });
+    } else {
+      play();
+    }
+
+    return () => {
+      window.removeEventListener("btb:preload-done", play);
+      ctx.revert();
+    };
   }, []);
 
   return (

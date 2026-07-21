@@ -7,8 +7,9 @@
    (warm ivory ground, oxblood ink, rose-taupe eyebrow, Fraunces 300, line-masked headline rise)
    so the sub-pages read as one house; a draped-linen still (royalty-free, Unsplash — see
    public/contact/CREDITS.md) carries the house look on the right. Copy is drafted house-voice
-   prose, gated per beat. Motion: reveal + image clip/ken-burns on mount (this route has no
-   preloader). Reduced-motion: end-state. data-theme light → nav inverts to dark UI.
+   prose, gated per beat. Motion: reveal + image clip/ken-burns, held until the preloader
+   curtain lifts (btb:preload-done) so it never plays behind it.
+   Reduced-motion: end-state. data-theme light → nav inverts to dark UI.
 
    ⚠ PLACEHOLDER FACTS — the client has not supplied the real values; confirm/replace before
    publish (same pattern as the ₹1,899 price placeholder):
@@ -34,15 +35,21 @@ export default function ContactMasthead() {
 
     const el = root.current;
     const q = gsap.utils.selector(el);
+    let intro: gsap.core.Timeline | null = null;
 
     const ctx = gsap.context(() => {
       gsap.set(q(".ct__rule"), { scaleX: 0, transformOrigin: "left" });
       gsap.set(q(".ct__eyebrow, .ct__intro, .ct__block"), { opacity: 0, y: 22 });
-      gsap.set(q(".ct__headline .inner"), { yPercent: 115 });
+      // y: 0 — see Hero.tsx: anim-initial.css mirrors this as a CSS transform,
+      // which GSAP would otherwise read as a stacked pixel offset.
+      gsap.set(q(".ct__headline .inner"), { yPercent: 115, y: 0 });
       gsap.set(q(".ct__media"), { clipPath: "inset(0 0 0 100%)" });
       gsap.set(q(".ct__media img"), { scale: 1.14 });
 
-      const tl = gsap.timeline({ delay: 0.15 });
+      // Paused: the route now carries a Preloader, and an unpaused timeline
+      // would run and finish behind the curtain, lifting onto a spent masthead.
+      const tl = gsap.timeline({ paused: true, delay: 0.15 });
+      intro = tl;
       tl.to(q(".ct__media"), { clipPath: "inset(0 0 0 0%)", duration: 1.1, ease: "power3.inOut" })
         .to(q(".ct__media img"), { scale: 1, duration: 1.5, ease: "power2.out" }, "<")
         .to(q(".ct__eyebrow"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.25)
@@ -52,7 +59,19 @@ export default function ContactMasthead() {
         .to(q(".ct__block"), { opacity: 1, y: 0, duration: 0.75, ease: "power3.out", stagger: 0.12 }, "-=0.5");
     }, el);
 
-    return () => ctx.revert();
+    // Play once the curtain lifts. On the isolation-preview route there is no
+    // Preloader, so nothing sets the flag and the intro plays immediately.
+    const play = () => intro?.play();
+    if (window.__btbPreloading) {
+      window.addEventListener("btb:preload-done", play, { once: true });
+    } else {
+      play();
+    }
+
+    return () => {
+      window.removeEventListener("btb:preload-done", play);
+      ctx.revert();
+    };
   }, []);
 
   return (

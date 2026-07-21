@@ -110,7 +110,9 @@ export default function Footer() {
     const ctx = gsap.context(() => {
       // newsletter tier rises in
       gsap.set(q(".ft__mark"), { opacity: 0, scale: 0.6 });
-      gsap.set(q(".ft__nl-title .inner"), { yPercent: 110 });
+      // y: 0 — see Hero.tsx: anim-initial.css mirrors this as a CSS transform,
+      // which GSAP would otherwise read as a stacked pixel offset.
+      gsap.set(q(".ft__nl-title .inner"), { yPercent: 110, y: 0 });
       gsap.set(q(".ft__nl-sub, .ft__nl-form"), { opacity: 0, y: 20 });
       const nlTl = gsap.timeline({
         scrollTrigger: { trigger: q(".ft__news"), start: "top 78%", once: true },
@@ -223,11 +225,11 @@ export default function Footer() {
                 {...linkAttrs(l.href)}
               >
                 <span>{l.label}</span>
-                {l.ext && (
-                  <svg className="ft__ext" width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
-                    <path d="M4 11L11 4M11 4H5M11 4V10" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
+                {/* An `l.ext` external-link arrow used to render here. MEGA is four
+                    INTERNAL routes and no entry ever carried `ext`, so the branch was
+                    unreachable — it broke `next build` (TS2339) while rendering nothing.
+                    Removed 2026-07-21. If an external destination is ever added to MEGA,
+                    reinstate it with `ext` declared on the array's type. */}
               </a>
             ))}
           </nav>

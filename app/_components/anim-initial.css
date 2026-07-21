@@ -1,0 +1,129 @@
+/* =================================================================
+   ENTRANCE INITIAL STATES — the CSS mirror of every gsap.set()
+
+   THE PROBLEM. Each section sets its own initial state in JS. Between
+   the HTML painting and React hydrating, those elements render in
+   their FINAL state and then snap back to hidden in order to play:
+   the composed headline flashes, ContactMasthead's full-bleed linen
+   still paints and clips to zero width. A preloader curtain hides it,
+   but does not fix it — and a route without a curtain (a PDP) shows it
+   plainly.
+
+   THE FIX. Mirror each JS initial state here, so the first painted
+   frame already matches what GSAP is about to animate from. Once GSAP
+   writes its inline styles they win, and these rules stop mattering.
+
+   WHY IT IS SAFE. Everything is scoped to `html.btb-anim`, set by a
+   blocking pre-paint script (theme.ts → ANIM_SCRIPT). The hide is
+   opt-IN and fails OPEN:
+     · no JS, or the script throws  → no class → content visible
+     · prefers-reduced-motion       → no class → content visible, which
+       matches every section's own reduced-motion early-return
+   A CSS hide can therefore never outlive the JS that undoes it.
+
+   ⚠ RULES FOR EDITING
+   1. Mirror `gsap.set(...)` + `.to(...)` ONLY. NEVER mirror a
+      `gsap.from()` target: `from()` reads the element's CURRENT value
+      as its DESTINATION, so pre-hiding one animates it from invisible
+      to invisible, permanently. This is why Footer's .ft__monogram,
+      .ft__mega-link and .ft__col are deliberately absent below.
+   2. Keep each block labelled with its source file, and keep the
+      values identical. gsap `y: 22` → translateY(22px); `yPercent: 115`
+      → translateY(115%); `scale: 1.14` → scale(1.14).
+   3. Never use !important here. Inline styles LOSE to !important, so
+      it would freeze the initial state and kill the animation.
+   4. Mirroring a PERCENTAGE transform (yPercent) requires pinning the
+      pixel component in the JS: `gsap.set(el, { yPercent: 115, y: 0 })`.
+      GSAP reads the element's computed transform as a matrix — i.e. in
+      PIXELS — so a CSS translateY(115%) is parsed as `y: 115.4px` and
+      yPercent is then stacked ON TOP. Animating yPercent back to 0
+      leaves the stale pixel offset and the mask never lands. Every
+      `.inner` rule below has its `y: 0` counterpart in the section.
+      (Pixel values like `y: 22` and `scale` are read back identically
+      and need no such pinning.)
+   ================================================================= */
+
+/* ---------- §1 HERO — Hero.tsx (gsap.set, intro timeline) ---------- */
+html.btb-anim .hero__title .inner { transform: translateY(110%); }
+html.btb-anim .hero__sub,
+html.btb-anim .hero__enter { opacity: 0; transform: translateY(16px); }
+
+/* ---------- /collection · masthead — CollectionMasthead.tsx ---------- */
+html.btb-anim .cmast__rule { transform: scaleX(0); transform-origin: left; }
+html.btb-anim .cmast__eyebrow,
+html.btb-anim .cmast__intro { opacity: 0; transform: translateY(22px); }
+html.btb-anim .cmast__headline .inner { transform: translateY(115%); }
+html.btb-anim .cmast__corner { opacity: 0; transform: scale(0.7); transform-origin: center; }
+html.btb-anim .cmast__watermark { opacity: 0; transform: scale(1.06); }
+
+/* ---------- /collection · chapter one — CollectionScent.tsx ---------- */
+html.btb-anim .cscent__eyebrow,
+html.btb-anim .cscent__intro { opacity: 0; transform: translateY(22px); }
+html.btb-anim .cscent__title .inner { transform: translateY(115%); }
+html.btb-anim .cscent__media { clip-path: inset(0 0 100% 0); }
+html.btb-anim .cscent__media img { transform: scale(1.16); }
+html.btb-anim .cscent__meta { opacity: 0; transform: translateY(18px); }
+
+/* ---------- /collection · forthcoming — CollectionForthcoming.tsx ---------- */
+html.btb-anim .cforth__eyebrow,
+html.btb-anim .cforth__headline,
+html.btb-anim .cforth__sub,
+html.btb-anim .cforth__tag { opacity: 0; transform: translateY(16px); }
+html.btb-anim .cforth__rule { transform: scaleX(0); transform-origin: center; }
+
+/* ---------- /journal · index — JournalIndex.tsx ---------- */
+html.btb-anim .jx__eyebrow,
+html.btb-anim .jx__intro { opacity: 0; transform: translateY(22px); }
+html.btb-anim .jx__headline .inner { transform: translateY(115%); }
+html.btb-anim .jx__media { clip-path: inset(0 0 0 100%); }
+html.btb-anim .jx__media img { transform: scale(1.14); }
+html.btb-anim .jx__body > * { opacity: 0; transform: translateY(24px); }
+
+/* ---------- /contact · masthead — ContactMasthead.tsx ---------- */
+html.btb-anim .ct__rule { transform: scaleX(0); transform-origin: left; }
+html.btb-anim .ct__eyebrow,
+html.btb-anim .ct__intro,
+html.btb-anim .ct__block { opacity: 0; transform: translateY(22px); }
+html.btb-anim .ct__headline .inner { transform: translateY(115%); }
+html.btb-anim .ct__media { clip-path: inset(0 0 0 100%); }
+html.btb-anim .ct__media img { transform: scale(1.14); }
+
+/* ---------- /fragrance/[slug] · the PDP — Pdp*.tsx ----------
+   This route deliberately carries NO preloader, so it is the one place a
+   visitor would still see the un-animated frame. These matter most. */
+html.btb-anim .pdp__crumb,
+html.btb-anim .pdp__buyinner > * { opacity: 0; transform: translateY(22px); }
+html.btb-anim .pdp__thumb { opacity: 0; transform: translateY(14px); }
+html.btb-anim .pdp__main { clip-path: inset(0 0 100% 0); }
+html.btb-anim .pdp__main img { transform: scale(1.16); }
+
+html.btb-anim .story__eyebrow,
+html.btb-anim .story__sign { opacity: 0; transform: translateY(20px); }
+html.btb-anim .story__s { opacity: 0.14; }   /* dim, then writes in */
+
+html.btb-anim .comp__copy > * { opacity: 0; transform: translateY(26px); }
+html.btb-anim .comp__group { opacity: 0; transform: translateY(20px); }
+html.btb-anim .comp__note { opacity: 0; transform: scale(0.6); }
+
+html.btb-anim .bp__head > *,
+html.btb-anim .bp__lede { opacity: 0; transform: translateY(26px); }
+html.btb-anim .bp__point,
+html.btb-anim .bp__val { opacity: 0; transform: translateY(22px); }
+
+html.btb-anim .det__head > * { opacity: 0; transform: translateY(24px); }
+html.btb-anim .det__row { opacity: 0; transform: translateY(18px); }
+
+html.btb-anim .assur__figure,
+html.btb-anim .assur__eyebrow { opacity: 0; transform: translateY(22px); }
+html.btb-anim .assur__item { opacity: 0; transform: translateY(16px); }
+
+html.btb-anim .xsell__head > * { opacity: 0; transform: translateY(22px); }
+html.btb-anim .xsell__card { opacity: 0; transform: translateY(34px); }
+
+/* ---------- FOOTER · newsletter tier — Footer.tsx ----------
+   The newsletter tier only (gsap.set + .to). The mega-nav monogram,
+   links and columns below it use gsap.from() — see rule 1 above. */
+html.btb-anim .ft__mark { opacity: 0; transform: scale(0.6); }
+html.btb-anim .ft__nl-title .inner { transform: translateY(110%); }
+html.btb-anim .ft__nl-sub,
+html.btb-anim .ft__nl-form { opacity: 0; transform: translateY(20px); }
