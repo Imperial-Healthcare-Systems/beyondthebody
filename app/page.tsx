@@ -7,7 +7,10 @@ import { BEATS } from "./_sections/registry";
 export default function Home() {
   return (
     <>
-      <Preloader />
+      {/* `intro` = this route may hand the curtain over to the INTRO REEL.
+          The Preloader still decides whether it actually does (desktop, motion
+          allowed, once per session). */}
+      <Preloader intro />
       <Nav />
       <main id="top">
         {BEATS.map((b) => {

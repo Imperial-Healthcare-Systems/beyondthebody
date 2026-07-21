@@ -27,9 +27,15 @@ export default function Hero() {
     const q = gsap.utils.selector(el);
 
     let intro: gsap.core.Timeline | null = null;
+    let breath: gsap.core.Tween | null = null;
 
     const ctx = gsap.context(() => {
-      gsap.set(q(".hero__title .inner"), { yPercent: 110 });
+      // y: 0 is load-bearing. anim-initial.css mirrors this state as
+      // `transform: translateY(110%)` to stop the headline painting composed
+      // before hydration; GSAP parses that computed matrix as a PIXEL y offset
+      // and would stack yPercent on top of it, leaving the mask stranded ~110%
+      // low once yPercent animates back to 0. Pinning y pins the px component.
+      gsap.set(q(".hero__title .inner"), { yPercent: 110, y: 0 });
       gsap.set(q(".hero__sub, .hero__enter"), { opacity: 0, y: 16 });
 
       // Built paused: the preloader curtain fades over 1s, so playing on mount
@@ -54,13 +60,17 @@ export default function Hero() {
           "-=0.6"
         );
 
-      // near-still cinemagraph: an almost-imperceptible breath
-      gsap.to(q(".hero__img"), {
+      // near-still cinemagraph: an almost-imperceptible breath.
+      // Paused, and started with the intro — the INTRO REEL rests on a copy of
+      // this exact frame at scale 1, so a breath that had been running behind
+      // the curtain would pop the moment the reel dissolves away.
+      breath = gsap.to(q(".hero__img"), {
         scale: 1.06,
         duration: 16,
         ease: "sine.inOut",
         yoyo: true,
         repeat: -1,
+        paused: true,
       });
 
       // scroll parallax: media lifts slowly, copy eases up + fades
@@ -79,7 +89,10 @@ export default function Hero() {
 
     // Play once the curtain lifts. On the isolation-preview route there is no
     // Preloader, so nothing sets the flag and the intro plays immediately.
-    const play = () => intro?.play();
+    const play = () => {
+      intro?.play();
+      breath?.play();
+    };
     if (window.__btbPreloading) {
       window.addEventListener("btb:preload-done", play, { once: true });
     } else {
