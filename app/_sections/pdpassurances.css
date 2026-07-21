@@ -1,0 +1,90 @@
+/* =================================================================
+   PDP · Assurances — certifications, rendered typographically (no raster
+   badges). A lead performance figure, then two hairline-ruled label rows:
+   primary certifications, then formulation claims. Calm ivory coda.
+   ================================================================= */
+
+.assur {
+  background: var(--ivory);
+  color: var(--oxblood);
+  padding: clamp(80px, 13vh, 168px) clamp(20px, 5vw, 80px);
+  text-align: center;
+}
+.assur__inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* ---- lead figure: "Lasts up to 12 hours" ---- */
+.assur__figure {
+  font-family: var(--ff-display);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  font-size: clamp(1.9rem, 3.6vw, 3rem);
+  line-height: 1.04;
+  color: var(--oxblood);
+  margin: 0;
+}
+.assur__eyebrow {
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: clamp(0.58rem, 0.78vw, 0.68rem);
+  color: var(--rose-taupe);
+  margin: clamp(18px, 2.6vh, 26px) 0 clamp(44px, 6vh, 72px);
+}
+
+/* ---- primary certifications ---- */
+.assur__primary,
+.assur__secondary {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+.assur__primary {
+  gap: clamp(18px, 3vw, 44px);
+  border-top: 1px solid rgba(78, 33, 45, 0.16);
+  border-bottom: 1px solid rgba(78, 33, 45, 0.16);
+  padding: clamp(26px, 3.6vh, 40px) 0;
+}
+.assur__primary .assur__item {
+  font-family: var(--ff-display);
+  font-weight: 300;
+  font-size: clamp(1rem, 1.5vw, 1.3rem);
+  letter-spacing: -0.01em;
+  color: var(--oxblood);
+}
+
+/* ---- secondary formulation claims ---- */
+.assur__secondary {
+  gap: clamp(14px, 2.4vw, 32px);
+  margin-top: clamp(26px, 3.6vh, 40px);
+}
+.assur__secondary .assur__item {
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: clamp(0.56rem, 0.74vw, 0.66rem);
+  color: var(--rose-taupe);
+  position: relative;
+}
+/* hairline dot separators between secondary items */
+.assur__secondary .assur__item + .assur__item::before {
+  content: "·";
+  position: absolute;
+  left: clamp(-9px, -1.3vw, -18px);
+  color: rgba(174, 143, 123, 0.6);
+}
+
+@media (max-width: 640px) {
+  .assur__primary {
+    gap: 12px 22px;
+  }
+  .assur__secondary .assur__item + .assur__item::before {
+    content: none;
+  }
+}

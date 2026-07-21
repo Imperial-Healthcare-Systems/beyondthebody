@@ -31,12 +31,13 @@ const linkAttrs = (href: string) =>
   href === "#" ? placeholderProps : { href };
 
 // Root-relative (Sprint 02, beat 0) — see Nav.tsx: bare hashes break from /journal.
-// "The Journal" is now a real page. Contact stays "#" (no page yet; placeholder).
+// Platforming pass (2026-07-17): "The Collection" → /collection, "The Journal" → /journal,
+// "The House" → / (home), "Contact" → /contact (built 2026-07-17).
 const MEGA = [
-  { label: "The House", href: "/#origin" },
-  { label: "The Collection", href: "/#collection" },
+  { label: "The House", href: "/" },
+  { label: "The Collection", href: "/collection" },
   { label: "The Journal", href: "/journal" },
-  { label: "Contact", href: "#", ext: true },
+  { label: "Contact", href: "/contact" },
 ];
 const COLLECTION = [
   { name: "Mon Amour", slug: "mon-amour" },

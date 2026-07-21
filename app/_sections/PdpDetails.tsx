@@ -1,11 +1,10 @@
 "use client";
 
-/* PDP · BEAT 4 — The Particulars (details / provenance / care). The quiet spec beat
-   after the Story. Delvaux keeps its details as understated rows; BTB renders them as a
-   hairline-ruled definition list — concentration, longevity, climate, provenance, batch —
-   with a short "how it wears" note. All values are frozen house spec + per-scent prose
-   (products-data). Motion: header rises, rows reveal in sequence. Reduced-motion:
-   end-state. data-theme light (sand ground). */
+/* PDP · The Particulars (details / care) — the quiet spec beat in its original slot right
+   after the Hero. Delvaux keeps its details as understated rows; BTB renders them as a
+   hairline-ruled definition list — concentration, longevity, batch — with a short "how it
+   wears" note. (Climate + provenance rows removed 2026-07-17 as unverified orphan claims.)
+   Motion: header rises, rows reveal in sequence. Reduced-motion: end-state. data-theme light. */
 
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
@@ -19,8 +18,6 @@ export default function PdpDetails({ product }: { product: Product }) {
   const rows: { label: string; value: string }[] = [
     ...(product.concentration ? [{ label: "Concentration", value: product.concentration }] : []),
     { label: "Longevity", value: product.spec.longevity },
-    { label: "Climate", value: product.spec.climate },
-    { label: "Provenance", value: product.spec.provenance },
     { label: "Batch", value: product.spec.batch },
   ];
 

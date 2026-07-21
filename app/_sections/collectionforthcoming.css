@@ -1,0 +1,74 @@
+/* =================================================================
+   /collection · BEAT 3 — Chapter Two · (forthcoming).
+   A quiet, shallow dark coda before the footer — understated on
+   purpose (modest type, low height, no watermark). Dark ground kept,
+   flatter and calmer than a hero.
+   ================================================================= */
+
+.cforth {
+  position: relative;
+  overflow: hidden;
+  background: var(--oxblood-3);
+  color: var(--ivory);
+  padding: clamp(72px, 12vh, 132px) clamp(20px, 5vw, 80px);
+}
+
+.cforth__inner {
+  position: relative;
+  width: 100%;
+  max-width: 56ch;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cforth__eyebrow {
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.38em;
+  font-size: clamp(0.56rem, 0.72vw, 0.64rem);
+  color: var(--rose-taupe);
+  margin: 0 0 clamp(20px, 3vh, 28px);
+}
+
+.cforth__headline {
+  font-family: var(--ff-display);
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: -0.01em;
+  font-size: clamp(1.4rem, 2.6vw, 2.15rem);
+  line-height: 1.16;
+  color: var(--champ-soft);
+  margin: 0;
+  max-width: 24ch;
+}
+
+.cforth__sub {
+  margin: clamp(18px, 2.6vh, 26px) 0 0;
+  max-width: 46ch;
+  font-family: var(--ff-body);
+  font-size: clamp(0.9rem, 1.05vw, 1rem);
+  line-height: 1.62;
+  color: var(--rose-taupe);
+}
+
+.cforth__rule {
+  display: block;
+  width: clamp(32px, 4.5vw, 52px);
+  height: 1px;
+  background: var(--rose-taupe);
+  opacity: 0.55;
+  margin: clamp(28px, 4vh, 40px) 0 clamp(16px, 2.2vh, 22px);
+}
+
+.cforth__tag {
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.32em;
+  font-size: clamp(0.52rem, 0.68vw, 0.6rem);
+  color: var(--rose-taupe);
+  opacity: 0.9;
+  margin: 0;
+}

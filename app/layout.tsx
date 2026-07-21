@@ -4,6 +4,7 @@ import "./globals.css";
 import "./_components/chrome.css";
 import { CartProvider } from "./_components/CartProvider";
 import CartDrawer from "./_components/CartDrawer";
+import Cursor from "./_components/Cursor";
 
 /* Frozen DS type: Fraunces (display), Archivo (body), Archivo Expanded (eyebrow/labels). */
 const fraunces = Fraunces({
@@ -44,6 +45,9 @@ export default function RootLayout({
         <CartProvider>
           {children}
           <CartDrawer />
+          {/* Custom cursor is site-wide (was home-only) so it can be the ONLY cursor on
+              every route; it self-disables on coarse/touch + reduced-motion. */}
+          <Cursor />
         </CartProvider>
       </body>
     </html>

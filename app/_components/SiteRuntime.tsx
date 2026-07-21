@@ -77,7 +77,7 @@ export default function SiteRuntime() {
     (window as unknown as { __lenis?: Lenis }).__lenis = lenis;
 
     // ---- cross-page hash landing (Sprint 02, beat 0) ----
-    // Arriving at /#collection from another route: the browser's native
+    // Arriving at a home anchor (e.g. /#origin, /#newsletter) from another route: the browser's native
     // scroll-to-anchor happens while the preloader holds the scroll locked and
     // Lenis is stopped, so it lands at the top instead. Re-run it via Lenis once
     // scroll is actually live — after preload release if the preloader is up,

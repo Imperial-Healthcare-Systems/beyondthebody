@@ -47,7 +47,7 @@ export default function PdpHero({ product }: { product: Product }) {
     <section className="pdp" data-theme="light" ref={root}>
       <div className="pdp__wrap">
         <nav className="pdp__crumb" aria-label="Breadcrumb">
-          <a href="/#collection">The Collection</a>
+          <a href="/collection">The Collection</a>
           <span aria-hidden="true">·</span>
           <span>{product.name}</span>
         </nav>
@@ -86,9 +86,12 @@ export default function PdpHero({ product }: { product: Product }) {
               <p className="pdp__tag">{product.tagline}</p>
               <AddToBag product={product} />
               <ul className="pdp__spec" aria-label="At a glance">
+                {/* At-a-glance = only load-bearing, verified facts. Climate/provenance
+                    (orphan claims from the retired nine-era copy) live in The Particulars,
+                    pending the client's confirmation — not asserted up here in the hero. */}
                 {product.concentration && <li>{product.concentration}</li>}
                 <li>{product.spec.longevity}</li>
-                <li>{product.spec.climate}</li>
+                <li>Unisex</li>
               </ul>
             </div>
           </div>

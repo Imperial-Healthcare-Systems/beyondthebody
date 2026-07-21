@@ -1,0 +1,124 @@
+/* =================================================================
+   /collection · BEAT 1 — Masthead. The house statement.
+   Warm ivory ground (shared with Journal/§9), oxblood ink, centred.
+   ================================================================= */
+
+.cmast {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--ivory) 0%, var(--ivory-2) 62%, #ecdfcb 100%);
+  color: var(--oxblood);
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  padding: clamp(110px, 14vh, 176px) clamp(20px, 5vw, 80px) clamp(72px, 10vh, 128px);
+}
+
+.cmast__inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: none;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ---- background texture: fine film grain + faint monogram watermark ---- */
+.cmast__grain {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.16'/%3E%3C/svg%3E");
+}
+.cmast__watermark {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--ff-display);
+  font-size: clamp(20rem, 46vw, 40rem);
+  line-height: 1;
+  color: var(--rose-taupe);
+  opacity: 0.05;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ---- the framed text block: Japanese-style corner brackets ---- */
+.cmast__frame {
+  position: relative;
+  width: min(75vw, 1520px); /* the bracketed box spans ~75% of the screen, centred */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(34px, 4vw, 68px) clamp(28px, 5vw, 88px);
+}
+.cmast__corner {
+  position: absolute;
+  width: clamp(20px, 2.4vw, 34px);
+  height: clamp(20px, 2.4vw, 34px);
+  border: 1px solid var(--rose-taupe);
+  opacity: 0.55;
+  pointer-events: none;
+}
+.cmast__corner--tl { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+.cmast__corner--tr { top: 0; right: 0; border-left: 0; border-bottom: 0; }
+.cmast__corner--bl { bottom: 0; left: 0; border-right: 0; border-top: 0; }
+.cmast__corner--br { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+
+.cmast__eyebrow {
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.44em;
+  font-size: clamp(0.6rem, 0.8vw, 0.72rem);
+  color: var(--rose-taupe);
+  margin: 0 0 clamp(24px, 3.5vh, 36px);
+}
+
+.cmast__rule {
+  display: block;
+  width: clamp(48px, 7vw, 88px);
+  height: 1px;
+  background: var(--rose-taupe);
+  opacity: 0.6;
+  margin: 0 0 clamp(30px, 4.5vh, 46px);
+}
+
+.cmast__headline {
+  font-family: var(--ff-display);
+  font-weight: 300;
+  letter-spacing: -0.025em;
+  font-size: clamp(2.8rem, 7.6vw, 6.4rem);
+  line-height: 0.98;
+  color: var(--oxblood);
+  margin: 0;
+}
+.cmast__headline .line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.09em; /* descender room through the mask */
+}
+.cmast__headline .inner {
+  display: block;
+  will-change: transform;
+}
+
+.cmast__intro {
+  margin: clamp(30px, 4.5vh, 46px) 0 0;
+  max-width: 72ch;
+  font-family: var(--ff-body);
+  font-size: clamp(1.02rem, 1.3vw, 1.22rem);
+  line-height: 1.68;
+  color: var(--oxblood-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cmast__headline .inner { will-change: auto; }
+}

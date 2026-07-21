@@ -8,14 +8,19 @@ import { useCart } from "./CartProvider";
 
 /* Root-relative hrefs (Sprint 02, beat 0): the site is now multi-page. A bare
    "#collection" resolves against the CURRENT route, so from /journal it points at
-   /journal#collection and dies. "/#collection" always means "the collection band on
-   home". On the home route itself it stays a same-document hash jump (no reload).
-   "The Journal" is now a real page → /journal. Cross-page hash landing (past the
-   preloader scroll-lock) is handled in SiteRuntime. */
+   /journal#collection and dies.
+   Platforming pass (2026-07-17): where a real ROUTE exists, link to it, not a home band.
+   "The Collection" → /collection (a full page) and "The Journal" → /journal. "The House" → /
+   (the home route). The remaining "/#…" link has NO standalone page yet and resolves to a home
+   section as the interim target — flagged in project/working/platforming-audit.md:
+     · "Join the House" → /#newsletter  (newsletter is the global footer; no /join page)
+   Brand → /#top is intentional: on home it scroll-to-tops WITHOUT replaying the preloader;
+   from elsewhere it loads home. Cross-page hash landing is handled in SiteRuntime. */
 const MENU_LINKS = [
-  { label: "The House", href: "/#origin" },
-  { label: "The Collection", href: "/#collection" },
+  { label: "The House", href: "/" },
+  { label: "The Collection", href: "/collection" },
   { label: "The Journal", href: "/journal" },
+  { label: "Contact", href: "/contact" },
   { label: "Join the House", href: "/#newsletter" },
 ];
 
@@ -60,7 +65,7 @@ export default function Nav() {
         </a>
 
         <nav className="nav__links" aria-label="Primary">
-          <a className="nav__link" href="/#collection">
+          <a className="nav__link" href="/collection">
             The Collection
           </a>
           <a className="nav__cta" href="/#newsletter">

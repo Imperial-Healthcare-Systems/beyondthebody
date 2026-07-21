@@ -1,14 +1,13 @@
 import Preloader from "./_components/Preloader";
-import Cursor from "./_components/Cursor";
 import Nav from "./_components/Nav";
 import SiteRuntime from "./_components/SiteRuntime";
 import { BEATS } from "./_sections/registry";
 
+// Cursor is now mounted once, site-wide, in app/layout.tsx (was here) so it renders on every route.
 export default function Home() {
   return (
     <>
       <Preloader />
-      <Cursor />
       <Nav />
       <main id="top">
         {BEATS.map((b) => {

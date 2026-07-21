@@ -1,0 +1,138 @@
+/* =================================================================
+   PDP · The Blueprint — the "why 25% Eau de Parfum" + Value tail.
+   Dark oxblood ground. A distinction pull-quote, then a 3-up points
+   grid, then a 2-up value grid, hairline-ruled. Denser register than
+   the editorial top, held restrained by space + type discipline.
+   ================================================================= */
+
+.bp {
+  position: relative;
+  isolation: isolate;
+  background: var(--oxblood-deep); /* fallback + reduced-motion ground */
+  color: var(--ivory);
+  padding: clamp(92px, 16vh, 200px) clamp(20px, 5vw, 80px);
+  overflow: hidden;
+}
+/* Chromatic Waves canvas layer (client UI element) */
+.bp__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+/* Legibility scrim over the waves — keeps the dense copy readable while the warm
+   marks still read through. Weighted a touch darker at the left where the header sits. */
+.bp__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+      100deg,
+      rgba(20, 5, 8, 0.72) 0%,
+      rgba(20, 5, 8, 0.5) 42%,
+      rgba(20, 5, 8, 0.42) 100%
+    );
+  pointer-events: none;
+}
+.bp__inner {
+  position: relative;
+  z-index: 2;
+  max-width: var(--maxw, 1200px);
+  margin: 0 auto;
+}
+
+/* ---- header ---- */
+.bp__head {
+  max-width: 40ch;
+}
+.bp__eyebrow {
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.42em;
+  font-size: clamp(0.6rem, 0.8vw, 0.7rem);
+  color: var(--champagne);
+  margin: 0 0 clamp(20px, 3vh, 30px);
+}
+.bp__title {
+  font-family: var(--ff-display);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1.02;
+  margin: 0;
+}
+
+/* ---- the distinction pull-quote ---- */
+.bp__lede {
+  font-family: var(--ff-display);
+  font-weight: 300;
+  font-size: clamp(1.25rem, 2.3vw, 1.9rem);
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  color: var(--champ-soft);
+  max-width: 26ch;
+  margin: clamp(40px, 6vh, 76px) 0 clamp(56px, 8vh, 104px);
+  text-wrap: pretty;
+}
+/* the second sentence carries the argument — let it read as the emphasis */
+.bp__lede { text-indent: 0; }
+
+/* ---- the three Blueprint points ---- */
+.bp__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(28px, 4vw, 64px);
+  border-top: 1px solid var(--line-dark, rgba(226, 203, 166, 0.22));
+  padding-top: clamp(40px, 5vh, 64px);
+}
+.bp__pointlabel {
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: clamp(0.62rem, 0.82vw, 0.72rem);
+  color: var(--champagne);
+  margin: 0 0 clamp(16px, 2.2vh, 22px);
+}
+.bp__pointbody {
+  font-family: var(--ff-body);
+  font-weight: 400;
+  font-size: clamp(0.92rem, 1.1vw, 1.02rem);
+  line-height: 1.8;
+  color: rgba(245, 239, 228, 0.82);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+/* ---- the Value coda ---- */
+.bp__value {
+  margin-top: clamp(56px, 8vh, 104px);
+}
+.bp__valueeyebrow {
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.42em;
+  font-size: clamp(0.6rem, 0.8vw, 0.7rem);
+  color: var(--rose-taupe);
+  margin: 0 0 clamp(28px, 4vh, 44px);
+}
+.bp__valuegrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(28px, 5vw, 88px);
+  border-top: 1px solid var(--line-dark, rgba(226, 203, 166, 0.22));
+  padding-top: clamp(36px, 5vh, 56px);
+  max-width: 72ch;
+}
+
+/* ---------- tablet: points 3→ wrap, value stacks ---------- */
+@media (max-width: 980px) {
+  .bp__grid {
+    grid-template-columns: 1fr;
+    gap: clamp(30px, 5vh, 44px);
+  }
+}
+@media (max-width: 720px) {
+  .bp__valuegrid {
+    grid-template-columns: 1fr;
+    gap: clamp(28px, 5vh, 40px);
+  }
+}

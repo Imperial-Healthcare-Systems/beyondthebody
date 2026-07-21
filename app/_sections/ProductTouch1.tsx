@@ -110,7 +110,8 @@ export default function ProductTouch1() {
         <h2 className="p1__name">Don Amour</h2>
         <span className="p1__rule" aria-hidden="true" />
         <p className="p1__subhead">Warmth, worn as your own.</p>
-        <a className="p1__cta rulelink" href="/#collection">
+        {/* §4 spotlights Don Amour → its PDP (was /#collection, the home band). */}
+        <a className="p1__cta rulelink" href="/fragrance/don-amour">
           Discover the scent
           <svg width="20" height="10" viewBox="0 0 20 10" fill="none" aria-hidden="true">
             <path d="M0 5h18M14 1l4 4-4 4" stroke="currentColor" strokeWidth="1.4" />

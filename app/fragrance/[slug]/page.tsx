@@ -8,12 +8,18 @@ import PdpComposition from "../../_sections/PdpComposition";
 import PdpStory from "../../_sections/PdpStory";
 import PdpDetails from "../../_sections/PdpDetails";
 import PdpCrossSell from "../../_sections/PdpCrossSell";
+import PdpBlueprint from "../../_sections/PdpBlueprint";
+import PdpAssurances from "../../_sections/PdpAssurances";
 import { PRODUCTS, productBySlug } from "../../_sections/products-data";
 
 /* /fragrance/[slug] — the PDP route. Server component; params is awaited (Next 16).
    Chrome the per-page way (Nav + main + Footer + SiteRuntime), NO Preloader. The four
-   scents are prerendered; unknown slugs 404. DOM order (client swapped 2↔4 on 07-16):
-   Hero → Details → Story → Composition → You-may-also-wear. */
+   scents are prerendered; unknown slugs 404.
+
+   DOM order — rebuilt 2026-07-17. The Particulars keeps its original slot after the Hero;
+   the DENSER new specs (Blueprint, Assurances) go below the recommendations (client's Amazon
+   ordering — editorial + quick details up top, the recs mid-page, the marketing/FAQ tail last):
+     Hero → The Particulars → Story → Composition → You-may-also-wear → The Blueprint → Assurances. */
 
 export function generateStaticParams() {
   return PRODUCTS.map((p) => ({ slug: p.slug }));
@@ -51,6 +57,8 @@ export default async function FragrancePage({
         <PdpStory product={product} />
         <PdpComposition product={product} />
         <PdpCrossSell product={product} />
+        <PdpBlueprint product={product} />
+        <PdpAssurances />
       </main>
       <Footer />
       <SiteRuntime />

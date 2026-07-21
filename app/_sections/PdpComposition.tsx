@@ -15,8 +15,10 @@ import "./pdpcomposition.css";
 
 // note label → cutout file (public/products/notes/*.png)
 const NOTE_IMG: Record<string, string> = {
+  // Don Amour
   ambroxan: "ambroxan",
   bergamot: "bergamot",
+  "italian bergamot": "bergamot", // client-specified label (2026-07-17); reuses the bergamot cutout
   "orris root": "orris-root",
   jasmine: "jasmine",
   "woody notes": "woody-notes",
@@ -26,6 +28,33 @@ const NOTE_IMG: Record<string, string> = {
   musk: "musk",
   cashalox: "cachalox",
   patchouli: "patchouli",
+  // Desir + Heartthrob + Mon Amour (sliced from the client note grids 2026-07-16)
+  pear: "pear",
+  "pink pepper": "pink-pepper",
+  "orange blossom": "orange-blossom",
+  coffee: "coffee",
+  licorice: "licorice",
+  "bitter almond": "bitter-almond",
+  cedar: "cedar",
+  vanilla: "vanilla",
+  "cashmere wood": "cashmere-wood",
+  "lemon zest": "lemon-zest",
+  artemisia: "artemisia",
+  mint: "mint",
+  lavender: "lavender",
+  pineapple: "pineapple",
+  "green notes": "green-notes",
+  geranium: "geranium",
+  sandalwood: "sandalwood",
+  "tonka bean": "tonka-bean",
+  "iso e super": "iso-e-super",
+  amberwood: "amberwood",
+  "pear blossom": "pear-blossom",
+  "red berries": "red-berries",
+  "italian mandarin": "italian-mandarin",
+  gardenia: "gardenia",
+  frangipani: "frangipani",
+  "brown sugar": "brown-sugar",
 };
 const imgFor = (n: string): string | null => {
   const k = NOTE_IMG[n.toLowerCase()];
@@ -65,11 +94,15 @@ export default function PdpComposition({ product }: { product: Product }) {
 
   return (
     <section className="comp" data-theme="dark" ref={root}>
-      <img
-        className="comp__scene"
-        src="/products/notes/don-amour-scene.png"
-        alt={`${product.name} with its raw materials`}
-      />
+      {/* Per-scent scene (products-data). Omitted → the deep-oxblood ground + scrim
+          carry the panel on their own (a clean placeholder, never another scent's scene). */}
+      {product.scene && (
+        <img
+          className="comp__scene"
+          src={product.scene}
+          alt={`${product.name} with its raw materials`}
+        />
+      )}
       <div className="comp__scrim" aria-hidden="true" />
 
       <div className="comp__inner">
@@ -80,7 +113,7 @@ export default function PdpComposition({ product }: { product: Product }) {
             <br />
             made of.
           </h2>
-          <p className="comp__sub">Scent as identity. Silence as statement.</p>
+          <p className="comp__sub">Scent as identity. Presence as statement.</p>
           {product.concentration && (
             <p className="comp__meta">{product.concentration} — Intense. Refined. Unforgettable.</p>
           )}

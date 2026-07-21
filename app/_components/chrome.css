@@ -146,7 +146,16 @@
 }
 
 /* ---------- CUSTOM CURSOR ---------- */
-.cursor, .cursor__dot { pointer-events: none; position: fixed; top: 0; left: 0; z-index: 300; }
+/* Hidden until Cursor.tsx confirms a fine+hover pointer IS inside the document (it toggles
+   html.custom-cursor). While active: the native cursor is hidden site-wide and only this one
+   shows; when the pointer leaves the window (or the tab blurs) the class drops and the native
+   cursor returns instantly. Coarse/touch + reduced-motion never get the class (JS bails) and
+   are double-guarded by the media queries below, so they keep the native cursor. */
+.cursor, .cursor__dot { pointer-events: none; position: fixed; top: 0; left: 0; z-index: 300; opacity: 0; }
+html.custom-cursor .cursor, html.custom-cursor .cursor__dot { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  html.custom-cursor, html.custom-cursor * { cursor: none !important; }
+}
 .cursor {
   width: 34px; height: 34px; border-radius: 50%;
   border: 1px solid color-mix(in srgb, var(--ui-fg) 55%, transparent);
