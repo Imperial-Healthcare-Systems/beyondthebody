@@ -1,0 +1,276 @@
+/* =================================================================
+   PDP · The concentration scale — a block INSIDE the Blueprint beat, so it
+   inherits that section's dark register (oxblood in the light scheme, the
+   deepest night register in the dark one). Everything below paints with
+   SEMANTIC tokens only, so both schemes resolve for free.
+
+   Two presentations of one table, split at 980px — the same breakpoint
+   .bp__grid already uses, so the whole beat reflows at once:
+     · above  — a 4-column rail, lightest → densest, with the 25% threshold
+                marked on a hairline beneath it
+     · below  — one hairline row per category, the threshold as a final row
+   The split is not only taste: the threshold label is centred on a point
+   87.5% along the rail, and below ~960px of inner width that label would
+   overrun the container's right edge. Reflowing solves it outright.
+   ================================================================= */
+
+.scale {
+  /* Tighter than the .bp__lede margin it sits under, on purpose: .scale__railwrap
+     already hangs ~76px of its own padding below the marker label, and stacking the
+     lede's full 104px on top of that pushed the three points nearly 250px away —
+     the scale ended up floating between the two rather than reading as the lede's
+     illustration. Closer above than below is the correct asymmetry here. */
+  margin: 0 0 clamp(36px, 4.5vh, 56px);
+  border-top: 1px solid var(--hairline);
+  padding-top: clamp(28px, 4vh, 44px);
+}
+
+.scale__eyebrow {
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.42em;
+  font-size: clamp(0.6rem, 0.8vw, 0.7rem);
+  color: var(--ink-muted);
+  margin: 0 0 clamp(26px, 3.6vh, 40px);
+}
+
+/* ---- the table ---- */
+.scale__table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* four equal bands — the rail's 87.5% depends on it */
+  text-align: left;
+}
+
+/* The <caption> states the fact in words for assistive tech; the rail below is a
+   visual restatement of it and is aria-hidden. Not `display:none` — that would
+   drop it from the accessibility tree along with everything else. */
+.scale__srcaption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.scale__table th {
+  font-family: var(--ff-exp);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: clamp(0.56rem, 0.72vw, 0.64rem);
+  color: var(--ink-muted);
+  padding: 0 clamp(14px, 1.6vw, 26px) clamp(16px, 2.2vh, 22px) 0;
+  vertical-align: bottom;
+}
+.scale__table td {
+  padding: 0 clamp(14px, 1.6vw, 26px) 0 0;
+  vertical-align: top;
+}
+/* hairline gutters between the bands (not before the first, not after the last) */
+.scale__table th + th,
+.scale__ranges td + td {
+  border-left: 1px solid var(--hairline);
+  padding-left: clamp(14px, 1.6vw, 26px);
+}
+
+/* the per-band wrapper — what the reveal animates, and the flex row ≤980px */
+.scale__band {
+  display: block;
+}
+
+/* the concentration figure — the actual content, so it carries the display weight */
+.scale__range {
+  display: block;
+  font-family: var(--ff-display);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  font-size: clamp(1.4rem, 2.4vw, 2.1rem);
+  line-height: 1;
+  color: var(--ink);
+}
+.scale__hrs {
+  display: block;
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: clamp(0.54rem, 0.7vw, 0.6rem);
+  /* deliberately NOT --accent: champagne is spent on the threshold alone, so the
+     one accented thing on the scale is the house's own position. */
+  color: var(--ink-muted);
+  margin-top: clamp(10px, 1.4vh, 14px);
+}
+/* the category name repeated for the stacked layout; the <thead> carries it above 980px */
+.scale__catmob {
+  display: none;
+}
+
+/* ---- the threshold ---- */
+.scale__railwrap {
+  position: relative;
+  margin-top: clamp(30px, 4vh, 46px);
+  /* room for the tick + two label lines hanging below the rule */
+  padding-bottom: clamp(58px, 7vh, 76px);
+}
+.scale__rail {
+  display: block;
+  height: 1px;
+  background: var(--accent);
+  opacity: 0.5;
+  transform-origin: left center;
+}
+.scale__mark {
+  position: absolute;
+  top: 0;
+  /* `left` is set inline from CONCENTRATION_MARK.atPercent */
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(9px, 1.2vh, 13px);
+}
+.scale__tick {
+  display: block;
+  width: 1px;
+  height: clamp(15px, 2vh, 20px);
+  background: var(--accent);
+  transform-origin: top center; /* it drops OUT of the rail, not out of thin air */
+}
+/* The marker sits at the far END of the rail (25% is the top edge of the 15–25% band),
+   so it hangs off its own right edge instead of centring on a mid-band tick. Without
+   this the label would overflow the container by half its width.
+
+   Fenced in min-width on purpose. `.scale__mark--end .scale__marklabel` is a two-class
+   selector, so it would OUTRANK the single-class rules in the ≤980px block below and drag
+   flex-end / right-alignment into the stacked row layout — a media query adds no
+   specificity of its own. Complementary breakpoints keep the two layouts from arguing. */
+@media (min-width: 981px) {
+  .scale__mark--end {
+    transform: translateX(-100%);
+    align-items: flex-end;
+  }
+  .scale__mark--end .scale__marklabel {
+    align-items: flex-end;
+    text-align: right;
+  }
+}
+
+.scale__marklabel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  text-align: center;
+}
+.scale__markhouse {
+  font-family: var(--ff-display);
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  font-size: clamp(0.98rem, 1.3vw, 1.15rem);
+  line-height: 1;
+  color: var(--accent);
+}
+.scale__markfig {
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: clamp(0.54rem, 0.7vw, 0.6rem);
+  color: var(--ink-2);
+}
+
+/* =================================================================
+   ≤980px — one hairline row per band; the threshold becomes a final row.
+   ================================================================= */
+@media (max-width: 980px) {
+  .scale__table,
+  .scale__table thead,
+  .scale__table tbody,
+  .scale__ranges,
+  .scale__ranges td {
+    display: block;
+    width: 100%;
+  }
+  /* the column headers are re-expressed per row by .scale__catmob */
+  .scale__table thead {
+    display: none;
+  }
+  .scale__ranges td,
+  .scale__ranges td + td {
+    border-left: 0;
+    border-top: 1px solid var(--hairline);
+    padding: clamp(15px, 2.2vh, 20px) 0;
+  }
+  .scale__ranges td:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+  .scale__band {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .scale__catmob {
+    display: block;
+    flex: 1 1 auto;
+    font-family: var(--ff-exp);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: clamp(0.56rem, 1.6vw, 0.64rem);
+    color: var(--ink-muted);
+  }
+  .scale__range {
+    flex: 0 0 auto;
+    font-size: clamp(1.15rem, 4.4vw, 1.5rem);
+    text-align: right;
+  }
+  .scale__hrs {
+    flex: 0 0 auto;
+    min-width: 7.5em;
+    margin-top: 0;
+    text-align: right;
+  }
+
+  /* the threshold, as the row the scale resolves into. .scale__rail is KEPT (it
+     becomes this row's top rule) rather than swapped for a border, so the rule
+     still draws left-to-right here — the motion is the same at every width. */
+  .scale__railwrap {
+    margin-top: 0;
+    padding-bottom: 0;
+  }
+  .scale__tick {
+    display: none;
+  }
+  /* `position: static` makes the inline `left` inert — no !important needed */
+  .scale__mark {
+    position: static;
+    transform: none;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: clamp(15px, 2.2vh, 20px);
+  }
+  .scale__marklabel {
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    width: 100%;
+    gap: 16px;
+    white-space: normal;
+    text-align: left;
+  }
+  .scale__markhouse {
+    font-size: clamp(1rem, 3.6vw, 1.2rem);
+  }
+  .scale__markfig {
+    flex: 0 0 auto;
+    text-align: right;
+    white-space: nowrap;
+  }
+}

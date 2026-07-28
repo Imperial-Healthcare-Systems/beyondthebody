@@ -28,7 +28,11 @@ const FRAMES = [
   "/intro/intro-03.webp",
   "/intro/intro-04.webp",
 ];
-const HERO_SRC = "/hero/hero.png";
+/* Must stay byte-identical to §1 HERO's asset — the reel comes to rest on a second copy
+   of that composition and dissolves into it, so any divergence shows as a pop at the
+   handover. Also the heaviest thing the preload below waits on: WebP (129KB) rather than
+   the client's 2.6MB PNG is what keeps the opening from stalling. See Hero.tsx. */
+const HERO_SRC = "/hero/hero.webp";
 
 const DURATION = 4000;  // ms of travel — the whole intro
 const SPIN = 5;         // frames that fly past before the hero

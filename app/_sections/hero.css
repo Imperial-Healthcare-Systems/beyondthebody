@@ -19,10 +19,25 @@
 .hero__media { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
 /* top/left + explicit width/height (NOT `right`, which would fight the width on
    a replaced <img>) — over-sized so the box always bleeds past every edge, with
-   vertical head-room for the scroll parallax. Never exposes the section bg. */
+   vertical head-room for the scroll parallax. Never exposes the section bg.
+
+   ZOOMED OUT 2026-07-28 (was -8%/-4% · 108%/116%). The oversize is the ONLY thing
+   that magnifies this photo: `cover` scales to fill the box, so a 116%-tall box blew
+   a 1774x887 asset up ~1.24x and cropped the composition's edges off. Now ~1.11x, so
+   ~98% of the frame survives on a wide window — the bottle reads at its shot size
+   rather than looming.
+     · Headroom is now ASYMMETRIC (top: 0, so all 4% hangs below). The parallax only
+       travels UP, so top headroom was dead weight; putting it all at the bottom is
+       what let the box shrink without the ground appearing mid-scroll.
+     · The paired parallax reduction (yPercent -12 -> -4 in Hero.tsx) is REQUIRED, not
+       taste: -12 of a 104% box travels 12.5% of the section and would strand the
+       bottom edge inside the viewport. Change one, re-derive the other.
+     · Cropping the ASSET cannot substitute for this. `cover` shows boxW/(imgW x scale)
+       of the width whatever the source ratio is — a narrower crop just re-picks WHICH
+       75% you lose, at identical magnification. Only the box geometry zooms out. */
 .hero__img {
-  position: absolute; top: -8%; left: -4%;
-  width: 108%; height: 116%; max-width: none; object-fit: cover;
+  position: absolute; top: 0; left: -0.5%;
+  width: 101%; height: 104%; max-width: none; object-fit: cover;
   will-change: transform;
 }
 /* the real photograph is shot high-key for an ivory page; ease it back on the
@@ -30,6 +45,17 @@
    Scoped to the <img> so the placeholder gradient below isn't double-dimmed.
    GSAP tweens only transform on .hero__img, so a CSS filter is safe here. */
 img.hero__img { filter: brightness(var(--img-dim)) saturate(var(--img-sat)); }
+
+/* PORTRAIT REFRAME. The hero asset is a single 2:1 landscape (see Hero.tsx — the
+   client supplied no portrait cut), and `object-fit: cover` crops horizontally
+   whenever the viewport is squarer than the image. On a phone that removes ~78% of
+   the width, and a default 50% centre lands on the empty middle — the bottle, which
+   sits at ~65% across, falls almost entirely outside the frame.
+   Keyed on ASPECT, not width, because aspect is what actually drives the crop.
+   Retune this number if the asset is ever replaced; it is specific to this photo. */
+@media (max-aspect-ratio: 1 / 1) {
+  img.hero__img { object-position: 66% center; }
+}
 
 /* REDESIGNED for the dark scheme (v0.2). The light-scheme ramp climbs
    oxblood-3 → #5a2734 → #7a4250: oxblood LIGHTENING into a dusty rose, which
@@ -69,6 +95,38 @@ img.hero__img { filter: brightness(var(--img-dim)) saturate(var(--img-sat)); }
     linear-gradient(90deg, rgb(var(--scrim) / .4) 0%, transparent 40%);
 }
 
+/* ---- the product credit, centred in the frame ----
+   Optically above centre (46%) rather than mathematically at 50%: the bottom third
+   carries the headline + sub + actions, so a true centre reads low. */
+.hero__signature {
+  position: absolute; z-index: 3;
+  top: 46%; left: 50%; transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: flex-start;
+  text-align: left;
+}
+.hero__sigrule {
+  display: block; width: clamp(26px, 2.4vw, 34px); height: 1px;
+  background: var(--accent); opacity: .8;
+  transform-origin: left center;
+  margin-bottom: clamp(14px, 1.8vh, 20px);
+}
+.hero__sigeyebrow {
+  margin: 0;
+  font-family: var(--ff-exp); font-weight: 500;
+  text-transform: uppercase; letter-spacing: .28em;
+  font-size: clamp(.58rem, .76vw, .68rem);
+  color: var(--champ-soft);
+}
+/* keeps the numero's lowercase o out of the parent's uppercase transform */
+.hero__signo { text-transform: none; }
+.hero__signame {
+  margin: clamp(10px, 1.4vh, 16px) 0 0;
+  font-family: var(--ff-display); font-weight: 300;
+  letter-spacing: -.01em; line-height: 1;
+  font-size: clamp(1.6rem, 2.6vw, 2.5rem);
+  color: var(--accent);
+}
+
 /* distributed bottom row */
 .hero__footer {
   position: absolute; left: 0; right: 0; bottom: clamp(34px, 6vh, 64px); z-index: 3;
@@ -92,8 +150,37 @@ img.hero__img { filter: brightness(var(--img-dim)) saturate(var(--img-sat)); }
   font-size: clamp(.92rem, 1.05vw, 1.02rem); line-height: 1.6;
 }
 
-.hero__enter {
+/* the two paths out, stacked right. The grid placement moved OFF .hero__enter and onto
+   this wrapper when the shop button joined it — .hero__enter is now just a link. */
+.hero__actions {
   grid-column: 3; justify-self: end; align-self: end;
+  display: flex; flex-direction: column; align-items: flex-end;
+  gap: clamp(16px, 2.2vh, 24px);
+}
+
+/* SHOP THE COLLECTION — the same outlined pill idiom as the nav's "Join the House"
+   (.nav__cta in chrome.css), so the page has ONE button language. Deliberately borrows
+   the shape rather than inventing a second one; --accent keeps it champagne on this
+   dark beat, and the border is mixed from currentColor so it tracks the ink. */
+.hero__shop {
+  font-family: var(--ff-exp); font-weight: 600;
+  font-size: clamp(.62rem, .78vw, .7rem);
+  letter-spacing: .2em; text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, currentColor 40%, transparent);
+  padding: clamp(13px, 1.7vh, 17px) clamp(28px, 3vw, 44px);
+  border-radius: 100px;
+  white-space: nowrap;
+  transition: background .4s var(--ease), transform .4s var(--ease),
+    border-color .4s var(--ease);
+}
+.hero__shop:hover {
+  transform: translateY(-2px);
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  border-color: color-mix(in srgb, currentColor 65%, transparent);
+}
+
+.hero__enter {
   display: inline-flex; align-items: center; gap: .6em;
   font-family: var(--ff-exp); font-weight: 600;
   font-size: .68rem; letter-spacing: .2em; text-transform: uppercase; color: var(--accent);
@@ -115,5 +202,17 @@ img.hero__img { filter: brightness(var(--img-dim)) saturate(var(--img-sat)); }
   }
   .hero__title { grid-column: 1; font-size: clamp(2.4rem, 11vw, 3.4rem); }
   .hero__sub { grid-column: 1; justify-self: start; text-align: left; max-width: 46ch; }
-  .hero__enter { grid-column: 1; justify-self: start; }
+  .hero__actions {
+    grid-column: 1; justify-self: start; align-items: flex-start;
+    gap: clamp(14px, 2vh, 20px);
+  }
+  /* the credit moves off centre-frame: at this width the flacon fills the middle, so a
+     centred block would sit on top of it. Anchored top-left under the nav instead, which
+     is also where the reference's editorial hierarchy puts it once the row stacks. */
+  .hero__signature {
+    top: auto; left: var(--pad); transform: none;
+    bottom: auto;
+    inset-block-start: clamp(96px, 15vh, 150px);
+  }
+  .hero__signame { font-size: clamp(1.5rem, 7vw, 2.1rem); }
 }

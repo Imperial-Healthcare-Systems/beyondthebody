@@ -18,7 +18,7 @@ const VALUES = [
   { n: "01", title: "Presence over attention", body: "It does not ask to be noticed. It is, quietly, already there." },
   { n: "02", title: "Material over marketing", body: "Absolutes from Grasse, Seville and Florence. The name stays off the price." },
   { n: "03", title: "Made in a single run", body: "We make what we can make well, then rest it before it ships." },
-  { n: "04", title: "Composed for the air", body: "Built at 22% to hold through warm light, not a European spring." },
+  { n: "04", title: "Composed for the air", body: "Built at 25% to hold through warm light, not a European spring." },
 ];
 
 export default function Values() {

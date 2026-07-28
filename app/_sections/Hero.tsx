@@ -11,7 +11,27 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./hero.css";
 
-const HAS_ASSET = true; // hero.png (desktop 2.33:1) · hero-mobile.png (portrait) — mirror-reflection, warm window light, oxblood lip
+/* hero.webp — 1774x887 (2:1). Client asset, 2026-07-28: the Mon Amour bottle on a lit
+   vanity, a figure holding the gaze in the mirror behind it. Product-led, which is the
+   point; the dark left third is where the headline sits.
+
+   SERVED AS WEBP, and that is not incidental: IntroReel PRELOADS this file before it can
+   hand over to the hero, so it gates the opening. The client PNG is 2.6MB; at q92 the WebP
+   is 129KB for no visible loss — same convention as the reel's own /intro/*.webp frames.
+   The untouched PNG stays in public/hero/ as the source of truth but is never referenced.
+   If this URL changes, change IntroReel.HERO_SRC in the same commit — the reel comes to
+   rest on a second copy of this exact composition, and a mismatch shows as a pop.
+
+   The superseded mirror-reflection hero is not kept as a file — it is in git at
+   ef0c82e (`git show ef0c82e:public/hero/hero.png`, and :hero-mobile.png), which is a
+   free and permanent record. Re-committing 3.7MB of it under a *-legacy name was not.
+
+   ONE ASSET FOR ALL VIEWPORTS (was: a portrait hero-mobile.png). The client supplied a
+   2:1 landscape only, and a 0.45:1 crop of it would be a ~399px-wide slice — too tight to
+   hold both bottle and figure, and soft on a 2x phone. Narrow viewports therefore reframe
+   in CSS via object-position instead (hero.css). Reinstate a <source> here the moment a
+   purpose-shot portrait asset exists; the crop is a stopgap, not the finish. */
+const HAS_ASSET = true;
 
 export default function Hero() {
   const root = useRef<HTMLElement>(null);
@@ -36,7 +56,9 @@ export default function Hero() {
       // and would stack yPercent on top of it, leaving the mask stranded ~110%
       // low once yPercent animates back to 0. Pinning y pins the px component.
       gsap.set(q(".hero__title .inner"), { yPercent: 110, y: 0 });
-      gsap.set(q(".hero__sub, .hero__enter"), { opacity: 0, y: 16 });
+      gsap.set(q(".hero__sub, .hero__enter, .hero__shop"), { opacity: 0, y: 16 });
+      gsap.set(q(".hero__sigrule"), { scaleX: 0 });
+      gsap.set(q(".hero__sigeyebrow, .hero__signame"), { opacity: 0, y: 18 });
 
       // Built paused: the preloader curtain fades over 1s, so playing on mount
       // meant the whole reveal finished behind it. `delay` lets the mask start
@@ -49,14 +71,22 @@ export default function Hero() {
         ease: "power4.out",
         stagger: 0.09,
       })
+        // the credit draws its rule, then names itself — over the headline's tail
+        .to(q(".hero__sigrule"), { scaleX: 1, duration: 0.7, ease: "power3.inOut" }, "-=0.75")
+        .to(
+          q(".hero__sigeyebrow, .hero__signame"),
+          { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.1 },
+          "-=0.45"
+        )
         .to(
           q(".hero__sub"),
           { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" },
-          "-=0.55"
+          "-=0.5"
         )
+        // both paths out land together, commerce first
         .to(
-          q(".hero__enter"),
-          { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" },
+          q(".hero__shop, .hero__enter"),
+          { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.09 },
           "-=0.6"
         );
 
@@ -73,9 +103,13 @@ export default function Hero() {
         paused: true,
       });
 
-      // scroll parallax: media lifts slowly, copy eases up + fades
+      /* scroll parallax: media lifts slowly, copy eases up + fades.
+         -4, not the old -12: the zoom-out cut .hero__img to height 104% with all 4% of
+         its headroom below (hero.css), and -12 of that box travels 12.5% of the section
+         — far past the headroom, which would slide the photo's bottom edge up into frame
+         and expose the section ground mid-scroll. These two numbers are one setting. */
       gsap.to(q(".hero__img"), {
-        yPercent: -12,
+        yPercent: -4,
         ease: "none",
         scrollTrigger: { trigger: el, start: "top top", end: "bottom top", scrub: true },
       });
@@ -109,15 +143,29 @@ export default function Hero() {
     <section className="hero" data-theme="dark" id="hero" ref={root}>
       <div className="hero__media">
         {HAS_ASSET ? (
-          <picture>
-            <source media="(max-width: 640px)" srcSet="/hero/hero-mobile.png" />
-            <img className="hero__img" src="/hero/hero.png" alt="" />
-          </picture>
+          <img className="hero__img" src="/hero/hero.webp" alt="" />
         ) : (
           <div className="hero__img hero__placeholder" aria-hidden="true" />
         )}
         <div className="hero__grain" aria-hidden="true" />
         <div className="hero__scrim" aria-hidden="true" />
+      </div>
+
+      {/* The product credit, centred in the frame beside the flacon (client direction
+          2026-07-28). Both strings are already-approved house copy reused in a new slot,
+          not new copy: "The Signature · No.01" is §4's eyebrow and Mon Amour is No.01 in
+          the catalogue — so this agrees with brief.yaml and does not collide with §4,
+          which carries Don Amour. Centred rather than pinned to a percentage so it holds
+          its relationship to the frame at any width. */}
+      <div className="hero__signature">
+        <span className="hero__sigrule" aria-hidden="true" />
+        {/* "No.01" is held out of the uppercase transform so the numero keeps its
+            lowercase o, as the client's reference sets it. (§8's .col__no does let the
+            transform flatten it to "NO. 01" — left alone, not in scope here.) */}
+        <p className="hero__sigeyebrow">
+          The Signature · <span className="hero__signo">No.01</span>
+        </p>
+        <p className="hero__signame">Mon Amour</p>
       </div>
 
       <div className="hero__footer">
@@ -135,12 +183,20 @@ export default function Hero() {
           everyone, and sorted for no one.
         </p>
 
-        <a className="hero__enter" href="/#origin">
-          Enter the house
-          <svg width="20" height="10" viewBox="0 0 20 10" fill="none" aria-hidden="true">
-            <path d="M0 5h18M14 1l4 4-4 4" stroke="currentColor" strokeWidth="1.4" />
-          </svg>
-        </a>
+        {/* Two paths out, stacked right — the commerce one promoted to a button, the
+            editorial one kept as the quieter rule-link beneath it. Route is /collection
+            (singular): that is the actual route, there is no /collections. */}
+        <div className="hero__actions">
+          <a className="hero__shop" href="/collection">
+            Shop the collection
+          </a>
+          <a className="hero__enter" href="/#origin">
+            Enter the house
+            <svg width="20" height="10" viewBox="0 0 20 10" fill="none" aria-hidden="true">
+              <path d="M0 5h18M14 1l4 4-4 4" stroke="currentColor" strokeWidth="1.4" />
+            </svg>
+          </a>
+        </div>
       </div>
     </section>
   );

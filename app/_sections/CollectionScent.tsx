@@ -81,7 +81,7 @@ export default function CollectionScent() {
                   </figure>
                   <div className="cscent__meta">
                     <span className="cscent__name">{p.name}</span>
-                    <span className="cscent__label">Extrait</span>
+                    <span className="cscent__label">Eau de Parfum</span>
                   </div>
                 </a>
                 <button

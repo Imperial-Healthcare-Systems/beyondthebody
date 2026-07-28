@@ -15,6 +15,7 @@ import ChromaticWaves from "../_components/ChromaticWaves";
 import { useScheme } from "../_components/useScheme";
 import type { Product } from "./products-data";
 import { EDP_DISTINCTION, BLUEPRINT, VALUE } from "./house-copy";
+import PdpScale from "./PdpScale";
 import "./pdpblueprint.css";
 
 /* Dot colour for the client's Chromatic Waves bg (client-chosen 2026-07-17): a single deep
@@ -71,11 +72,33 @@ export default function PdpBlueprint({ product }: { product: Product }) {
     const ctx = gsap.context(() => {
       gsap.set(q(".bp__head > *, .bp__lede"), { opacity: 0, y: 26 });
       gsap.set(q(".bp__point, .bp__val"), { opacity: 0, y: 22 });
+      /* The scale: header + bands rise, the threshold rule DRAWS across the ladder,
+         the tick drops out of it, then the label lands.
+         NOTE what is deliberately NOT animated here: `.scale__mark` itself. It carries
+         `translateX(-50%)` to centre on its inline `left`, and GSAP resolves a computed
+         CSS transform into a PIXEL matrix — touching it would freeze that centring at
+         one width and stack any y on top of it (calibration ledger, trap 1). Animating
+         its children keeps the transform GSAP owns separate from the one CSS owns. */
+      gsap.set(q(".scale__eyebrow, .scale__band"), { opacity: 0, y: 18 });
+      gsap.set(q(".scale__rail"), { scaleX: 0 });
+      gsap.set(q(".scale__tick"), { scaleY: 0 });
+      gsap.set(q(".scale__marklabel"), { opacity: 0, y: 10 });
 
       const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 66%", once: true } });
       tl.to(q(".bp__head > *"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.1 })
         .to(q(".bp__lede"), { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, "-=0.3")
-        .to(q(".bp__point"), { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", stagger: 0.12 }, "-=0.35")
+        .to(
+          q(".scale__eyebrow, .scale__band"),
+          { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", stagger: 0.08 },
+          "-=0.45"
+        )
+        // the argument's beat: the rule sweeps the full ladder, unhurried…
+        .to(q(".scale__rail"), { scaleX: 1, duration: 1.1, ease: "power3.inOut" }, "-=0.2")
+        // …the tick drops out of the rule at 25%…
+        .to(q(".scale__tick"), { scaleY: 1, duration: 0.4, ease: "power3.out" }, "-=0.3")
+        // …and the house's name lands under it
+        .to(q(".scale__marklabel"), { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, "-=0.15")
+        .to(q(".bp__point"), { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", stagger: 0.12 }, "-=0.3")
         .to(q(".bp__val"), { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", stagger: 0.12 }, "-=0.2");
     }, el);
 
@@ -104,6 +127,10 @@ export default function PdpBlueprint({ product }: { product: Product }) {
         </header>
 
         <p className="bp__lede">{EDP_DISTINCTION}</p>
+
+        {/* The claim above, shown. Sits between the pull-quote and the three points so
+            the beat escalates: state it → show it → elaborate. */}
+        <PdpScale />
 
         <div className="bp__grid">
           {points.map((p) => (

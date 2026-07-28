@@ -46,7 +46,14 @@
 /* ---------- §1 HERO — Hero.tsx (gsap.set, intro timeline) ---------- */
 html.btb-anim .hero__title .inner { transform: translateY(110%); }
 html.btb-anim .hero__sub,
-html.btb-anim .hero__enter { opacity: 0; transform: translateY(16px); }
+html.btb-anim .hero__enter,
+html.btb-anim .hero__shop { opacity: 0; transform: translateY(16px); }
+/* the product credit. .hero__signature itself is absent on purpose — it carries
+   translate(-50%,-50%) for centring and is never animated; the reveal is on its
+   children, so GSAP's transform and the layout's never share an element. */
+html.btb-anim .hero__sigrule { transform: scaleX(0); }
+html.btb-anim .hero__sigeyebrow,
+html.btb-anim .hero__signame { opacity: 0; transform: translateY(18px); }
 
 /* ---------- /collection · masthead — CollectionMasthead.tsx ---------- */
 html.btb-anim .cmast__rule { transform: scaleX(0); transform-origin: left; }
@@ -109,6 +116,14 @@ html.btb-anim .bp__head > *,
 html.btb-anim .bp__lede { opacity: 0; transform: translateY(26px); }
 html.btb-anim .bp__point,
 html.btb-anim .bp__val { opacity: 0; transform: translateY(22px); }
+/* the concentration scale (inside .bp). `.scale__mark` is absent on purpose — it owns
+   translateX(-50%) and is never animated; mirroring a transform onto it would knock the
+   marker off its own tick before hydration. Its children carry the reveal instead. */
+html.btb-anim .scale__eyebrow,
+html.btb-anim .scale__band { opacity: 0; transform: translateY(18px); }
+html.btb-anim .scale__rail { transform: scaleX(0); }
+html.btb-anim .scale__tick { transform: scaleY(0); }
+html.btb-anim .scale__marklabel { opacity: 0; transform: translateY(10px); }
 
 html.btb-anim .det__head > * { opacity: 0; transform: translateY(24px); }
 html.btb-anim .det__row { opacity: 0; transform: translateY(18px); }
