@@ -35,12 +35,20 @@ export const EDP_DISTINCTION =
        band and the marker cannot contradict each other
      · Body Mist / Body Splash 1–2 hrs is the one figure with no client source (that band
        is new) — the conventional number, and the first thing to correct if they have one */
+/* `vessel` keys a drawn flacon in PdpScale.tsx. `topPct` is the band's upper bound as a
+   number — it drives how full that flacon is drawn (topPct / 25, so the Eau de Parfum
+   vessel reads FULL and the house's ceiling is stated by the graphic, not just the
+   caption). Keep it in step with `range`; it is the same fact twice, once for reading
+   and once for drawing. */
 export const CONCENTRATION_SCALE = [
-  { name: "Body Mist / Body Splash", range: "1–3%", hours: "1–2 hrs" },
-  { name: "Eau de Cologne", range: "2–5%", hours: "1–3 hrs" },
-  { name: "Eau de Toilette", range: "5–15%", hours: "3–4 hrs" },
-  { name: "Eau de Parfum", range: "15–25%", hours: "5–12 hrs" },
+  { name: "Body Mist / Body Splash", range: "1–3%", hours: "1–2 hrs", topPct: 3, vessel: "mist" },
+  { name: "Eau de Cologne", range: "2–5%", hours: "1–3 hrs", topPct: 5, vessel: "cologne" },
+  { name: "Eau de Toilette", range: "5–15%", hours: "3–4 hrs", topPct: 15, vessel: "toilette" },
+  { name: "Eau de Parfum", range: "15–25%", hours: "5–12 hrs", topPct: 25, vessel: "parfum" },
 ] as const;
+
+// the scale the fills are drawn against — the top of the highest band
+export const CONCENTRATION_CEILING = 25;
 
 /* Where the house sits on that ladder.
    `atPercent` is the marker's position along the rail, as a % of its width. Four equal

@@ -4,14 +4,14 @@
    deepest night register in the dark one). Everything below paints with
    SEMANTIC tokens only, so both schemes resolve for free.
 
-   Two presentations of one table, split at 980px — the same breakpoint
+   Two presentations of one list, split at 980px — the same breakpoint
    .bp__grid already uses, so the whole beat reflows at once:
-     · above  — a 4-column rail, lightest → densest, with the 25% threshold
-                marked on a hairline beneath it
-     · below  — one hairline row per category, the threshold as a final row
-   The split is not only taste: the threshold label is centred on a point
-   87.5% along the rail, and below ~960px of inner width that label would
-   overrun the container's right edge. Reflowing solves it outright.
+     · above  — a 4-column rail, lightest → densest, each band a drawn flacon
+                over its figures, with the 25% threshold marked beneath
+     · below  — one hairline row per band, flacon at the row head
+   The split is not only taste: the threshold label is centred on a point at
+   the rail's end, and below ~960px of inner width it would overrun the
+   container's right edge. Reflowing solves it outright.
    ================================================================= */
 
 .scale {
@@ -34,58 +34,85 @@
   margin: 0 0 clamp(26px, 3.6vh, 40px);
 }
 
-/* ---- the table ---- */
-.scale__table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed; /* four equal bands — the rail's 87.5% depends on it */
-  text-align: left;
-}
-
-/* The <caption> states the fact in words for assistive tech; the rail below is a
-   visual restatement of it and is aria-hidden. Not `display:none` — that would
-   drop it from the accessibility tree along with everything else. */
-.scale__srcaption {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
+/* ---- the four bands ---- */
+.scale__bands {
+  list-style: none;
+  margin: 0;
   padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-  border: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  /* equal columns are load-bearing: the threshold marker's position along the rail
+     is derived from the bands being equal-width (house-copy.ts → atPercent) */
 }
-
-.scale__table th {
-  font-family: var(--ff-exp);
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  font-size: clamp(0.56rem, 0.72vw, 0.64rem);
-  color: var(--ink-muted);
-  padding: 0 clamp(14px, 1.6vw, 26px) clamp(16px, 2.2vh, 22px) 0;
-  vertical-align: bottom;
+.scale__band {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-right: clamp(14px, 1.6vw, 26px);
 }
-.scale__table td {
-  padding: 0 clamp(14px, 1.6vw, 26px) 0 0;
-  vertical-align: top;
-}
-/* hairline gutters between the bands (not before the first, not after the last) */
-.scale__table th + th,
-.scale__ranges td + td {
+/* hairline gutters between the bands (not before the first) */
+.scale__band + .scale__band {
   border-left: 1px solid var(--hairline);
   padding-left: clamp(14px, 1.6vw, 26px);
 }
 
-/* the per-band wrapper — what the reveal animates, and the flex row ≤980px */
-.scale__band {
+/* ---- the drawn flacons ---- */
+.scale__flacon {
   display: block;
+  /* Sized to have real presence in the column, like the client's reference gives the
+     illustration — the first cut at ~50px read as a thin vial rather than a flacon. */
+  height: clamp(72px, 7.6vw, 104px);
+  width: auto;
+  color: var(--accent);
+  margin-bottom: clamp(20px, 2.6vh, 28px);
+  overflow: visible;
+}
+/* A true 1px hairline at every size — the same line weight as this scale's rail and
+   §8's rules. Without non-scaling-stroke the stroke would scale with the viewBox and
+   thicken into an outline as the icon grows. */
+.scale__glass {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.72;
+}
+/* the flacon's own vertical facet edges — glass, so lighter than the silhouette */
+.scale__facet {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.3;
+}
+/* The fill level IS the concentration (house-copy.ts → topPct / 25).
+   0.34, not the 0.22 first tried: this beat's ground is a live WebGL shader under a
+   gradient scrim, so a fill that faint took its read from whatever drifted behind it
+   and the four levels stopped comparing. Opaque enough to be its own value. */
+.scale__liquid {
+  fill: currentColor;
+  opacity: 0.34;
+}
+/* the liquid's surface — a hairline at the fill level, so a 12% fill reads as a LEVEL */
+.scale__meniscus {
+  stroke: currentColor;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.6;
+}
+
+.scale__cat {
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: clamp(0.56rem, 0.72vw, 0.64rem);
+  color: var(--ink-muted);
+  margin-bottom: clamp(14px, 1.8vh, 20px);
 }
 
 /* the concentration figure — the actual content, so it carries the display weight */
 .scale__range {
-  display: block;
   font-family: var(--ff-display);
   font-weight: 300;
   letter-spacing: -0.02em;
@@ -94,19 +121,14 @@
   color: var(--ink);
 }
 .scale__hrs {
-  display: block;
   font-family: var(--ff-exp);
   text-transform: uppercase;
   letter-spacing: 0.18em;
   font-size: clamp(0.54rem, 0.7vw, 0.6rem);
-  /* deliberately NOT --accent: champagne is spent on the threshold alone, so the
-     one accented thing on the scale is the house's own position. */
+  /* deliberately NOT --accent: champagne is spent on the flacons and the threshold,
+     so the accent stays the through-line and does not become the default ink. */
   color: var(--ink-muted);
   margin-top: clamp(10px, 1.4vh, 14px);
-}
-/* the category name repeated for the stacked layout; the <thead> carries it above 980px */
-.scale__catmob {
-  display: none;
 }
 
 /* ---- the threshold ---- */
@@ -133,13 +155,7 @@
   align-items: center;
   gap: clamp(9px, 1.2vh, 13px);
 }
-.scale__tick {
-  display: block;
-  width: 1px;
-  height: clamp(15px, 2vh, 20px);
-  background: var(--accent);
-  transform-origin: top center; /* it drops OUT of the rail, not out of thin air */
-}
+
 /* The marker sits at the far END of the rail (25% is the top edge of the 15–25% band),
    so it hangs off its own right edge instead of centring on a mid-band tick. Without
    this the label would overflow the container by half its width.
@@ -159,6 +175,13 @@
   }
 }
 
+.scale__tick {
+  display: block;
+  width: 1px;
+  height: clamp(15px, 2vh, 20px);
+  background: var(--accent);
+  transform-origin: top center; /* it drops OUT of the rail, not out of thin air */
+}
 .scale__marklabel {
   display: flex;
   flex-direction: column;
@@ -184,54 +207,44 @@
 }
 
 /* =================================================================
-   ≤980px — one hairline row per band; the threshold becomes a final row.
+   ≤980px — one hairline row per band, flacon at the row head;
+   the threshold becomes a final row.
    ================================================================= */
 @media (max-width: 980px) {
-  .scale__table,
-  .scale__table thead,
-  .scale__table tbody,
-  .scale__ranges,
-  .scale__ranges td {
-    display: block;
-    width: 100%;
+  .scale__bands {
+    grid-template-columns: 1fr;
   }
-  /* the column headers are re-expressed per row by .scale__catmob */
-  .scale__table thead {
-    display: none;
-  }
-  .scale__ranges td,
-  .scale__ranges td + td {
+  .scale__band,
+  .scale__band + .scale__band {
+    flex-direction: row;
+    align-items: center;
+    gap: clamp(12px, 3.4vw, 18px);
     border-left: 0;
     border-top: 1px solid var(--hairline);
-    padding: clamp(15px, 2.2vh, 20px) 0;
+    padding: clamp(13px, 1.9vh, 18px) 0;
   }
-  .scale__ranges td:first-child {
+  .scale__band:first-child {
     border-top: 0;
     padding-top: 0;
   }
-  .scale__band {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 16px;
+  .scale__flacon {
+    height: clamp(44px, 11.5vw, 56px);
+    margin-bottom: 0;
+    flex: 0 0 auto;
   }
-  .scale__catmob {
-    display: block;
+  .scale__cat {
     flex: 1 1 auto;
-    font-family: var(--ff-exp);
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    font-size: clamp(0.56rem, 1.6vw, 0.64rem);
-    color: var(--ink-muted);
+    margin-bottom: 0;
+    font-size: clamp(0.54rem, 2.9vw, 0.62rem);
   }
   .scale__range {
     flex: 0 0 auto;
-    font-size: clamp(1.15rem, 4.4vw, 1.5rem);
+    font-size: clamp(1.05rem, 4.2vw, 1.4rem);
     text-align: right;
   }
   .scale__hrs {
     flex: 0 0 auto;
-    min-width: 7.5em;
+    min-width: 6.6em;
     margin-top: 0;
     text-align: right;
   }
