@@ -1,175 +1,191 @@
-/* PDP · The concentration scale — lives INSIDE the Blueprint beat, between the
-   distinction pull-quote and the three points. Presentational only: it owns no
-   effect, because its reveal belongs to PdpBlueprint's timeline (one timeline per
-   section keeps the choreography honest — see PdpBlueprint.tsx).
+/* PDP · The concentration scale — a wide cinematic composition inside the Blueprint beat,
+   between the distinction pull-quote and the three points. Built to the client's reference
+   (2026-07-28) as a replication, not an interpretation: title + subtitle top-left, four
+   product renders standing on an ascending stepped platform, a bronze connecting line with
+   markers, then name / percentage / longevity per column, closed by a divider and the house
+   statement bottom-right.
 
-   Restructured from the client's 2026-07-28 infographic. The four DRAWN FLACONS are
-   the creative the client asked for; what was dropped is only the packaging around
-   them — the rounded card frames, the gold filigree and corner flourishes, and the
-   tinted concentration badges. "No loud badges / restraint over decoration"
-   (design-philosophy §1) rules out that chrome, not the illustration.
+   Supersedes the drawn-SVG flacons. Those were an editorial spec rail; the client's
+   requirement was a premium visual — real product renders on a sculpted platform.
 
-   The vessels are drawn here rather than placed as artwork, and that is deliberate:
-     · they inherit --accent, so both colour schemes are correct for free
-     · a 1px non-scaling stroke stays a true hairline at every size, which is the
-       house's line language (§8's rules, the assurances hairlines, this scale's rail)
-     · the FILL IS THE DATA — each flacon is filled topPct/25, so the ladder is legible
-       as a picture before a single number is read, and the Eau de Parfum vessel reads
-       FULL. That is the argument: the house sits at the ceiling of its own category.
-   The fourth silhouette is BTB's own flacon — faceted body, chamfered corners, the
-   spherical cap of the real Mon Amour bottle — so the category the house actually
-   ships is the one drawn as its own product. The other three are generic vessels for
-   categories BTB does not sell, in the same line language.
+   Presentational only: it owns no timeline. The reveal belongs to PdpBlueprint's single
+   section timeline (one per section keeps the choreography honest), which is also why the
+   ambient highlight sweep and the hover lift live in CSS rather than JS — they must not be
+   sequenced against the reveal, and CSS keeps them off the main thread.
 
-   Markup is a <ul>, not a <table>. It was a table when the desktop layout was a
-   4-column rail with a <thead>, but every band is now self-describing (vessel, name,
-   range, longevity), so the column headers had nothing left to associate — and a
-   responsive table that reflows via display:block loses its semantics anyway. */
+   GEOMETRY, and why it still needs no JS measurement. Every figure comes from
+   CONCENTRATION_LADDER in house-copy.ts, measured off the reference file pixel by pixel —
+   see the long note there. Each column carries its own cumulative `--rise`, so the step
+   heights are NON-UNIFORM (1 : 1.65 : 2.27, accelerating), and the connector is a measured
+   Bézier path rather than a straight chord. Both were wrong in the previous cut, which
+   assumed a constant rise and therefore could only ever draw a straight line.
+   Nothing is measured at runtime: the reference numbers are data, the units are cqw, and
+   the browser resolves them against the section's own width. See pdpscale.css. */
 
-import { CONCENTRATION_SCALE, CONCENTRATION_MARK, CONCENTRATION_CEILING } from "./house-copy";
+import {
+  CONCENTRATION_SCALE,
+  CONCENTRATION_SUBTITLE,
+  CONCENTRATION_MARK,
+  CONCENTRATION_LADDER,
+} from "./house-copy";
 import "./pdpscale.css";
 
-/* Flacon geometry, in a shared 40x72 viewBox. All four stand on the SAME baseline
-   (body bottom y=68) and widen as the category concentrates — 14 / 20 / 26 / 30 units
-   — so the row reads as one graduated set rather than four unrelated icons.
-   `top`/`bottom` bound the BODY, not the neck or cap: that is what the fill is measured
-   against, because liquid must never appear in a neck. The first three carry their cap
-   in the outline itself, with `capLine` drawn back over the junction so it still reads
-   as a separate stopper.
+type Entry = (typeof CONCENTRATION_SCALE)[number];
 
-   THE BOX ASPECT IS THE WHOLE GAME, and it took two passes to get right. `width: auto`
-   against a height-driven size means the viewBox ratio sets how wide these can ever
-   look: at 40x92 even the widest bottle came out ~0.44 wide-to-tall and every one of
-   them read as a laboratory vial. At 40x72 the Eau de Parfum flacon lands near 0.64,
-   which is roughly the real Mon Amour bottle. Widen the shapes without shortening the
-   box and you get nothing — the box scales them straight back down. */
-const VESSELS = {
-  // slimmest — a tall mist/splash bottle with a long slender collar
-  mist: {
-    outline: "M16 4h8v8l3 4v50a2 2 0 0 1-2 2H15a2 2 0 0 1-2-2V16l3-4V4z",
-    capLine: "M16 12h8",
-    top: 16,
-    bottom: 68,
-  },
-  // a lighter flask, shoulders sloping wider
-  cologne: {
-    outline: "M16 5h8v8l6 4v48a3 3 0 0 1-3 3H13a3 3 0 0 1-3-3V17l6-4V5z",
-    capLine: "M16 13h8",
-    top: 17,
-    bottom: 68,
-  },
-  // squarer and broader, with a heavier stopper
-  toilette: {
-    outline: "M15 7h10v9l8 4v45a3 3 0 0 1-3 3H10a3 3 0 0 1-3-3V20l8-4V7z",
-    capLine: "M15 16h10",
-    top: 20,
-    bottom: 68,
-  },
-  // the BTB flacon — faceted body, chamfered corners, the spherical cap of the real
-  // Mon Amour bottle. The one category the house actually ships is drawn as its product.
-  parfum: {
-    outline: "M5 27l6-6h18l6 6v38l-4 3H9l-4-3z",
-    collar: "M17 16h6v5h-6z",
-    capCircle: { cx: 20, cy: 10, r: 7 },
-    facets: ["M11 21v47", "M29 21v47"],
-    top: 21,
-    bottom: 68,
-  },
-} as const;
+/* THE CURVE, resolved ONCE — and the single source of truth for both the path and the dots.
 
-function Flacon({ vessel, topPct }: { vessel: keyof typeof VESSELS; topPct: number }) {
-  const v = VESSELS[vessel];
-  const clipId = `scale-clip-${vessel}`;
-  const span = v.bottom - v.top;
-  const fillH = span * (topPct / CONCENTRATION_CEILING);
-  const fillY = v.bottom - fillH;
+   `curveK` bows each measured marker away from the straight end-to-end chord. Scaling a
+   deviation is affine in y, which is why it can be applied to the anchor points and still
+   yield a correct Bézier — the same reason preserveAspectRatio="none" is safe on the result.
 
-  return (
-    <svg
-      className="scale__flacon"
-      viewBox="0 0 40 72"
-      fill="none"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <defs>
-        {/* the liquid is a plain rect clipped to the body outline, so it takes the
-            flacon's exact shape — shoulders, chamfers and all — at any fill level */}
-        <clipPath id={clipId}>
-          <path d={v.outline} />
-        </clipPath>
-      </defs>
-
-      <rect
-        className="scale__liquid"
-        x="0"
-        y={fillY}
-        width="40"
-        height={fillH}
-        clipPath={`url(#${clipId})`}
-      />
-      {/* the surface of the liquid. Clipped to the same body, so it spans exactly the
-          flacon's width at that height — and it is what makes a 12% fill legible as a
-          LEVEL rather than a smudge. Skipped at full, where it would double the
-          shoulder line it sits on. */}
-      {topPct < CONCENTRATION_CEILING && (
-        <line
-          className="scale__meniscus"
-          x1="0"
-          x2="40"
-          y1={fillY}
-          y2={fillY}
-          clipPath={`url(#${clipId})`}
-        />
-      )}
-
-      <path className="scale__glass" d={v.outline} />
-      {"capLine" in v && <path className="scale__glass" d={v.capLine} />}
-      {"collar" in v && <path className="scale__glass" d={v.collar} />}
-      {"capCircle" in v && (
-        <circle className="scale__glass" cx={v.capCircle.cx} cy={v.capCircle.cy} r={v.capCircle.r} />
-      )}
-      {"facets" in v &&
-        v.facets.map((d) => <path className="scale__facet" key={d} d={d} />)}
-    </svg>
-  );
+   ⚠ WHY THIS IS SHARED. The previous cut bowed the PATH by curveK but positioned the markers
+   from the RAW measured values, so the two disagreed by exactly the bow: dots 2 and 3 floated
+   ~5.6px above the line they were supposed to sit on, and only the two endpoints (whose
+   deviation is zero) still touched it. Deriving the dots from the same bowed points makes them
+   sit on the line by construction, at any curveK and any viewport width. */
+function bow(pts: ReadonlyArray<readonly number[]>, k: number) {
+  const [ax, ay] = pts[0];
+  const [bx, by] = pts[pts.length - 1];
+  const chord = (x: number) => ay + ((x - ax) * (by - ay)) / (bx - ax);
+  return pts.map(([x, y]) => [x, chord(x) + k * (y - chord(x))]);
 }
+
+/* Catmull-Rom with reflected end tangents, so the spline passes THROUGH all four points
+   rather than merely approaching them. */
+function ladderPath(P: number[][]) {
+  const e = [
+    [2 * P[0][0] - P[1][0], 2 * P[0][1] - P[1][1]],
+    ...P,
+    [2 * P[3][0] - P[2][0], 2 * P[3][1] - P[2][1]],
+  ];
+  const f = (n: number) => n.toFixed(2);
+  let d = `M ${f(P[0][0])} ${f(P[0][1])}`;
+  for (let i = 1; i < e.length - 2; i++) {
+    const [p0, p1, p2, p3] = [e[i - 1], e[i], e[i + 1], e[i + 2]];
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += ` C ${f(c1[0])} ${f(c1[1])}, ${f(c2[0])} ${f(c2[1])}, ${f(p2[0])} ${f(p2[1])}`;
+  }
+  return d;
+}
+
+const BOWED = bow(CONCENTRATION_LADDER.markers, CONCENTRATION_LADDER.curveK);
+const LADDER_D = ladderPath(BOWED);
+
+/* Each dot's height above marker 1, in cqw, read off the BOWED curve. y runs 100 (marker 1,
+   the lowest) to 0, so the rise is the complement. */
+const DOT_Y = BOWED.map((pt) => ((100 - pt[1]) / 100) * CONCENTRATION_LADDER.lineTotal);
+
+/* Per-column custom properties, all UNITLESS numbers so the CSS can do arithmetic with them
+   (an earlier cut passed a percentage, and `length * percentage` is invalid CSS — the height
+   silently fell back to intrinsic). Typed loosely because React's CSSProperties has no slot
+   for custom properties.
+     --bottle-k   this bottle's height as a fraction of --bottle-unit (≤720px singles only)
+     --bottle-ar  its aspect ratio
+     --rise       cumulative BASE rise at this column, cqw — where the bottle stands
+     --line-y     this dot's height above marker 1, cqw, taken from the bowed curve
+     --dot-nudge  a px optical correction on top (see CONCENTRATION_LADDER.dotNudge)
+   Neither rise is derivable from the column index: both are non-uniform. */
+function colVars(i: number, c: Entry) {
+  return {
+    "--bottle-k": (c.refH / 100).toFixed(4),
+    "--bottle-ar": (c.w / c.h).toFixed(4),
+    "--rise": CONCENTRATION_LADDER.rise[i],
+    "--line-y": DOT_Y[i].toFixed(4),
+    "--dot-nudge": `${CONCENTRATION_LADDER.dotNudge[i]}px`,
+  } as React.CSSProperties;
+}
+
+const STRIP = CONCENTRATION_LADDER.strip;
 
 export default function PdpScale() {
   return (
     <figure className="scale">
-      <figcaption className="scale__eyebrow">The concentration scale</figcaption>
+      <header className="scale__head">
+        <h3 className="scale__title">The concentration scale</h3>
+        <p className="scale__subtitle">{CONCENTRATION_SUBTITLE}</p>
+      </header>
 
-      <ul className="scale__bands">
-        {CONCENTRATION_SCALE.map((c) => (
-          <li className="scale__band" key={c.name}>
-            <Flacon vessel={c.vessel} topPct={c.topPct} />
-            <span className="scale__cat">{c.name}</span>
-            <span className="scale__range">{c.range}</span>
-            <span className="scale__hrs">{c.hours}</span>
-          </li>
+      {/* The stage: platform, bottles, line and markers share one positioning context so
+          every element derives its vertical position from the same measured values. */}
+      <div className="scale__stage">
+        {CONCENTRATION_SCALE.map((c, i) => (
+          <div className="scale__col" key={c.name} style={colVars(i, c)}>
+            {/* The step. Two faces in one element: a lit top band and a shaded front,
+                layered as a single background so there is no extra node to composite. */}
+            <span className="scale__step" aria-hidden="true" />
+            {/* The ≤720px bottle. Hidden above that breakpoint, where .scale__strip renders
+                all four at once — so it costs nothing there (a display:none lazy image below
+                the fold is never fetched). width/height are each asset's OWN intrinsic size;
+                a shared pair would mis-reserve the box for three of the four. */}
+            <img
+              className="scale__bottle"
+              src={c.img}
+              alt={c.alt}
+              width={c.w}
+              height={c.h}
+              loading="lazy"
+              decoding="async"
+            />
+            <span className="scale__marker" aria-hidden="true" />
+          </div>
         ))}
-      </ul>
 
-      {/* The threshold. The rail draws left-to-right, then the tick and label land.
-          aria-hidden on the rail itself — it is the visual restatement of the mark,
-          and the sentence below carries the same fact in words. */}
-      <div className="scale__railwrap">
-        <span className="scale__rail" aria-hidden="true" />
-        <span
-          className={`scale__mark${
-            CONCENTRATION_MARK.anchor === "end" ? " scale__mark--end" : ""
-          }`}
-          style={{ left: `${CONCENTRATION_MARK.atPercent}%` }}
-        >
-          <span className="scale__tick" aria-hidden="true" />
-          <span className="scale__marklabel">
-            <span className="scale__markhouse">{CONCENTRATION_MARK.house}</span>
-            <span className="scale__markfig">
-              {CONCENTRATION_MARK.figure} · {CONCENTRATION_MARK.hours}
-            </span>
-          </span>
+        {/* The four bottles as ONE asset, above 720px — the client's supplied composite,
+            cropped to the bottles so the copy underneath stays live text. It spans the stage's
+            content box and its own bottom edge is column 1's base, so every bottle lands on
+            its tread with no per-bottle positioning. It is also the grid row's only in-flow
+            item up here, which is what gives the stage its height.
+            alt is empty and it is aria-hidden: the legend below states every band in text, so
+            announcing the decorative arrangement again would only add noise. */}
+        <img
+          className="scale__strip"
+          src={STRIP.src}
+          alt=""
+          aria-hidden="true"
+          width={STRIP.w}
+          height={STRIP.h}
+          loading="lazy"
+          decoding="async"
+        />
+
+        {/* The connecting line — a measured CURVE, and it runs BELOW the bottle bases, on the
+            treads' front lips, which is where the reference puts it. preserveAspectRatio="none"
+            stretches the normalised 100x100 box onto the rectangle; because a non-uniform
+            scale is affine it carries the Bézier control points with it, so the curve keeps
+            its measured shape at every viewport width. non-scaling-stroke keeps the stroke a
+            true hairline through that stretch. */}
+        <span className="scale__lineclip" aria-hidden="true">
+          <svg
+            className="scale__line"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            fill="none"
+          >
+            <path d={LADDER_D} />
+          </svg>
         </span>
+      </div>
+
+      {/* The legend, on the same four-column grid so every label centres under its bottle. */}
+      <div className="scale__legend">
+        {CONCENTRATION_SCALE.map((c) => (
+          <div className="scale__entry" key={c.name}>
+            <p className="scale__cat">{c.name}</p>
+            <p className="scale__range">{c.range}</p>
+            <p className="scale__hrs">{c.hours}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="scale__foot">
+        <span className="scale__rule" aria-hidden="true" />
+        <p className="scale__mark">
+          <span className="scale__markhouse">{CONCENTRATION_MARK.house}</span>
+          <span className="scale__markfig">
+            {CONCENTRATION_MARK.figure} · {CONCENTRATION_MARK.hours}
+          </span>
+        </p>
       </div>
     </figure>
   );

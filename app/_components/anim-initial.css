@@ -116,14 +116,19 @@ html.btb-anim .bp__head > *,
 html.btb-anim .bp__lede { opacity: 0; transform: translateY(26px); }
 html.btb-anim .bp__point,
 html.btb-anim .bp__val { opacity: 0; transform: translateY(22px); }
-/* the concentration scale (inside .bp). `.scale__mark` is absent on purpose — it owns
-   translateX(-50%) and is never animated; mirroring a transform onto it would knock the
-   marker off its own tick before hydration. Its children carry the reveal instead. */
-html.btb-anim .scale__eyebrow,
-html.btb-anim .scale__band { opacity: 0; transform: translateY(18px); }
-html.btb-anim .scale__rail { transform: scaleX(0); }
-html.btb-anim .scale__tick { transform: scaleY(0); }
-html.btb-anim .scale__marklabel { opacity: 0; transform: translateY(10px); }
+/* the concentration scale (inside .bp). `.scale__marker` is transform-free here on purpose —
+   it owns a translate(-50%,50%) of its own and mirroring one would fight it, so only its
+   opacity is mirrored. The clip keeps its NEGATIVE bottom inset: the connector is a curve that
+   sags below the straight chord, and a flush clip would slice the dip off. */
+html.btb-anim .scale__title,
+html.btb-anim .scale__subtitle { opacity: 0; transform: translateY(18px); }
+html.btb-anim .scale__col,
+html.btb-anim .scale__entry { opacity: 0; transform: translateY(22px); }
+html.btb-anim .scale__strip { opacity: 0; transform: translateY(26px); }
+html.btb-anim .scale__lineclip { clip-path: inset(0 100% -40% 0); }
+html.btb-anim .scale__marker { opacity: 0; }
+html.btb-anim .scale__rule { transform: scaleX(0); }
+html.btb-anim .scale__mark { opacity: 0; transform: translateY(12px); }
 
 html.btb-anim .det__head > * { opacity: 0; transform: translateY(24px); }
 html.btb-anim .det__row { opacity: 0; transform: translateY(18px); }

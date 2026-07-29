@@ -35,37 +35,118 @@ export const EDP_DISTINCTION =
        band and the marker cannot contradict each other
      · Body Mist / Body Splash 1–2 hrs is the one figure with no client source (that band
        is new) — the conventional number, and the first thing to correct if they have one */
-/* `vessel` keys a drawn flacon in PdpScale.tsx. `topPct` is the band's upper bound as a
-   number — it drives how full that flacon is drawn (topPct / 25, so the Eau de Parfum
-   vessel reads FULL and the house's ceiling is stated by the graphic, not just the
-   caption). Keep it in step with `range`; it is the same fact twice, once for reading
-   and once for drawing. */
+/* Subtitle — NEW COPY, client-approved 2026-07-28, transcribed from their reference
+   composition. It is not in "Homepage Copy (Final)" or the PDP content drop; it exists
+   because the reference sets it under the section title. Approved as the only one of the
+   reference's two new strings to carry (the 01–04 index numbers were declined). */
+export const CONCENTRATION_SUBTITLE = "A guide to fragrance intensity";
+
+/* THE ≤720px SINGLES. Above that breakpoint the four bottles render as ONE image — see
+   CONCENTRATION_LADDER.strip below. Both are cut from the same source by
+   scripts/make-ladder-strip.mjs, so the two breakpoints match tonally; the singles exist only
+   because a four-across strip cannot reflow into the 2x2 that narrow widths need.
+
+   `w` / `h` are each asset's TRUE intrinsic pixel size — not interchangeable, and not to be
+   averaged into one shared pair. They drive the <img> aspect reservation (so nothing shifts as
+   the four decode) and the rendered width, which follows from the height × the asset's ratio.
+
+   `refH` is the display height as a share of the tallest, read from the reference's ALPHA
+   CHANNEL — exact silhouettes, not inferences. The four bottles are near-LEVEL,
+   98.0 / 95.3 / 97.0 / 100, and the ascent is carried entirely by the platform steps. Using
+   the original product renders at one uniform scale would instead give
+   100 / 88.0 / 87.4 / 87.0 and stand the slimmest bottle, the Body Mist, tallest.
+
+   ⚠ These are NOT the raw product renders any more, and their aspect ratios differ from them
+   measurably (the Eau de Toilette is 0.521 here against the render's 0.462). The reference
+   composition scaled its bottles non-uniformly, so the renders could never have reproduced it
+   by scaling alone — which is the substantive argument for the strip. */
 export const CONCENTRATION_SCALE = [
-  { name: "Body Mist / Body Splash", range: "1–3%", hours: "1–2 hrs", topPct: 3, vessel: "mist" },
-  { name: "Eau de Cologne", range: "2–5%", hours: "1–3 hrs", topPct: 5, vessel: "cologne" },
-  { name: "Eau de Toilette", range: "5–15%", hours: "3–4 hrs", topPct: 15, vessel: "toilette" },
-  { name: "Eau de Parfum", range: "15–25%", hours: "5–12 hrs", topPct: 25, vessel: "parfum" },
+  { name: "Body Mist / Body Splash", range: "1–3%", hours: "1–2 hrs",
+    img: "/scale/mist.webp", w: 69, h: 293, refH: 98.0,
+    alt: "A slim cylindrical body mist bottle in smoked glass" },
+  { name: "Eau de Cologne", range: "2–5%", hours: "1–3 hrs",
+    img: "/scale/edc.webp", w: 109, h: 285, refH: 95.3,
+    alt: "A rounded cologne flacon, lightly filled" },
+  { name: "Eau de Toilette", range: "5–15%", hours: "3–4 hrs",
+    img: "/scale/edt.webp", w: 151, h: 290, refH: 97.0,
+    alt: "A broad eau de toilette flacon, filled to a third" },
+  { name: "Eau de Parfum", range: "15–25%", hours: "5–12 hrs",
+    img: "/scale/edp.webp", w: 172, h: 299, refH: 100,
+    alt: "A heavy eau de parfum flacon with a spherical stopper, filled with deep amber" },
 ] as const;
 
-// the scale the fills are drawn against — the top of the highest band
-export const CONCENTRATION_CEILING = 25;
+/* THE LADDER — measured, not designed.
+   Source: the client's reference composition (1774x887, frame aspect exactly 2.000; its inner
+   content box — the title's left edge to the foot rule's right end — is 95.15% of that and
+   2.134:1) plus its background-removed twin, whose ALPHA CHANNEL gives exact bottle
+   silhouettes. Units are `cqw`: 1% of the rendered section's inner content box, so the whole
+   geometry is resolution-independent. Figures measured as a share of the crop's width were
+   converted by × 86.44, the stage's content span as a share of that inner box.
 
-/* Where the house sits on that ladder.
-   `atPercent` is the marker's position along the rail, as a % of its width. Four equal
-   columns, each standing for one band, so a concentration's position is its position
-   WITHIN its band: 25% is the top edge of the 15–25% band, i.e. the far end of the 4th
-   column — 100%. `anchor: "end"` is therefore not decoration; a centred label at 100%
-   would hang half its width off the container. If the bands ever change, re-derive BOTH.
+   TWO CORRECTIONS THE ALPHA CHANNEL FORCED, both of which had been wrong:
+   1. The bottles do NOT stand on the ladder line. Their bases sit 23–40px ABOVE the markers,
+      because a bottle rests at the BACK of a tread while the marker sits on its front lip.
+      Hence `lineDrop` — and hence the client's "bring the line a little lower", which is the
+      reference being right and the earlier build being wrong.
+   2. Tread 1 had been extrapolated 24px too low: the line trace only covered x 412..1344, and
+      column 1's centre at 338.5 sat outside it.
 
-   Longevity wording is the RESOLVED 2026-07-17 figure ("up to 12 hours" — the same string
-   as LONGEVITY_BADGE), deliberately the more conservative of the client's two phrasings
-   (the Blueprint's "well beyond the 12-hour mark" is the other). */
+   THE LINE IS CURVED. A quadratic fit halves a straight one's residual (3.1px vs 5.2px RMS)
+   and the traced slope steepens monotonically from -0.071 to -0.180 left to right. At its
+   widest the measured line sits 13.0% of its total rise below the straight chord between the
+   end markers. `markers` holds those four positions normalised into a 100x100 box (y down;
+   100 = marker 1, the lowest, at the four EVEN column centres the grid actually renders), and
+   `curveK` scales the bow away from the chord — 1 is exactly as measured. */
+export const CONCENTRATION_LADDER = {
+  /* The four bottles as one asset. Its width is the stage's content span and its bottom edge
+     is column 1's base, so pinning those two in CSS lands every bottle on its own tread with
+     no per-bottle positioning: the rises between the bases are baked in at the same ratios
+     `rise` below uses. `heightCqw` mirrors the asset's own aspect and exists so the stage can
+     reserve height before the image decodes. */
+  strip: { src: "/scale/ladder.webp", w: 1462, h: 435, heightCqw: 25.719 },
+
+  /* cumulative BASE rise per column, cqw — where each bottle stands. Index-matched to
+     CONCENTRATION_SCALE. Non-uniform: 2.365 / 2.838 / 2.838, so the treads are not evenly
+     spaced and a constant-rise model cannot draw the connector. */
+  rise: [0, 2.365, 5.203, 8.041],
+  totalRise: 8.041,
+
+  /* cumulative MARKER rise per column, cqw — where the line runs. Distinct from `rise`
+     above: the line has its own, slightly shallower climb (7.798 against the bases' 8.041). */
+  lineY: [0, 1.585, 4.203, 7.798],
+  lineTotal: 7.798,
+  /* how far the line sits BELOW tread 1 — the tread's front lip, not its surface */
+  lineDrop: 1.389,
+
+  /* measured marker positions, normalised (x across the even column centres, y 100 at the
+     lowest marker) */
+  markers: [
+    [0, 100],
+    [33.33, 79.68],
+    [66.67, 46.17],
+    [100, 0],
+  ],
+  /* Bow multiplier on the curve. 1.0 = exactly as measured; 1.5 is the client's "curve it
+     slightly" on top of that. The dots are derived FROM the bowed curve (PdpScale.tsx), never
+     from the raw markers above, so this can move without stranding them off the line. */
+  curveK: 1.5,
+
+  /* Per-dot optical correction in px, positive = up, applied on top of the curve. Client
+     direction 2026-07-29: nudge the Eau de Parfum dot up a couple of pixels. It is the one
+     dot sitting on the curve's steepest run, where a hairline stroke's own width reads as the
+     dot hanging slightly under the line even when its centre is mathematically on it. The
+     other three need no correction. Not measured — a deliberate optical override. */
+  dotNudge: [0, 0, 0, 2],
+} as const;
+
+/* The house's own position, set bottom-right under the closing divider as the reference
+   does. Longevity wording is the RESOLVED 2026-07-17 figure ("up to 12 hours" — the same
+   string as LONGEVITY_BADGE), deliberately the more conservative of the client's two
+   phrasings (the Blueprint's "well beyond the 12-hour mark" is the other). */
 export const CONCENTRATION_MARK = {
   house: "Beyond The Body",
   figure: "25%",
   hours: "up to 12 hours",
-  atPercent: 100,
-  anchor: "end",
 } as const;
 
 // The Blueprint — three points. Per scent, the client varies the copy differently in each:

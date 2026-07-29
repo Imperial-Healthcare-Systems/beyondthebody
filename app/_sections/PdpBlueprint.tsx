@@ -72,32 +72,53 @@ export default function PdpBlueprint({ product }: { product: Product }) {
     const ctx = gsap.context(() => {
       gsap.set(q(".bp__head > *, .bp__lede"), { opacity: 0, y: 26 });
       gsap.set(q(".bp__point, .bp__val"), { opacity: 0, y: 22 });
-      /* The scale: header + bands rise, the threshold rule DRAWS across the ladder,
-         the tick drops out of it, then the label lands.
-         NOTE what is deliberately NOT animated here: `.scale__mark` itself. It carries
-         `translateX(-50%)` to centre on its inline `left`, and GSAP resolves a computed
-         CSS transform into a PIXEL matrix — touching it would freeze that centring at
-         one width and stack any y on top of it (calibration ledger, trap 1). Animating
-         its children keeps the transform GSAP owns separate from the one CSS owns. */
-      gsap.set(q(".scale__eyebrow, .scale__band"), { opacity: 0, y: 18 });
-      gsap.set(q(".scale__rail"), { scaleX: 0 });
-      gsap.set(q(".scale__tick"), { scaleY: 0 });
-      gsap.set(q(".scale__marklabel"), { opacity: 0, y: 10 });
+      /* The scale (client reference, 2026-07-28): header, then the platform and the
+         bottles rise together per column, then the connecting line draws, then the
+         markers and the closing statement land. Slow by direction — 900–1200ms, 120ms
+         stagger, no bounce.
+
+         NOTE what is deliberately NOT transformed: `.scale__marker`. It carries a CSS
+         transform of its own (translate(-50%,50%) centring), and GSAP resolves a computed
+         transform into a PIXEL matrix — writing to it would freeze that centring at one
+         viewport width and stack on top of it (calibration ledger, trap 1). Only its opacity
+         is animated. `.scale__strip` is safe to move: it carries no layout transform.
+
+         The line's clip keeps a NEGATIVE bottom inset in both states. The connector is a
+         curve that sags below the straight chord, so a flush clip would slice the dip off
+         as it drew. */
+      gsap.set(q(".scale__title, .scale__subtitle"), { opacity: 0, y: 18 });
+      gsap.set(q(".scale__col, .scale__entry"), { opacity: 0, y: 22 });
+      gsap.set(q(".scale__strip"), { opacity: 0, y: 26 });
+      gsap.set(q(".scale__lineclip"), { clipPath: "inset(0 100% -40% 0)" });
+      gsap.set(q(".scale__marker"), { opacity: 0 });
+      gsap.set(q(".scale__rule"), { scaleX: 0 });
+      gsap.set(q(".scale__mark"), { opacity: 0, y: 12 });
 
       const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 66%", once: true } });
       tl.to(q(".bp__head > *"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.1 })
         .to(q(".bp__lede"), { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, "-=0.3")
         .to(
-          q(".scale__eyebrow, .scale__band"),
-          { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", stagger: 0.08 },
+          q(".scale__title, .scale__subtitle"),
+          { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.1 },
           "-=0.45"
         )
-        // the argument's beat: the rule sweeps the full ladder, unhurried…
-        .to(q(".scale__rail"), { scaleX: 1, duration: 1.1, ease: "power3.inOut" }, "-=0.2")
-        // …the tick drops out of the rule at 25%…
-        .to(q(".scale__tick"), { scaleY: 1, duration: 0.4, ease: "power3.out" }, "-=0.3")
-        // …and the house's name lands under it
-        .to(q(".scale__marklabel"), { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, "-=0.15")
+        // the platform rises step by step, and the bottles settle onto it as one
+        .to(
+          q(".scale__col"),
+          { opacity: 1, y: 0, duration: 1.1, ease: "power3.out", stagger: 0.12 },
+          "-=0.3"
+        )
+        .to(q(".scale__strip"), { opacity: 1, y: 0, duration: 1.2, ease: "power3.out" }, "-=0.95")
+        // the connecting line draws across the ladder — 700ms ceiling, once
+        .to(q(".scale__lineclip"), { clipPath: "inset(0 0% 0 0)", duration: 0.7, ease: "power2.inOut" }, "-=0.5")
+        .to(q(".scale__marker"), { opacity: 0.85, duration: 0.5, ease: "power2.out", stagger: 0.08 }, "-=0.4")
+        .to(
+          q(".scale__entry"),
+          { opacity: 1, y: 0, duration: 0.9, ease: "power3.out", stagger: 0.12 },
+          "-=0.75"
+        )
+        .to(q(".scale__rule"), { scaleX: 1, duration: 0.9, ease: "power3.inOut" }, "-=0.4")
+        .to(q(".scale__mark"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, "-=0.5")
         .to(q(".bp__point"), { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", stagger: 0.12 }, "-=0.3")
         .to(q(".bp__val"), { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", stagger: 0.12 }, "-=0.2");
     }, el);

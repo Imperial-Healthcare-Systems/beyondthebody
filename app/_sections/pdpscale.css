@@ -1,200 +1,443 @@
 /* =================================================================
-   PDP · The concentration scale — a block INSIDE the Blueprint beat, so it
-   inherits that section's dark register (oxblood in the light scheme, the
-   deepest night register in the dark one). Everything below paints with
-   SEMANTIC tokens only, so both schemes resolve for free.
+   PDP · The concentration scale — built to the client's reference composition
+   (2026-07-28). Lives inside the Blueprint beat, so it inherits that section's
+   dark register (oxblood in the light scheme, the deepest night register in the
+   dark one). Everything paints with SEMANTIC tokens, so both schemes resolve free.
 
-   Two presentations of one list, split at 980px — the same breakpoint
-   .bp__grid already uses, so the whole beat reflows at once:
-     · above  — a 4-column rail, lightest → densest, each band a drawn flacon
-                over its figures, with the 25% threshold marked beneath
-     · below  — one hairline row per band, flacon at the row head
-   The split is not only taste: the threshold label is centred on a point at
-   the rail's end, and below ~960px of inner width it would overrun the
-   container's right edge. Reflowing solves it outright.
+   ORGANISATION — layout, then platform, then bottles, then line, then type,
+   then motion, then responsive. The knobs are all at the top of .scale.
+
+   THE GEOMETRY CONTRACT. Every figure below is MEASURED off the client's reference
+   composition (see house-copy.ts → CONCENTRATION_LADDER for the file, the method and
+   the numbers). Vertical positions in the stage derive from --step-base and the
+   column's own cumulative --rise:
+
+       step height   = --step-base + --rise × 1cqw
+       bottle bottom = that step height
+       marker centre = that step height
+       line span     = --rise-total, from marker 1 up to marker 4
+
+   The rises are NON-UNIFORM and accelerate left to right, so the path through the
+   four markers is a CURVE — drawn as a measured Bézier in a stretched viewBox. An
+   earlier cut assumed a constant rise, which forced a straight line and could not
+   reproduce the reference. Nothing is measured at runtime.
+
+   UNITS. Everything is `cqw` — 1% of this section's own inner content box (see
+   container-type below), never of the viewport. The section is 90% of the column
+   above 980px and 100% below it, so a vw-based figure would jump at that breakpoint
+   where a cqw-based one cannot. Reference values were taken as a share of the
+   composition's FRAME width and converted to the inner box by /0.9515.
    ================================================================= */
 
 .scale {
-  /* Tighter than the .bp__lede margin it sits under, on purpose: .scale__railwrap
-     already hangs ~76px of its own padding below the marker label, and stacking the
-     lede's full 104px on top of that pushed the three points nearly 250px away —
-     the scale ended up floating between the two rather than reading as the lede's
-     illustration. Closer above than below is the correct asymmetry here. */
-  margin: 0 0 clamp(36px, 4.5vh, 56px);
-  border-top: 1px solid var(--hairline);
-  padding-top: clamp(28px, 4vh, 44px);
+  /* ---- THE ONE KNOB ----
+     Multiplies every bottle. 1 = the size measured in the reference. Nothing else needs
+     touching to rescale the bottles: the steps, markers, line and type are independent. */
+  --bottle-scale: 1;
+
+  /* ---- measured constants ---- */
+  /* the TALLEST bottle (Eau de Toilette at refH 100) — 18.51% of the reference frame */
+  --bottle-unit: calc(clamp(96px, 19.46cqw, 250px) * var(--bottle-scale));
+  --rise-total: 8.041; /* cqw, tread 1 up to tread 4 — matches CONCENTRATION_LADDER.totalRise */
+  /* The connector has its OWN, shallower climb and sits BELOW the bottle bases, on the treads'
+     front lips. Both figures are measured; an earlier build put the line exactly at the bases,
+     which is what made it read too high. */
+  --line-total: 7.798; /* cqw, marker 1 up to marker 4 */
+  --line-drop: 1.389; /* cqw, how far below tread 1 the line begins */
+  /* Multiplies every rise. 1 = as measured. Only the ≤720px cut moves it, where four
+     measured rises spread over two columns would barely read. */
+  --rise-k: 1;
+  /* Tread 1's height above the stage's baseline. It has to exceed --line-drop, or the lowered
+     line and its marker would fall outside the stage box and be clipped. */
+  --step-base: clamp(17px, 2cqw, 32px);
+  /* The platform does not stop at the treads: in the reference its front faces carry on
+     downward and dissolve BEHIND the legend, with no floor line anywhere. This is how far
+     each step overshoots its column; the mask below does the dissolving. */
+  --step-drop: clamp(24px, 4cqw, 60px);
+  --step-face: clamp(5px, 0.7cqw, 9px); /* thickness of the lit top face */
+  --marker-size: clamp(7px, 0.72cqw, 10px);
+
+  /* THE STAGE INSET. Measured column centres are 19.08 / 38.84 / 59.84 / 80.95% of the
+     reference frame — a ~20.6% pitch inside a stage inset from both edges, so the staircase
+     does not bleed off the frame. (An earlier cut ran the columns across the full width,
+     putting them at 12.5 / 37.5 / 62.5 / 87.5% and making the treads read as wide shelves.)
+     Insetting as PADDING on the grid keeps the four columns equal and keeps the steps
+     butting, so the staircase is still one continuous stair; only its two ends pull in.
+     6.68% solves inset + (100 − 2·inset)/8 = 17.51%, the first centre relative to the
+     inner box. The head and foot are NOT inset — in the reference they run the full width. */
+  --stage-inset: 6.68%;
+  /* the first and last column CENTRES as a share of the stage's full width — one eighth of
+     the inset content box, offset by the inset. Spans the connecting line. */
+  --stage-edge: calc(var(--stage-inset) + (100% - 2 * var(--stage-inset)) / 8);
+
+  /* 90% of the content column, centred — the reference's cinematic proportion
+     (brief: 85–90%). The 2.42% inline padding is the reference's own outer margin, which
+     is why cqw resolves against the inner box and every figure above is normalised to it.
+     Deliberately no top hairline: the reference opens on the title, and the beat's own
+     .bp__lede margin above supplies the separation. */
+  width: 90%;
+  padding-inline: 2.42%;
+  margin: 0 auto clamp(40px, 5vh, 64px);
+  /* the query container every cqw above resolves against — cqw is 1% of its CONTENT box, so
+     the padding is already excluded. Also establishes a containing block for absolutely
+     positioned descendants, which is harmless: the step, line and marker all position
+     against .scale__col / .scale__stage, and both are relative. */
+  container-type: inline-size;
 }
 
-.scale__eyebrow {
+/* ---- header ----
+   Tight on purpose, and measured: in the reference the tallest bottle's cap begins 0.96% of
+   the frame width under the subtitle, so the title block and the top of the stage share one
+   vertical band rather than sitting in separate registers.
+
+   CENTRED is a deliberate departure from the reference, which sets both lines flush left at
+   2.42% of the frame. Client direction 2026-07-29; logged to the calibration ledger. The
+   vertical rhythm is unaffected — only the inline alignment changes. */
+.scale__head {
+  margin-bottom: clamp(7px, 0.93cqw, 15px);
+  text-align: center;
+}
+.scale__title {
   font-family: var(--ff-exp);
+  font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.42em;
-  font-size: clamp(0.6rem, 0.8vw, 0.7rem);
+  font-size: clamp(0.6rem, 0.97cqw, 0.79rem);
+  /* Line boxes are pinned throughout the composition. The reference's vertical figures are
+     GLYPH-BAND gaps; a CSS margin sits between LINE BOXES, so every default line-height
+     silently adds its half-leading to the gap on both sides. Pinning the boxes makes the
+     half-leading a known quantity, and each margin below has it subtracted out. */
+  line-height: 1.2;
+  color: var(--ink);
+  margin: 0;
+}
+.scale__subtitle {
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  font-size: clamp(0.56rem, 0.84cqw, 0.69rem);
+  line-height: 1.2;
   color: var(--ink-muted);
-  margin: 0 0 clamp(26px, 3.6vh, 40px);
+  /* measured 1.42cqw glyph-to-glyph, less both half-leadings */
+  margin: clamp(10px, 1.24cqw, 19px) 0 0;
 }
 
-/* ---- the four bands ---- */
-.scale__bands {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+/* =================================================================
+   THE STAGE — platform, bottles, line, markers
+   ================================================================= */
+.scale__stage {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  /* equal columns are load-bearing: the threshold marker's position along the rail
-     is derived from the bands being equal-width (house-copy.ts → atPercent) */
+  align-items: end;
+  /* gap 0 is structural, not cosmetic: the steps butt against their neighbours to
+     read as ONE continuous staircase. Column breathing room comes from the legend
+     below, which has its own padding. */
+  gap: 0;
+  padding-inline: var(--stage-inset);
 }
-.scale__band {
+.scale__col {
+  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  padding-right: clamp(14px, 1.6vw, 26px);
-}
-/* hairline gutters between the bands (not before the first) */
-.scale__band + .scale__band {
-  border-left: 1px solid var(--hairline);
-  padding-left: clamp(14px, 1.6vw, 26px);
+  align-items: center;
+  justify-content: flex-end;
+  /* Resolved once here so the step, the bottle and the marker cannot drift apart. --rise is
+     this column's CUMULATIVE rise in cqw, set per column in PdpScale.tsx from the measured
+     ladder — it is not derivable from the column index, because the rises are non-uniform. */
+  --step-h: calc(var(--step-base) + var(--rise) * var(--rise-k) * 1cqw);
 }
 
-/* ---- the drawn flacons ---- */
-.scale__flacon {
-  display: block;
-  /* Sized to have real presence in the column, like the client's reference gives the
-     illustration — the first cut at ~50px read as a thin vial rather than a flacon. */
-  height: clamp(72px, 7.6vw, 104px);
+/* ---- the platform ---- */
+/* One element, two faces, drawn as a single layered background — a lit top band then
+   a softly shaded front. No borders (the reference has none), no box-shadow and no
+   blur: the brief asks for sculpted, and gradients on a solid ground are both cheaper
+   and cleaner than shadow stacks.
+   Contrast is DELIBERATELY low (reference-alignment parse, 2026-07-29): the first cut read
+   as four lighter rectangles laid on the ground, where the reference's platform is barely
+   separated from it and is legible mainly by its lit top edge. The mask is the other half
+   of that — the front faces dissolve downward instead of ending on a hard baseline, which
+   is why the reference has no visible floor line. */
+.scale__step {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* overshoots its column downward so the front face carries on behind the legend, as the
+     reference's does; the mask dissolves it before it gets far. .scale__legend is given a
+     stacking context below so the text always stays in front of it. */
+  bottom: calc(-1 * var(--step-drop));
+  height: calc(var(--step-h) + var(--step-drop));
+  z-index: 0;
+  background:
+    /* the lit leading edge of the top face */
+    linear-gradient(
+        180deg,
+        rgb(var(--bloom) / 0.13) 0,
+        rgb(var(--bloom) / 0.046) var(--step-face),
+        transparent var(--step-face)
+      ),
+    /* the front face — light falls off downward */
+      linear-gradient(
+        180deg,
+        rgb(var(--bloom) / 0.042) var(--step-face),
+        rgb(var(--bloom) / 0.02) calc(var(--step-face) + 34%),
+        rgb(var(--scrim) / 0.16) 100%
+      );
+  /* dissolve the front face into the ground — no floor line, as the reference has none */
+  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 34%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 0, #000 34%, transparent 100%);
+}
+/* the top face's front edge, catching the light — 1px, the house hairline. It is the one
+   part of the step that reads clearly, so it carries the whole staircase. */
+.scale__step::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  background: rgb(var(--bloom) / 0.26);
+}
+/* The vertical seam where one step meets the next. Very faint, and it FADES OUT downward
+   with the face it belongs to — at full strength it turned the stair into four separate
+   tiles, which the reference is not. Not on the first column: nothing to its left. */
+.scale__col:not(:first-child) .scale__step::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, rgb(var(--scrim) / 0.16) 0, transparent 74%);
+}
+
+/* ---- the strip: all four bottles as one asset, above 720px ---- */
+/* It is the grid row's only IN-FLOW item up here, which is deliberate — it gives the row (and
+   so the stage) its height, with no magic number and nothing to keep in sync. Spanning all
+   four columns puts its own baked-in bottle positions exactly on the four column centres, and
+   the margin-bottom lifts its bottom edge — column 1's base — to tread 1, which lands every
+   other bottle on its own tread automatically.
+   No filter, no overlay, no glow: it already carries the reference's lighting, and the glass
+   is genuinely semi-transparent, so this beat's ground shows through it the way the reference
+   intends. That is the whole reason it reads as dark glass rather than a pasted-on render. */
+.scale__strip {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  align-self: end;
+  justify-self: stretch;
+  width: 100%;
+  height: auto;
+  /* Lifts the strip's bottom edge to tread 1. The asset's crop runs 3 source px BELOW column
+     1's base (the erase slack that stops a base measured a pixel high from clipping the
+     glass), so that slack is subtracted back out here — 3px of 1462 is 0.205% of the span,
+     which is 0.177cqw. Without it every bottle floats a uniform ~2px above its tread. */
+  margin-bottom: calc(var(--step-base) - 0.177cqw);
+  position: relative;
+  z-index: 2;
+}
+/* The columns share row 1 with the strip and contribute no height of their own up here —
+   their step and marker are both absolutely positioned.
+   ⚠ The grid column MUST be explicit. Grid places definitely-positioned items first, so the
+   strip claims columns 1..4 of row 1 before the columns are placed; an auto-placed column with
+   only `grid-row: 1` then finds "the first available column" is 5, and all four land in
+   zero-width IMPLICIT columns off the right edge — steps invisible, markers stacked in a
+   vertical row at the far edge. Naming the column is what keeps them under the bottles. */
+.scale__col {
+  grid-row: 1;
+}
+.scale__col:nth-child(1) { grid-column: 1; }
+.scale__col:nth-child(2) { grid-column: 2; }
+.scale__col:nth-child(3) { grid-column: 3; }
+.scale__col:nth-child(4) { grid-column: 4; }
+
+/* ---- the bottles (≤720px only; see the media query at the foot of this file) ---- */
+/* Client product renders, used as supplied: no filter, no colour overlay, no glow —
+   the brief is explicit, and these are premium renders that only lose by processing.
+   `--bottle-k` is a UNITLESS fraction of --bottle-unit, set per column in PdpScale.tsx.
+   ⚠ It must stay unitless. The previous cut passed a percentage here, and `length *
+   percentage` is invalid CSS — the declaration was dropped in silence and every bottle
+   rendered at its intrinsic pixel height, which put the slimmest (the 500px Body Mist) at
+   the top of the row and made the whole composition roughly 2.3× oversized. */
+.scale__bottle {
+  display: none; /* the strip covers this breakpoint; re-shown ≤720px */
+  position: relative;
+  z-index: 2;
+  height: calc(var(--bottle-unit) * var(--bottle-k));
   width: auto;
-  color: var(--accent);
-  margin-bottom: clamp(20px, 2.6vh, 28px);
+  /* stand it exactly on its own step */
+  margin-bottom: var(--step-h);
+  /* GPU-friendly and keeps the hover lift off the layout */
+  will-change: transform;
+  transition: transform 0.25s var(--ease);
+}
+
+/* ---- the connecting line + markers ---- */
+/* The clip is the draw-on mechanism: revealing the box left-to-right reveals the
+   diagonal inside it. clip-path on a 1px-tall-ish box is far cheaper than animating
+   stroke-dashoffset, and it sidesteps dasharray behaving unpredictably under this
+   element's non-uniform scale. */
+.scale__lineclip {
+  position: absolute;
+  z-index: 1;
+  /* The curve SAGS below the straight chord, so at mid-span the path dips past the box's
+     bottom edge. A negative bottom inset in the reveal clip (PdpBlueprint + anim-initial)
+     expands the clip region downward so the sag is never sliced off. */
+  /* the centres of the first and last column — derived from --stage-inset, so changing the
+     inset moves the line with the bottles instead of leaving it stranded */
+  left: var(--stage-edge);
+  right: var(--stage-edge);
+  /* marker 1's height up to marker 4's — its own measured climb, dropped below tread 1 */
+  bottom: calc(var(--step-base) - var(--line-drop) * var(--rise-k) * 1cqw);
+  height: calc(var(--line-total) * var(--rise-k) * 1cqw);
+  pointer-events: none;
+}
+.scale__line {
+  display: block;
+  width: 100%;
+  height: 100%;
   overflow: visible;
 }
-/* A true 1px hairline at every size — the same line weight as this scale's rail and
-   §8's rules. Without non-scaling-stroke the stroke would scale with the viewBox and
-   thicken into an outline as the icon grows. */
-.scale__glass {
-  fill: none;
-  stroke: currentColor;
+/* `path`, not `line` — the connector is a measured curve. non-scaling-stroke is what keeps
+   it a true hairline: without it the stroke width would be stretched by the same non-uniform
+   scale that maps the viewBox onto the box, and would read thicker vertically than
+   horizontally. `linecap: round` matters on a curve where the ends land on the markers. */
+.scale__line path {
+  stroke: var(--accent);
   stroke-width: 1;
-  stroke-linejoin: round;
+  stroke-linecap: round;
   vector-effect: non-scaling-stroke;
-  opacity: 0.72;
-}
-/* the flacon's own vertical facet edges — glass, so lighter than the silhouette */
-.scale__facet {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
-  opacity: 0.3;
-}
-/* The fill level IS the concentration (house-copy.ts → topPct / 25).
-   0.34, not the 0.22 first tried: this beat's ground is a live WebGL shader under a
-   gradient scrim, so a fill that faint took its read from whatever drifted behind it
-   and the four levels stopped comparing. Opaque enough to be its own value. */
-.scale__liquid {
-  fill: currentColor;
-  opacity: 0.34;
-}
-/* the liquid's surface — a hairline at the fill level, so a 12% fill reads as a LEVEL */
-.scale__meniscus {
-  stroke: currentColor;
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
-  opacity: 0.6;
+  opacity: 0.42;
 }
 
+/* a small ring, straddling its step's top edge */
+.scale__marker {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  /* On the line, not on the tread: tread 1's height, less the line's drop below it, plus this
+     dot's own climb along the BOWED curve (--line-y is derived from that curve in
+     PdpScale.tsx, so the dot cannot drift off the line), plus its px optical nudge. */
+  bottom: calc(
+    var(--step-base) - var(--line-drop) * var(--rise-k) * 1cqw + var(--line-y) * var(--rise-k) *
+      1cqw + var(--dot-nudge, 0px)
+  );
+  width: var(--marker-size);
+  height: var(--marker-size);
+  transform: translate(-50%, 50%);
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  background: var(--ground);
+  opacity: 0.85;
+}
+/* the centre dot */
+.scale__marker::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* =================================================================
+   THE LEGEND — name / percentage / longevity, on the stage's grid
+   ================================================================= */
+.scale__legend {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  /* the same inset as the stage — this is what keeps every label centred under its bottle */
+  padding-inline: var(--stage-inset);
+  /* Measured: the reference sets the category row 1.66% of the frame width below tread 1,
+     and there is no floor line to clear — which is why both this and --step-base stay small.
+     Together they are that gap. */
+  margin-top: clamp(6px, 0.7cqw, 12px);
+  /* Above the platform's overshoot. The steps drop below the stage to dissolve behind this
+     text, and an absolutely-positioned descendant would otherwise paint over in-flow text. */
+  position: relative;
+  z-index: 6;
+}
+/* Each entry opts into the legend's OWN row tracks (subgrid) rather than laying out its
+   three lines independently. Without this, a category that wraps to two lines — "Body Mist /
+   Body Splash" is the only one that does, and it wraps at narrow widths — pushes its own
+   percentage and hours down while its neighbours' stay put, and the row loses its baselines.
+   Falls back cleanly: where subgrid is unsupported the declaration is ignored and the entry
+   behaves as a plain block, which is what it did before. */
+.scale__entry {
+  text-align: center;
+  padding: 0 clamp(8px, 1.2cqw, 20px);
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  align-content: start;
+}
 .scale__cat {
   font-family: var(--ff-exp);
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  font-size: clamp(0.56rem, 0.72vw, 0.64rem);
+  font-size: clamp(0.53rem, 0.824cqw, 0.67rem);
+  /* 1.25 rather than 1: this is the one label that wraps to two lines at narrow widths, and
+     a pinned 1 would collide them. */
+  line-height: 1.25;
   color: var(--ink-muted);
-  margin-bottom: clamp(14px, 1.8vh, 20px);
+  margin: 0;
 }
-
-/* the concentration figure — the actual content, so it carries the display weight */
+/* the largest type in the column — the figure is the content */
 .scale__range {
   font-family: var(--ff-display);
   font-weight: 300;
   letter-spacing: -0.02em;
-  font-size: clamp(1.4rem, 2.4vw, 2.1rem);
+  font-size: clamp(1.4rem, 3.42cqw, 2.8rem);
   line-height: 1;
   color: var(--ink);
+  margin: clamp(9px, 1.04cqw, 16px) 0 0;
 }
+/* The longevity line measures WIDER in the reference than the category above it despite
+   reading smaller — so the extra width comes from tracking, not size. Widened here rather
+   than scaled up, which would have inverted the hierarchy. */
 .scale__hrs {
   font-family: var(--ff-exp);
   text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: clamp(0.54rem, 0.7vw, 0.6rem);
-  /* deliberately NOT --accent: champagne is spent on the flacons and the threshold,
-     so the accent stays the through-line and does not become the default ink. */
+  letter-spacing: 0.26em;
+  font-size: clamp(0.48rem, 0.8cqw, 0.64rem);
+  line-height: 1.25;
   color: var(--ink-muted);
-  margin-top: clamp(10px, 1.4vh, 14px);
+  margin: clamp(6px, 0.745cqw, 12px) 0 0;
 }
 
-/* ---- the threshold ---- */
-.scale__railwrap {
-  position: relative;
-  margin-top: clamp(30px, 4vh, 46px);
-  /* room for the tick + two label lines hanging below the rule */
-  padding-bottom: clamp(58px, 7vh, 76px);
+/* =================================================================
+   THE FOOT — divider, then the house statement bottom-right
+   ================================================================= */
+.scale__foot {
+  margin-top: clamp(19px, 2.44cqw, 38px);
 }
-.scale__rail {
+/* the reference's divider turns a short tick down at its right end — the tick is a clear
+   ~1.7% of the composition width there, where the first cut set it from vh and it all but
+   vanished at desktop heights */
+.scale__rule {
   display: block;
-  height: 1px;
-  background: var(--accent);
-  opacity: 0.5;
+  height: clamp(12px, 1.6cqw, 26px);
+  border-top: 1px solid var(--hairline-2);
+  border-right: 1px solid var(--hairline-2);
   transform-origin: left center;
 }
 .scale__mark {
-  position: absolute;
-  top: 0;
-  /* `left` is set inline from CONCENTRATION_MARK.atPercent */
-  transform: translateX(-50%);
+  /* the small right pad keeps the statement INSIDE the rule's down-tick rather than flush
+     against it, as the reference sets it */
+  margin: clamp(5px, 0.6cqw, 10px) 0 0;
+  padding-right: clamp(3px, 0.5cqw, 9px);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: clamp(9px, 1.2vh, 13px);
-}
-
-/* The marker sits at the far END of the rail (25% is the top edge of the 15–25% band),
-   so it hangs off its own right edge instead of centring on a mid-band tick. Without
-   this the label would overflow the container by half its width.
-
-   Fenced in min-width on purpose. `.scale__mark--end .scale__marklabel` is a two-class
-   selector, so it would OUTRANK the single-class rules in the ≤980px block below and drag
-   flex-end / right-alignment into the stacked row layout — a media query adds no
-   specificity of its own. Complementary breakpoints keep the two layouts from arguing. */
-@media (min-width: 981px) {
-  .scale__mark--end {
-    transform: translateX(-100%);
-    align-items: flex-end;
-  }
-  .scale__mark--end .scale__marklabel {
-    align-items: flex-end;
-    text-align: right;
-  }
-}
-
-.scale__tick {
-  display: block;
-  width: 1px;
-  height: clamp(15px, 2vh, 20px);
-  background: var(--accent);
-  transform-origin: top center; /* it drops OUT of the rail, not out of thin air */
-}
-.scale__marklabel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-  text-align: center;
+  align-items: flex-end;
+  gap: clamp(4px, 0.6cqw, 9px);
+  text-align: right;
 }
 .scale__markhouse {
   font-family: var(--ff-display);
   font-weight: 300;
   letter-spacing: -0.01em;
-  font-size: clamp(0.98rem, 1.3vw, 1.15rem);
+  font-size: clamp(1rem, 1.66cqw, 1.35rem);
   line-height: 1;
   color: var(--accent);
 }
@@ -202,88 +445,108 @@
   font-family: var(--ff-exp);
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  font-size: clamp(0.54rem, 0.7vw, 0.6rem);
+  font-size: clamp(0.52rem, 0.8cqw, 0.66rem);
+  line-height: 1.2;
   color: var(--ink-2);
 }
 
 /* =================================================================
-   ≤980px — one hairline row per band, flacon at the row head;
-   the threshold becomes a final row.
+   MOTION
+   The reveal is PdpBlueprint's (opacity + rise + line clip + marker fade).
+   Only the two ambient behaviours live here.
+   ================================================================= */
+
+/* Reduced motion needs no rule of its own here. Nothing in this file animates: the ambient
+   sheen and the hover lift were both removed with the move to the single strip (the reference
+   composition is static, and a nudge on one image holding four bottles reads as a glitch).
+   The reveal is PdpBlueprint's, and its early return leaves every element in its end state. */
+
+/* =================================================================
+   RESPONSIVE
+   Tablet keeps the horizontal journey and only tightens the tunables (they are
+   already vw-clamped, so this is mostly type). Below 720px the four-across
+   composition stops being honest at bottle sizes worth keeping, so it becomes a
+   2x2 — the stepped progression survives WITHIN each row, and the bottles stay
+   large, which the brief prioritises over keeping one row.
    ================================================================= */
 @media (max-width: 980px) {
-  .scale__bands {
-    grid-template-columns: 1fr;
+  .scale {
+    width: 100%;
   }
-  .scale__band,
-  .scale__band + .scale__band {
-    flex-direction: row;
-    align-items: center;
-    gap: clamp(12px, 3.4vw, 18px);
-    border-left: 0;
-    border-top: 1px solid var(--hairline);
-    padding: clamp(13px, 1.9vh, 18px) 0;
+  .scale__entry {
+    padding: 0 clamp(5px, 1cqw, 12px);
   }
-  .scale__band:first-child {
-    border-top: 0;
-    padding-top: 0;
-  }
-  .scale__flacon {
-    height: clamp(44px, 11.5vw, 56px);
-    margin-bottom: 0;
-    flex: 0 0 auto;
-  }
-  .scale__cat {
-    flex: 1 1 auto;
-    margin-bottom: 0;
-    font-size: clamp(0.54rem, 2.9vw, 0.62rem);
-  }
-  .scale__range {
-    flex: 0 0 auto;
-    font-size: clamp(1.05rem, 4.2vw, 1.4rem);
-    text-align: right;
-  }
-  .scale__hrs {
-    flex: 0 0 auto;
-    min-width: 6.6em;
-    margin-top: 0;
-    text-align: right;
-  }
+}
 
-  /* the threshold, as the row the scale resolves into. .scale__rail is KEPT (it
-     becomes this row's top rule) rather than swapped for a border, so the rule
-     still draws left-to-right here — the motion is the same at every width. */
-  .scale__railwrap {
-    margin-top: 0;
-    padding-bottom: 0;
+@media (max-width: 720px) {
+  /* Two columns instead of four, so each column is twice as wide. cqw is a share of the
+     SECTION, not of the column, so every column-relative figure has to be restated here or
+     it would render at half its intended size against the column.
+     --bottle-unit is doubled to hold the reference's bottle-to-column relationship (a bottle
+     stands about 0.9 of its column's width tall); --rise-k opens the ladder back up, since
+     the measured rises are calibrated to a four-across frame and would be barely visible
+     spread over two. --bottle-scale is NOT touched here: it is the global knob. */
+  .scale {
+    --bottle-unit: calc(clamp(110px, 38.9cqw, 210px) * var(--bottle-scale));
+    --rise-k: 2.4;
+    --step-base: clamp(14px, 3.4cqw, 24px);
+    --step-drop: clamp(20px, 7cqw, 44px);
+    /* pulled in from 6.68%: at two columns the composition is already narrow, and the
+       reference's generous side margins are a property of a four-across desktop frame */
+    --stage-inset: 4%;
   }
-  .scale__tick {
+  /* The strip is a four-across composition and cannot reflow, so below this breakpoint the
+     four singles come back and the columns return to sizing their own rows. Both sets are cut
+     from the same source, so the switch is invisible tonally. */
+  .scale__strip {
     display: none;
   }
-  /* `position: static` makes the inline `left` inert — no !important needed */
-  .scale__mark {
-    position: static;
-    transform: none;
-    flex-direction: row;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 16px;
-    padding-top: clamp(15px, 2.2vh, 20px);
+  .scale__bottle {
+    display: block;
   }
-  .scale__marklabel {
-    flex-direction: row;
-    align-items: baseline;
-    justify-content: space-between;
-    width: 100%;
-    gap: 16px;
-    white-space: normal;
-    text-align: left;
+  .scale__col,
+  .scale__col:nth-child(1),
+  .scale__col:nth-child(2),
+  .scale__col:nth-child(3),
+  .scale__col:nth-child(4) {
+    grid-row: auto;
+    grid-column: auto; /* hand placement back to auto-flow for the 2x2 */
   }
-  .scale__markhouse {
-    font-size: clamp(1rem, 3.6vw, 1.2rem);
+  /* 2x2. Each column keeps its own measured --rise, so row 1 climbs col 1 -> 2 and row 2
+     climbs col 3 -> 4; the staircase reads within each row and the rows continue the ascent. */
+  .scale__stage,
+  .scale__legend {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .scale__markfig {
-    flex: 0 0 auto;
-    text-align: right;
-    white-space: nowrap;
+  .scale__stage {
+    row-gap: clamp(14px, 5cqw, 26px);
+  }
+  /* The legend must NOT use row-gap here. Its entries are subgrids spanning three of its
+     rows, so a row-gap would also open up between each entry's category, percentage and
+     hours — the two-line wrap already showed how far that pushes them apart. The gap
+     between the two BANDS of entries is a margin on the second pair instead. */
+  .scale__legend .scale__entry:nth-child(n + 3) {
+    margin-top: clamp(20px, 7cqw, 32px);
+  }
+  /* Would span the first two column centres of a 2-col grid — a quarter of the inset
+     content box rather than an eighth. Kept correct for the record even though the line is
+     hidden here (see the note below). */
+  .scale__lineclip {
+    left: calc(var(--stage-inset) + (100% - 2 * var(--stage-inset)) / 4);
+    right: calc(var(--stage-inset) + (100% - 2 * var(--stage-inset)) / 4);
+    top: 0;
+    bottom: auto;
+    height: calc(var(--rise) * var(--rise-k) * 1cqw);
+    display: none; /* see note */
+  }
+  /* The line is HIDDEN below 720px rather than reflowed: across a 2x2 it would have to jump
+     the row gap to connect band 2 to band 3, and a broken connector reads as a mistake.
+     The markers go with it. They exist to sit ON the line — a ring floating in the space below
+     a bottle, with no line through it, reads as a speck of dirt rather than a marker. */
+  .scale__marker {
+    display: none;
+  }
+  .scale__legend .scale__entry {
+    padding: 0 6px;
   }
 }
