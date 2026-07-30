@@ -30,12 +30,12 @@ export default function PdpHero({ product }: { product: Product }) {
       gsap.set(q(".pdp__main"), { clipPath: "inset(0 0 100% 0)" });
       gsap.set(q(".pdp__main img"), { scale: 1.16 });
 
-      const tl = gsap.timeline({ delay: 0.12 });
-      tl.to(q(".pdp__main"), { clipPath: "inset(0 0 0% 0)", duration: 1.1, ease: "power3.inOut" })
-        .to(q(".pdp__main img"), { scale: 1, duration: 1.6, ease: "power2.out" }, "<")
-        .to(q(".pdp__crumb"), { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.15)
-        .to(q(".pdp__buyinner > *"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.09 }, 0.3)
-        .to(q(".pdp__thumb"), { opacity: 1, y: 0, duration: 0.5, ease: "power3.out", stagger: 0.08 }, 0.5);
+      const tl = gsap.timeline({ delay: 0.067 });
+      tl.to(q(".pdp__main"), { clipPath: "inset(0 0 0% 0)", duration: 0.611, ease: "power3.inOut" })
+        .to(q(".pdp__main img"), { scale: 1, duration: 0.889, ease: "power2.out" }, "<")
+        .to(q(".pdp__crumb"), { opacity: 1, y: 0, duration: 0.333, ease: "power3.out" }, 0.083)
+        .to(q(".pdp__buyinner > *"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out", stagger: 0.026 }, 0.167)
+        .to(q(".pdp__thumb"), { opacity: 1, y: 0, duration: 0.278, ease: "power3.out", stagger: 0.023 }, 0.278);
     }, el);
 
     return () => ctx.revert();

@@ -35,7 +35,7 @@ export const ESSAYS: Essay[] = [
       "This is why we let a named note lead and keep the adjectives out of it. Amber is amber. Oud is oud. If the material is right and rested, it does not need to be described as luxurious; it simply behaves that way on skin.",
       "Patience is the least visible ingredient and the most expensive one. It does not appear on the pyramid. It is the reason a scent that opens quietly can still be present eight hours later, having said very little the whole time.",
     ],
-    img: "/journal/essay-1-patience.jpg",
+    img: "/journal/essay-1-patience.webp",
     imgAlt:
       "A pressed book and blotter strips in warm window light — the slow patience of composition",
   },
@@ -51,7 +51,7 @@ export const ESSAYS: Essay[] = [
       "We source from these three not for the labels but because the materials refuse to be improved elsewhere. A house that begins with scent can afford to be stubborn about this. It is, after all, the whole of the work.",
       "And then the material travels — to a studio, into a composition, onto skin that lives in a warmer climate than any of those towns. Which is its own kind of provenance, and the next thing worth getting right.",
     ],
-    img: "/journal/essay-2-towns.jpg",
+    img: "/journal/essay-2-towns.webp",
     imgAlt:
       "Kraft-paper letters and botanicals arranged on a warm surface — provenance and place",
   },
@@ -67,7 +67,7 @@ export const ESSAYS: Essay[] = [
       "Warm air is also honest. It reveals a thin composition quickly and rewards a deep one just as fast, drawing out amber, oud and skin musk into something that reads as warmth on warmth.",
       "Tuning for climate is not a feature to announce. It is simply what it means to compose for the people who will actually wear the work, in the air they will actually wear it in.",
     ],
-    img: "/journal/essay-3-heat.jpg",
+    img: "/journal/essay-3-heat.webp",
     imgAlt:
       "Warm, hazy afternoon light across a studio surface — composing for the heat",
   },

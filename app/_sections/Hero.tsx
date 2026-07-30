@@ -63,31 +63,31 @@ export default function Hero() {
       // Built paused: the preloader curtain fades over 1s, so playing on mount
       // meant the whole reveal finished behind it. `delay` lets the mask start
       // through the last of the fade, then land in the clear. (Tunable.)
-      const tl = gsap.timeline({ paused: true, delay: 0.55 });
+      const tl = gsap.timeline({ paused: true, delay: 0.306 });
       intro = tl;
       tl.to(q(".hero__title .inner"), {
         yPercent: 0,
-        duration: 1.05,
+        duration: 0.583,
         ease: "power4.out",
-        stagger: 0.09,
+        stagger: 0.026,
       })
         // the credit draws its rule, then names itself — over the headline's tail
-        .to(q(".hero__sigrule"), { scaleX: 1, duration: 0.7, ease: "power3.inOut" }, "-=0.75")
+        .to(q(".hero__sigrule"), { scaleX: 1, duration: 0.389, ease: "power3.inOut" }, "-=0.417")
         .to(
           q(".hero__sigeyebrow, .hero__signame"),
-          { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.1 },
-          "-=0.45"
+          { opacity: 1, y: 0, duration: 0.389, ease: "power3.out", stagger: 0.029 },
+          "-=0.25"
         )
         .to(
           q(".hero__sub"),
-          { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" },
-          "-=0.5"
+          { opacity: 1, y: 0, duration: 0.444, ease: "power3.out" },
+          "-=0.278"
         )
         // both paths out land together, commerce first
         .to(
           q(".hero__shop, .hero__enter"),
-          { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.09 },
-          "-=0.6"
+          { opacity: 1, y: 0, duration: 0.389, ease: "power3.out", stagger: 0.026 },
+          "-=0.333"
         );
 
       // near-still cinemagraph: an almost-imperceptible breath.

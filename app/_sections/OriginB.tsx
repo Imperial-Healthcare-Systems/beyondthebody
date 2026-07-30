@@ -31,13 +31,13 @@ export default function OriginB() {
       gsap.set(q(".originb__scroll"), { opacity: 0 });
 
       const tl = gsap.timeline({
-        scrollTrigger: { trigger: el, start: "top 72%", once: true },
+        scrollTrigger: { trigger: el, start: "top 88%", once: true },
       });
-      tl.to(q(".origin__mark"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" })
-        .to(q(".originb__chapter"), { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, "-=0.45")
-        .to(q(".origin__head"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, "-=0.4")
-        .to(q(".origin__line"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, "-=0.45")
-        .to(q(".originb__scroll"), { opacity: 1, duration: 0.9, ease: "power2.out" }, "-=0.2");
+      tl.to(q(".origin__mark"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" })
+        .to(q(".originb__chapter"), { opacity: 1, y: 0, duration: 0.333, ease: "power3.out" }, "-=0.25")
+        .to(q(".origin__head"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" }, "-=0.222")
+        .to(q(".origin__line"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" }, "-=0.25")
+        .to(q(".originb__scroll"), { opacity: 1, duration: 0.5, ease: "power2.out" }, "-=0.111");
 
       gsap.fromTo(
         q(".originb__img"),
@@ -57,7 +57,7 @@ export default function OriginB() {
     <section className="originb" data-theme="dark" id="origin" ref={root}>
       <div className="originb__media">
         {HAS_ASSET ? (
-          <img className="originb__img" src="/sections/origin-bg.jpg" alt="" />
+          <img className="originb__img" src="/sections/origin-bg.webp" alt="" />
         ) : (
           <div className="originb__img originb__placeholder" aria-hidden="true" />
         )}

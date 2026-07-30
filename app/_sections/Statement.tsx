@@ -42,18 +42,18 @@ export default function Statement() {
       gsap.set(q(".bs__attr"), { opacity: 0, y: 20 });
 
       const tl = gsap.timeline({
-        scrollTrigger: { trigger: el, start: "top 68%", once: true },
+        scrollTrigger: { trigger: el, start: "top 88%", once: true },
       });
       tl.to(q(".bs__w"), {
         opacity: 1,
         y: 0,
-        duration: 0.85,
+        duration: 0.472,
         ease: "power3.out",
-        stagger: 0.045,
+        stagger: 0.013,
       }).to(
         q(".bs__attr"),
-        { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" },
-        "-=0.3"
+        { opacity: 1, y: 0, duration: 0.444, ease: "power3.out" },
+        "-=0.167"
       );
 
       // the shaft of window light drifts slowly across the scroll

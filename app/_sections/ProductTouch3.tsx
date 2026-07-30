@@ -29,7 +29,7 @@ const COLLECTION: Signature[] = [
     name: "Mon Amour",
     tag: "Love, remembered.",
     profile: "Pear Blossom · Red Berries · Italian Mandarin · Gardenia · Jasmine · Frangipani · Brown Sugar · Patchouli",
-    img: "/products/collection/mon-amour.png",
+    img: "/products/collection/mon-amour.webp",
     side: "left",
   },
   {
@@ -38,7 +38,7 @@ const COLLECTION: Signature[] = [
     name: "Heartthrob",
     tag: "Magnetism, refined.",
     profile: "Bergamot · Lemon Zest · Artemisia · Mint · Lavender · Pineapple · Green Notes · Geranium · Sandalwood · Tonka Bean · Cedar · Iso E Super · Amberwood",
-    img: "/products/collection/heart-throb.png",
+    img: "/products/collection/heart-throb.webp",
     side: "right",
   },
   {
@@ -47,7 +47,7 @@ const COLLECTION: Signature[] = [
     name: "Desir",
     tag: "Desire, distilled.",
     profile: "Pear · Pink Pepper · Orange Blossom · Coffee · Jasmine · Bitter Almond · Cedar · Vanilla · Cashmere Wood · Patchouli",
-    img: "/products/collection/desir.png",
+    img: "/products/collection/desir.webp",
     side: "left",
   },
   {
@@ -56,7 +56,7 @@ const COLLECTION: Signature[] = [
     name: "Don Amour",
     tag: "A love worn in silence.",
     profile: "Ambroxan · Bergamot · Orris Root · Jasmine · Woody Notes · Amber · Musk · Cashalox · Patchouli",
-    img: "/products/collection/don-amour.png",
+    img: "/products/collection/don-amour.webp",
     side: "right",
   },
 ];
@@ -105,12 +105,12 @@ export default function ProductTouch3() {
         if (mark) gsap.set(mark, { opacity: 0, scale: 0.6 });
 
         const tl = gsap.timeline({
-          scrollTrigger: { trigger: r, start: "top 76%", once: true },
+          scrollTrigger: { trigger: r, start: "top 88%", once: true },
         });
-        tl.to(media, { clipPath: clipEnd, duration: 1.1, ease: "power3.inOut" })
-          .to(img, { scale: 1, duration: 1.5, ease: "power2.out" }, "<")
-          .to(r.querySelectorAll(".col__text > *"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.1 }, "-=0.75");
-        if (mark) tl.to(mark, { opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.7)" }, "-=0.4");
+        tl.to(media, { clipPath: clipEnd, duration: 0.611, ease: "power3.inOut" })
+          .to(img, { scale: 1, duration: 0.833, ease: "power2.out" }, "<")
+          .to(r.querySelectorAll(".col__text > *"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out", stagger: 0.029 }, "-=0.417");
+        if (mark) tl.to(mark, { opacity: 1, scale: 1, duration: 0.389, ease: "back.out(1.7)" }, "-=0.222");
 
         gsap.fromTo(
           img,

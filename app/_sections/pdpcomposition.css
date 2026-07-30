@@ -176,7 +176,7 @@
     flex-direction: column;
     background-image:
       linear-gradient(rgb(var(--scrim) / 0.8), rgb(var(--scrim) / 0.88)),
-      url("/products/notes/comp-texture.jpg");
+      url("/products/notes/comp-texture.webp");
     background-size: cover;
     background-position: center;
   }

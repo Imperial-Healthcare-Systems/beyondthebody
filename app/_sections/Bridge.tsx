@@ -30,15 +30,15 @@ export default function Bridge() {
 
       // --- type reveal ---
       const tl = gsap.timeline({
-        scrollTrigger: { trigger: el, start: "top 74%", once: true },
+        scrollTrigger: { trigger: el, start: "top 88%", once: true },
       });
-      tl.to(q(".bridge__eyebrow"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" })
+      tl.to(q(".bridge__eyebrow"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" })
         .to(
           q(".bridge__line .inner"),
-          { yPercent: 0, duration: 1, ease: "power4.out", stagger: 0.14 },
-          "-=0.35"
+          { yPercent: 0, duration: 0.556, ease: "power4.out", stagger: 0.04 },
+          "-=0.194"
         )
-        .to(q(".bridge__link"), { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, "-=0.5");
+        .to(q(".bridge__link"), { opacity: 1, y: 0, duration: 0.333, ease: "power3.out" }, "-=0.278");
 
       // fragmented lines drift apart on scroll
       gsap.to(q(".bridge__line--a"), {

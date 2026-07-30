@@ -36,12 +36,12 @@ export default function JournalIndex() {
       // y: 0 — see Hero.tsx: anim-initial.css mirrors this as a CSS transform,
       // which GSAP would otherwise read as a stacked pixel offset.
       gsap.set(q(".jx__headline .inner"), { yPercent: 115, y: 0 });
-      const mast = gsap.timeline({ paused: true, delay: 0.15 });
+      const mast = gsap.timeline({ paused: true, delay: 0.083 });
       intro = mast;
       mast
-        .to(q(".jx__eyebrow"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" })
-        .to(q(".jx__headline .inner"), { yPercent: 0, duration: 1.05, ease: "power4.out" }, "-=0.45")
-        .to(q(".jx__intro"), { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "-=0.7");
+        .to(q(".jx__eyebrow"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" })
+        .to(q(".jx__headline .inner"), { yPercent: 0, duration: 0.583, ease: "power4.out" }, "-=0.25")
+        .to(q(".jx__intro"), { opacity: 1, y: 0, duration: 0.444, ease: "power3.out" }, "-=0.389");
 
       // --- essay rows: clip-reveal + ken-burns + text stagger on scroll ---
       const rows = gsap.utils.toArray<HTMLElement>(q(".jx__essay"));
@@ -57,11 +57,11 @@ export default function JournalIndex() {
         gsap.set(row.querySelectorAll(".jx__body > *"), { opacity: 0, y: 24 });
 
         const tl = gsap.timeline({
-          scrollTrigger: { trigger: row, start: "top 78%", once: true },
+          scrollTrigger: { trigger: row, start: "top 88%", once: true },
         });
-        tl.to(media, { clipPath: "inset(0 0 0 0%)", duration: 1.1, ease: "power3.inOut" })
-          .to(img, { scale: 1, duration: 1.5, ease: "power2.out" }, "<")
-          .to(row.querySelectorAll(".jx__body > *"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.1 }, "-=0.8");
+        tl.to(media, { clipPath: "inset(0 0 0 0%)", duration: 0.611, ease: "power3.inOut" })
+          .to(img, { scale: 1, duration: 0.833, ease: "power2.out" }, "<")
+          .to(row.querySelectorAll(".jx__body > *"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out", stagger: 0.029 }, "-=0.444");
 
         // gentle parallax while the row is in view
         gsap.fromTo(

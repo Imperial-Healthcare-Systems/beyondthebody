@@ -13,7 +13,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { Product } from "./products-data";
 import "./pdpcomposition.css";
 
-// note label → cutout file (public/products/notes/*.png)
+// note label → cutout file (public/products/notes/*.webp)
 const NOTE_IMG: Record<string, string> = {
   // Don Amour
   ambroxan: "ambroxan",
@@ -58,7 +58,7 @@ const NOTE_IMG: Record<string, string> = {
 };
 const imgFor = (n: string): string | null => {
   const k = NOTE_IMG[n.toLowerCase()];
-  return k ? `/products/notes/${k}.png` : null;
+  return k ? `/products/notes/${k}.webp` : null;
 };
 
 const GROUPS = [
@@ -83,10 +83,10 @@ export default function PdpComposition({ product }: { product: Product }) {
       gsap.set(q(".comp__group"), { opacity: 0, y: 20 });
       gsap.set(q(".comp__note"), { opacity: 0, scale: 0.6 });
 
-      const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 62%", once: true } });
-      tl.to(q(".comp__copy > *"), { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", stagger: 0.1 })
-        .to(q(".comp__group"), { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", stagger: 0.14 }, "-=0.4")
-        .to(q(".comp__note"), { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.6)", stagger: 0.05 }, "-=0.7");
+      const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 88%", once: true } });
+      tl.to(q(".comp__copy > *"), { opacity: 1, y: 0, duration: 0.444, ease: "power3.out", stagger: 0.029 })
+        .to(q(".comp__group"), { opacity: 1, y: 0, duration: 0.333, ease: "power3.out", stagger: 0.04 }, "-=0.222")
+        .to(q(".comp__note"), { opacity: 1, scale: 1, duration: 0.278, ease: "back.out(1.6)", stagger: 0.014 }, "-=0.389");
     }, el);
 
     return () => ctx.revert();

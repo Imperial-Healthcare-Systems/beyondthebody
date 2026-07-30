@@ -122,7 +122,12 @@ export default function Preloader({
     let pct = 0;
     let handoff: ReturnType<typeof setTimeout>;
     const el = fill.current;
-    const p = PACE[pace];
+    /* Below INTRO_MIN_WIDTH the reel never runs, so on a phone the curtain IS
+       the entire opening — and 1.2-1.8s of progress bar before any content is
+       exactly the page-load slowness the client called out. Phones take the
+       sub-page pace; desktop keeps the full curtain the reel is choreographed
+       against. Sub-pages already resolve to `brief`, so this only moves mobile HOME. */
+    const p = PACE[window.innerWidth >= INTRO_MIN_WIDTH ? pace : "brief"];
     const iv = setInterval(() => {
       pct = Math.min(100, pct + Math.random() * p.gain + p.floor);
       if (el) el.style.width = pct + "%";

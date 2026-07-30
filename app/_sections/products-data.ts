@@ -93,11 +93,11 @@ export const PRODUCTS: Product[] = [
       "Wear it close. A touch at the pulse — the wrist, the base of the throat — morning or late. It sits low and stays, more felt than announced. Kept from light and heat, it keeps for years.",
     cardLine:
       "Ambroxan and orris over warm amber, musk and quiet woods. Close-held, and certain of itself.",
-    scene: "/products/notes/don-amour-scene.png",
+    scene: "/products/notes/don-amour-scene.webp",
     gallery: [
-      { src: "/products/collection/don-amour.png", alt: "Don Amour — the flacon, editorial still", ratio: "3 / 4" },
-      { src: "/products/fullbleed/product-1-donamour.png", alt: "Don Amour — the flacon in warm directional light", ratio: "1915 / 821" },
-      { src: "/products/notes/don-amour-notes-grid.png", alt: "Don Amour — the raw materials, laid out", ratio: "3 / 2" },
+      { src: "/products/collection/don-amour.webp", alt: "Don Amour — the flacon, editorial still", ratio: "3 / 4" },
+      { src: "/products/fullbleed/product-1-donamour.webp", alt: "Don Amour — the flacon in warm directional light", ratio: "1915 / 821" },
+      { src: "/products/notes/don-amour-notes-grid.webp", alt: "Don Amour — the raw materials, laid out", ratio: "3 / 2" },
     ],
     // "You may also wear" — TWO per PDP (client, 2026-07-17). Dark kin + one bright bridge.
     crossSell: ["desir", "heartthrob"],
@@ -129,10 +129,10 @@ export const PRODUCTS: Product[] = [
       "Wear it after dark — or when you want the dark to arrive early. A touch at the throat and the inner wrist, where warmth will draw it out. Kept from light and heat, it keeps for years.",
     cardLine:
       "Pear and pink pepper over a dark heart of coffee and almond, dried down in vanilla and wood. Warm, and slow to leave.",
-    scene: "/products/collection/desir.png",
+    scene: "/products/collection/desir.webp",
     gallery: [
-      { src: "/products/fullbleed/product-2-desir-real.png", alt: "Desir — the flacon in warm directional light", ratio: "1915 / 821" },
-      { src: "/products/collection/desir.png", alt: "Desir — editorial still", ratio: "3 / 4" },
+      { src: "/products/fullbleed/product-2-desir-real.webp", alt: "Desir — the flacon in warm directional light", ratio: "1915 / 821" },
+      { src: "/products/collection/desir.webp", alt: "Desir — editorial still", ratio: "3 / 4" },
     ],
     crossSell: ["don-amour", "mon-amour"],
   },
@@ -166,9 +166,9 @@ export const PRODUCTS: Product[] = [
       "An everyday signature — clean enough for the morning, warm enough to carry into the night. A spray at the chest and the nape, where it lifts as you move. Kept from light and heat, it keeps for years.",
     cardLine:
       "Cool bergamot and mint over an aromatic heart, warmed by sandalwood, tonka and amberwood. Clean, and magnetic.",
-    scene: "/products/collection/heart-throb.png",
+    scene: "/products/collection/heart-throb.webp",
     gallery: [
-      { src: "/products/collection/heart-throb.png", alt: "Heartthrob — editorial still", ratio: "3 / 4" },
+      { src: "/products/collection/heart-throb.webp", alt: "Heartthrob — editorial still", ratio: "3 / 4" },
     ],
     crossSell: ["mon-amour", "don-amour"],
   },
@@ -199,9 +199,9 @@ export const PRODUCTS: Product[] = [
       "Wear it on the days you'll want to remember. A touch at the pulse and through the hair, where it lingers longest. Kept from light and heat, it keeps for years.",
     cardLine:
       "Soft fruit and white flowers over warm brown sugar and patchouli. Tender, and hard to forget.",
-    scene: "/products/collection/mon-amour.png",
+    scene: "/products/collection/mon-amour.webp",
     gallery: [
-      { src: "/products/collection/mon-amour.png", alt: "Mon Amour — editorial still", ratio: "3 / 4" },
+      { src: "/products/collection/mon-amour.webp", alt: "Mon Amour — editorial still", ratio: "3 / 4" },
     ],
     crossSell: ["heartthrob", "desir"],
   },

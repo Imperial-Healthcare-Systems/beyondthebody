@@ -29,12 +29,12 @@ export default function CircularClose() {
       gsap.set(q(".cc__accent, .cc__mark"), { opacity: 0, y: 16 });
 
       const tl = gsap.timeline({
-        scrollTrigger: { trigger: el, start: "top 66%", once: true },
+        scrollTrigger: { trigger: el, start: "top 88%", once: true },
       });
-      tl.to(q(".cc__mark"), { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" })
-        .to(q(".cc__title .inner"), { yPercent: 0, duration: 1.1, ease: "power4.out", stagger: 0.1 }, "-=0.5")
-        .to(q(".cc__rule"), { scaleX: 1, duration: 0.9, ease: "power3.inOut" }, "-=0.55")
-        .to(q(".cc__accent"), { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "-=0.5");
+      tl.to(q(".cc__mark"), { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" })
+        .to(q(".cc__title .inner"), { yPercent: 0, duration: 0.611, ease: "power4.out", stagger: 0.029 }, "-=0.278")
+        .to(q(".cc__rule"), { scaleX: 1, duration: 0.5, ease: "power3.inOut" }, "-=0.306")
+        .to(q(".cc__accent"), { opacity: 1, y: 0, duration: 0.444, ease: "power3.out" }, "-=0.278");
 
       // near-still breath, echoing the hero cinemagraph
       gsap.to(q(".cc__img"), {
@@ -59,7 +59,7 @@ export default function CircularClose() {
   return (
     <section className="cc" data-theme="dark" id="close" ref={root}>
       <div className="cc__media">
-        <img className="cc__img" src="/sections/circular-close.png" alt="" />
+        <img className="cc__img" src="/sections/circular-close.webp" alt="" />
         <div className="cc__grain" aria-hidden="true" />
         <div className="cc__scrim" aria-hidden="true" />
       </div>

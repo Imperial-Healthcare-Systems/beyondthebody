@@ -29,9 +29,9 @@ export default function PdpAssurances() {
       gsap.set(q(".assur__figure, .assur__eyebrow"), { opacity: 0, y: 22 });
       gsap.set(q(".assur__item"), { opacity: 0, y: 16 });
 
-      const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 76%", once: true } });
-      tl.to(q(".assur__figure, .assur__eyebrow"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.1 })
-        .to(q(".assur__item"), { opacity: 1, y: 0, duration: 0.5, ease: "power3.out", stagger: 0.05 }, "-=0.25");
+      const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 88%", once: true } });
+      tl.to(q(".assur__figure, .assur__eyebrow"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out", stagger: 0.029 })
+        .to(q(".assur__item"), { opacity: 1, y: 0, duration: 0.278, ease: "power3.out", stagger: 0.014 }, "-=0.139");
     }, el);
 
     return () => ctx.revert();

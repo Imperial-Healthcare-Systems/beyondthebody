@@ -115,27 +115,27 @@ export default function Footer() {
       gsap.set(q(".ft__nl-title .inner"), { yPercent: 110, y: 0 });
       gsap.set(q(".ft__nl-sub, .ft__nl-form"), { opacity: 0, y: 20 });
       const nlTl = gsap.timeline({
-        scrollTrigger: { trigger: q(".ft__news"), start: "top 78%", once: true },
+        scrollTrigger: { trigger: q(".ft__news"), start: "top 88%", once: true },
       });
       nlTl
-        .to(q(".ft__mark"), { opacity: 1, scale: 1, duration: 0.8, ease: "back.out(1.7)" })
-        .to(q(".ft__nl-title .inner"), { yPercent: 0, duration: 1.0, ease: "power4.out" }, "-=0.4")
-        .to(q(".ft__nl-sub"), { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "-=0.6")
-        .to(q(".ft__nl-form"), { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "-=0.6");
+        .to(q(".ft__mark"), { opacity: 1, scale: 1, duration: 0.444, ease: "back.out(1.7)" })
+        .to(q(".ft__nl-title .inner"), { yPercent: 0, duration: 0.556, ease: "power4.out" }, "-=0.222")
+        .to(q(".ft__nl-sub"), { opacity: 1, y: 0, duration: 0.444, ease: "power3.out" }, "-=0.333")
+        .to(q(".ft__nl-form"), { opacity: 1, y: 0, duration: 0.444, ease: "power3.out" }, "-=0.333");
 
       // mega nav lines + columns settle in — mega-links animate Y only, so the
       // live scrollspy (below) owns their opacity/colour.
       gsap.from(q(".ft__monogram"), {
-        opacity: 0, y: 26, duration: 0.8, ease: "power3.out",
-        scrollTrigger: { trigger: q(".ft__mega-row"), start: "top 82%", once: true },
+        opacity: 0, y: 26, duration: 0.444, ease: "power3.out",
+        scrollTrigger: { trigger: q(".ft__mega-row"), start: "top 88%", once: true },
       });
       gsap.from(q(".ft__mega-link"), {
-        y: 26, duration: 0.8, ease: "power3.out", stagger: 0.08,
-        scrollTrigger: { trigger: q(".ft__mega-row"), start: "top 82%", once: true },
+        y: 26, duration: 0.444, ease: "power3.out", stagger: 0.023,
+        scrollTrigger: { trigger: q(".ft__mega-row"), start: "top 88%", once: true },
       });
       gsap.from(q(".ft__col"), {
-        opacity: 0, y: 22, duration: 0.7, ease: "power3.out", stagger: 0.1,
-        scrollTrigger: { trigger: q(".ft__detail"), start: "top 86%", once: true },
+        opacity: 0, y: 22, duration: 0.389, ease: "power3.out", stagger: 0.029,
+        scrollTrigger: { trigger: q(".ft__detail"), start: "top 88%", once: true },
       });
 
       // THE REVEAL — image scrubs 1.3 → 1 as the sticky frame is unveiled
@@ -277,8 +277,8 @@ export default function Footer() {
       <div className="ft__reveal">
         <div className="ft__sticky">
           <picture>
-            <source media="(max-width: 760px)" srcSet="/footer/reveal-mobile.jpg" />
-            <img className="ft__reveal-img" src="/footer/reveal-desktop.jpg" alt="" />
+            <source media="(max-width: 760px)" srcSet="/footer/reveal-mobile.webp" />
+            <img className="ft__reveal-img" src="/footer/reveal-desktop.webp" alt="" />
           </picture>
           <div className="ft__reveal-grain" aria-hidden="true" />
           <div className="ft__reveal-scrim" aria-hidden="true" />

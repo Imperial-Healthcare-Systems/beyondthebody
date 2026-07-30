@@ -5,7 +5,7 @@
    headline "The things around the work.", sub, "Read →". Warm editorial register.
    Large 3:2 studio image + a quiet text column. Motion is restrained: image
    clip-reveal + ken-burns + parallax; text staggers in. Reduced-motion: end-state.
-   NOTE: /sections/journal.jpg is a temporary warm stand-in — swap with the real
+   NOTE: /sections/journal.webp is a temporary warm stand-in — swap with the real
    perfumer's-studio render (prompt in the copy file's §9 imagery brief). */
 
 import { useEffect, useRef } from "react";
@@ -30,11 +30,11 @@ export default function Journal() {
       gsap.set(q(".jr__text > *"), { opacity: 0, y: 26 });
 
       const tl = gsap.timeline({
-        scrollTrigger: { trigger: el, start: "top 74%", once: true },
+        scrollTrigger: { trigger: el, start: "top 88%", once: true },
       });
-      tl.to(q(".jr__media"), { clipPath: "inset(0 0 0 0%)", duration: 1.15, ease: "power3.inOut" })
-        .to(q(".jr__media img"), { scale: 1, duration: 1.6, ease: "power2.out" }, "<")
-        .to(q(".jr__text > *"), { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", stagger: 0.12 }, "-=0.85");
+      tl.to(q(".jr__media"), { clipPath: "inset(0 0 0 0%)", duration: 0.639, ease: "power3.inOut" })
+        .to(q(".jr__media img"), { scale: 1, duration: 0.889, ease: "power2.out" }, "<")
+        .to(q(".jr__text > *"), { opacity: 1, y: 0, duration: 0.444, ease: "power3.out", stagger: 0.034 }, "-=0.472");
 
       gsap.fromTo(
         q(".jr__media img"),
@@ -62,7 +62,7 @@ export default function Journal() {
         </div>
 
         <figure className="jr__media">
-          <img src="/sections/journal.jpg" alt="From the studio — notebook, blotter strips and botanicals in warm window light" />
+          <img src="/sections/journal.webp" alt="From the studio — notebook, blotter strips and botanicals in warm window light" />
           <figcaption className="jr__caption">From the studio</figcaption>
         </figure>
       </div>

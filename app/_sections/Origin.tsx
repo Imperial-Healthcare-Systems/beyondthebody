@@ -30,13 +30,13 @@ export default function Origin() {
       gsap.set(q(".origin__scroll"), { opacity: 0 });
 
       const tl = gsap.timeline({
-        scrollTrigger: { trigger: el, start: "top 66%", once: true },
+        scrollTrigger: { trigger: el, start: "top 88%", once: true },
       });
-      tl.to(q(".origin__mark"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" })
-        .to(q(".origin__eyebrow"), { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, "-=0.45")
-        .to(q(".origin__head"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, "-=0.4")
-        .to(q(".origin__line"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, "-=0.45")
-        .to(q(".origin__scroll"), { opacity: 1, duration: 0.9, ease: "power2.out" }, "-=0.2");
+      tl.to(q(".origin__mark"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" })
+        .to(q(".origin__eyebrow"), { opacity: 1, y: 0, duration: 0.333, ease: "power3.out" }, "-=0.25")
+        .to(q(".origin__head"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" }, "-=0.222")
+        .to(q(".origin__line"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" }, "-=0.25")
+        .to(q(".origin__scroll"), { opacity: 1, duration: 0.5, ease: "power2.out" }, "-=0.111");
 
       // parallax: the glow + BTB drift at different speeds
       gsap.to(q(".origin__glow"), {

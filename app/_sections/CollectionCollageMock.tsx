@@ -8,18 +8,18 @@
 import "./collectioncollagemock.css";
 
 const IMAGES = [
-  "/hero/hero.jpg",
-  "/journal/index-lead.jpg",
-  "/journal/essay-1-patience.jpg",
-  "/journal/essay-2-towns.jpg",
-  "/journal/essay-3-heat.jpg",
-  "/sections/origin-bg.jpg",
-  "/sections/journal.jpg",
-  "/sections/banner-1.jpg",
-  "/footer/reveal-desktop.jpg",
-  "/products/collection/mon-amour.png",
-  "/products/collection/don-amour.png",
-  "/products/notes/don-amour-notes-grid.png",
+  "/hero/hero.webp",
+  "/journal/index-lead.webp",
+  "/journal/essay-1-patience.webp",
+  "/journal/essay-2-towns.webp",
+  "/journal/essay-3-heat.webp",
+  "/sections/origin-bg.webp",
+  "/sections/journal.webp",
+  "/sections/banner-1.webp",
+  "/footer/reveal-desktop.webp",
+  "/products/collection/mon-amour.webp",
+  "/products/collection/don-amour.webp",
+  "/products/notes/don-amour-notes-grid.webp",
 ];
 
 // enough tiles to cover the section; a few span 2 to break the grid into a collage

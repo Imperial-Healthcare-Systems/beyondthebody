@@ -48,15 +48,15 @@ export default function ContactMasthead() {
 
       // Paused: the route now carries a Preloader, and an unpaused timeline
       // would run and finish behind the curtain, lifting onto a spent masthead.
-      const tl = gsap.timeline({ paused: true, delay: 0.15 });
+      const tl = gsap.timeline({ paused: true, delay: 0.083 });
       intro = tl;
-      tl.to(q(".ct__media"), { clipPath: "inset(0 0 0 0%)", duration: 1.1, ease: "power3.inOut" })
-        .to(q(".ct__media img"), { scale: 1, duration: 1.5, ease: "power2.out" }, "<")
-        .to(q(".ct__eyebrow"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.25)
-        .to(q(".ct__rule"), { scaleX: 1, duration: 0.9, ease: "power3.inOut" }, "-=0.4")
-        .to(q(".ct__headline .inner"), { yPercent: 0, duration: 1.05, ease: "power4.out", stagger: 0.08 }, "-=0.55")
-        .to(q(".ct__intro"), { opacity: 1, y: 0, duration: 0.85, ease: "power3.out" }, "-=0.6")
-        .to(q(".ct__block"), { opacity: 1, y: 0, duration: 0.75, ease: "power3.out", stagger: 0.12 }, "-=0.5");
+      tl.to(q(".ct__media"), { clipPath: "inset(0 0 0 0%)", duration: 0.611, ease: "power3.inOut" })
+        .to(q(".ct__media img"), { scale: 1, duration: 0.833, ease: "power2.out" }, "<")
+        .to(q(".ct__eyebrow"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" }, 0.139)
+        .to(q(".ct__rule"), { scaleX: 1, duration: 0.5, ease: "power3.inOut" }, "-=0.222")
+        .to(q(".ct__headline .inner"), { yPercent: 0, duration: 0.583, ease: "power4.out", stagger: 0.023 }, "-=0.306")
+        .to(q(".ct__intro"), { opacity: 1, y: 0, duration: 0.472, ease: "power3.out" }, "-=0.333")
+        .to(q(".ct__block"), { opacity: 1, y: 0, duration: 0.417, ease: "power3.out", stagger: 0.034 }, "-=0.278");
     }, el);
 
     // Play once the curtain lifts. On the isolation-preview route there is no
@@ -108,7 +108,7 @@ export default function ContactMasthead() {
 
         <figure className="ct__media">
           <img
-            src="/contact/contact-linen.jpg"
+            src="/contact/contact-linen.webp"
             alt="Draped, undyed linen in warm directional window light — the house look"
           />
           <span className="ct__scrim" aria-hidden="true" />

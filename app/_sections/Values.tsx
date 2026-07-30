@@ -40,13 +40,13 @@ export default function Values() {
       gsap.set(q(".hv__tile-rule"), { scaleX: 0, transformOrigin: "left center" });
 
       const tl = gsap.timeline({
-        scrollTrigger: { trigger: el, start: "top 66%", once: true },
+        scrollTrigger: { trigger: el, start: "top 88%", once: true },
       });
-      tl.to(q(".hv__eyebrow"), { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" })
-        .to(q(".hv__neg"), { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", stagger: 0.16 }, "-=0.2")
-        .to(q(".hv__resolve"), { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.0, ease: "power3.out" }, "-=0.2")
-        .to(q(".hv__tile-rule"), { scaleX: 1, duration: 0.7, ease: "power2.out", stagger: 0.12 }, "-=0.4")
-        .to(q(".hv__tile"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.12 }, "<0.1");
+      tl.to(q(".hv__eyebrow"), { opacity: 1, y: 0, duration: 0.333, ease: "power3.out" })
+        .to(q(".hv__neg"), { opacity: 1, y: 0, duration: 0.333, ease: "power3.out", stagger: 0.046 }, "-=0.111")
+        .to(q(".hv__resolve"), { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.556, ease: "power3.out" }, "-=0.111")
+        .to(q(".hv__tile-rule"), { scaleX: 1, duration: 0.389, ease: "power2.out", stagger: 0.034 }, "-=0.222")
+        .to(q(".hv__tile"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out", stagger: 0.034 }, "<0.056");
     }, el);
 
     return () => ctx.revert();

@@ -35,14 +35,14 @@ export default function CollectionMasthead() {
 
       // Paused: the route now carries a Preloader, and an unpaused timeline
       // would run and finish behind the curtain, lifting onto a spent masthead.
-      const tl = gsap.timeline({ paused: true, delay: 0.15 });
+      const tl = gsap.timeline({ paused: true, delay: 0.083 });
       intro = tl;
-      tl.to(q(".cmast__eyebrow"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" })
-        .to(q(".cmast__rule"), { scaleX: 1, duration: 0.9, ease: "power3.inOut" }, "-=0.4")
-        .to(q(".cmast__watermark"), { opacity: 0.05, scale: 1, duration: 1.4, ease: "power2.out" }, "<")
-        .to(q(".cmast__headline .inner"), { yPercent: 0, duration: 1.05, ease: "power4.out", stagger: 0.08 }, "-=0.5")
-        .to(q(".cmast__corner"), { opacity: 1, scale: 1, duration: 0.8, ease: "power3.out", stagger: 0.06 }, "-=0.7")
-        .to(q(".cmast__intro"), { opacity: 1, y: 0, duration: 0.85, ease: "power3.out" }, "-=0.6");
+      tl.to(q(".cmast__eyebrow"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" })
+        .to(q(".cmast__rule"), { scaleX: 1, duration: 0.5, ease: "power3.inOut" }, "-=0.222")
+        .to(q(".cmast__watermark"), { opacity: 0.05, scale: 1, duration: 0.778, ease: "power2.out" }, "<")
+        .to(q(".cmast__headline .inner"), { yPercent: 0, duration: 0.583, ease: "power4.out", stagger: 0.023 }, "-=0.278")
+        .to(q(".cmast__corner"), { opacity: 1, scale: 1, duration: 0.444, ease: "power3.out", stagger: 0.017 }, "-=0.389")
+        .to(q(".cmast__intro"), { opacity: 1, y: 0, duration: 0.472, ease: "power3.out" }, "-=0.333");
     }, el);
 
     // Play once the curtain lifts. On the isolation-preview route there is no

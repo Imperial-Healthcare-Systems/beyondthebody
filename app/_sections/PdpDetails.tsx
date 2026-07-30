@@ -33,9 +33,9 @@ export default function PdpDetails({ product }: { product: Product }) {
       gsap.set(q(".det__head > *"), { opacity: 0, y: 24 });
       gsap.set(q(".det__row"), { opacity: 0, y: 18 });
 
-      const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 68%", once: true } });
-      tl.to(q(".det__head > *"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.1 })
-        .to(q(".det__row"), { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", stagger: 0.09 }, "-=0.3");
+      const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 88%", once: true } });
+      tl.to(q(".det__head > *"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out", stagger: 0.029 })
+        .to(q(".det__row"), { opacity: 1, y: 0, duration: 0.333, ease: "power3.out", stagger: 0.026 }, "-=0.167");
     }, el);
 
     return () => ctx.revert();

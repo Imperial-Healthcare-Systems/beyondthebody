@@ -27,12 +27,12 @@ export default function CollectionForthcoming() {
       gsap.set(q(".cforth__eyebrow, .cforth__headline, .cforth__sub, .cforth__tag"), { opacity: 0, y: 16 });
       gsap.set(q(".cforth__rule"), { scaleX: 0, transformOrigin: "center" });
 
-      const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 82%", once: true } });
-      tl.to(q(".cforth__eyebrow"), { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" })
-        .to(q(".cforth__headline"), { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "-=0.35")
-        .to(q(".cforth__sub"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, "-=0.5")
-        .to(q(".cforth__rule"), { scaleX: 1, duration: 0.8, ease: "power3.inOut" }, "-=0.35")
-        .to(q(".cforth__tag"), { opacity: 0.9, y: 0, duration: 0.65, ease: "power3.out" }, "-=0.45");
+      const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 88%", once: true } });
+      tl.to(q(".cforth__eyebrow"), { opacity: 1, y: 0, duration: 0.333, ease: "power3.out" })
+        .to(q(".cforth__headline"), { opacity: 1, y: 0, duration: 0.444, ease: "power3.out" }, "-=0.194")
+        .to(q(".cforth__sub"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" }, "-=0.278")
+        .to(q(".cforth__rule"), { scaleX: 1, duration: 0.444, ease: "power3.inOut" }, "-=0.194")
+        .to(q(".cforth__tag"), { opacity: 0.9, y: 0, duration: 0.361, ease: "power3.out" }, "-=0.25");
     }, el);
 
     return () => ctx.revert();

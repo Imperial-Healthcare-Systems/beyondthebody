@@ -94,33 +94,33 @@ export default function PdpBlueprint({ product }: { product: Product }) {
       gsap.set(q(".scale__rule"), { scaleX: 0 });
       gsap.set(q(".scale__mark"), { opacity: 0, y: 12 });
 
-      const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 66%", once: true } });
-      tl.to(q(".bp__head > *"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.1 })
-        .to(q(".bp__lede"), { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, "-=0.3")
+      const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 88%", once: true } });
+      tl.to(q(".bp__head > *"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out", stagger: 0.029 })
+        .to(q(".bp__lede"), { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, "-=0.167")
         .to(
           q(".scale__title, .scale__subtitle"),
-          { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.1 },
-          "-=0.45"
+          { opacity: 1, y: 0, duration: 0.389, ease: "power3.out", stagger: 0.029 },
+          "-=0.25"
         )
         // the platform rises step by step, and the bottles settle onto it as one
         .to(
           q(".scale__col"),
-          { opacity: 1, y: 0, duration: 1.1, ease: "power3.out", stagger: 0.12 },
-          "-=0.3"
+          { opacity: 1, y: 0, duration: 0.611, ease: "power3.out", stagger: 0.034 },
+          "-=0.167"
         )
-        .to(q(".scale__strip"), { opacity: 1, y: 0, duration: 1.2, ease: "power3.out" }, "-=0.95")
-        // the connecting line draws across the ladder — 700ms ceiling, once
-        .to(q(".scale__lineclip"), { clipPath: "inset(0 0% 0 0)", duration: 0.7, ease: "power2.inOut" }, "-=0.5")
-        .to(q(".scale__marker"), { opacity: 0.85, duration: 0.5, ease: "power2.out", stagger: 0.08 }, "-=0.4")
+        .to(q(".scale__strip"), { opacity: 1, y: 0, duration: 0.667, ease: "power3.out" }, "-=0.528")
+        // the connecting line draws across the ladder — 250ms ceiling, once
+        .to(q(".scale__lineclip"), { clipPath: "inset(0 0% 0 0)", duration: 0.389, ease: "power2.inOut" }, "-=0.278")
+        .to(q(".scale__marker"), { opacity: 0.85, duration: 0.278, ease: "power2.out", stagger: 0.023 }, "-=0.222")
         .to(
           q(".scale__entry"),
-          { opacity: 1, y: 0, duration: 0.9, ease: "power3.out", stagger: 0.12 },
-          "-=0.75"
+          { opacity: 1, y: 0, duration: 0.5, ease: "power3.out", stagger: 0.034 },
+          "-=0.417"
         )
-        .to(q(".scale__rule"), { scaleX: 1, duration: 0.9, ease: "power3.inOut" }, "-=0.4")
-        .to(q(".scale__mark"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, "-=0.5")
-        .to(q(".bp__point"), { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", stagger: 0.12 }, "-=0.3")
-        .to(q(".bp__val"), { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", stagger: 0.12 }, "-=0.2");
+        .to(q(".scale__rule"), { scaleX: 1, duration: 0.5, ease: "power3.inOut" }, "-=0.222")
+        .to(q(".scale__mark"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" }, "-=0.278")
+        .to(q(".bp__point"), { opacity: 1, y: 0, duration: 0.333, ease: "power3.out", stagger: 0.034 }, "-=0.167")
+        .to(q(".bp__val"), { opacity: 1, y: 0, duration: 0.333, ease: "power3.out", stagger: 0.034 }, "-=0.111");
     }, el);
 
     return () => ctx.revert();

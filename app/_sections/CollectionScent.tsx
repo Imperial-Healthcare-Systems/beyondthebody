@@ -35,21 +35,21 @@ export default function CollectionScent() {
       // y: 0 — see Hero.tsx: anim-initial.css mirrors this as a CSS transform,
       // which GSAP would otherwise read as a stacked pixel offset.
       gsap.set(q(".cscent__title .inner"), { yPercent: 115, y: 0 });
-      const mast = gsap.timeline({ scrollTrigger: { trigger: q(".cscent__head"), start: "top 82%", once: true } });
+      const mast = gsap.timeline({ scrollTrigger: { trigger: q(".cscent__head"), start: "top 88%", once: true } });
       mast
-        .to(q(".cscent__eyebrow"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" })
-        .to(q(".cscent__title .inner"), { yPercent: 0, duration: 1.0, ease: "power4.out" }, "-=0.4")
-        .to(q(".cscent__intro"), { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "-=0.6");
+        .to(q(".cscent__eyebrow"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" })
+        .to(q(".cscent__title .inner"), { yPercent: 0, duration: 0.556, ease: "power4.out" }, "-=0.222")
+        .to(q(".cscent__intro"), { opacity: 1, y: 0, duration: 0.444, ease: "power3.out" }, "-=0.333");
 
       // the row's cards — clip-reveal media + rise, staggered across the row
       gsap.set(q(".cscent__media"), { clipPath: "inset(0 0 100% 0)" });
       gsap.set(q(".cscent__media img"), { scale: 1.16 });
       gsap.set(q(".cscent__meta"), { opacity: 0, y: 18 });
-      const row = gsap.timeline({ scrollTrigger: { trigger: q(".cscent__row"), start: "top 84%", once: true } });
+      const row = gsap.timeline({ scrollTrigger: { trigger: q(".cscent__row"), start: "top 88%", once: true } });
       row
-        .to(q(".cscent__media"), { clipPath: "inset(0 0 0% 0)", duration: 1.0, ease: "power3.inOut", stagger: 0.12 })
-        .to(q(".cscent__media img"), { scale: 1, duration: 1.4, ease: "power2.out", stagger: 0.12 }, "<")
-        .to(q(".cscent__meta"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.12 }, "-=1.0");
+        .to(q(".cscent__media"), { clipPath: "inset(0 0 0% 0)", duration: 0.556, ease: "power3.inOut", stagger: 0.034 })
+        .to(q(".cscent__media img"), { scale: 1, duration: 0.778, ease: "power2.out", stagger: 0.034 }, "<")
+        .to(q(".cscent__meta"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out", stagger: 0.034 }, "-=0.556");
     }, el);
 
     return () => ctx.revert();

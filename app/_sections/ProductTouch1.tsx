@@ -12,7 +12,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./product1.css";
 
-const BOTTLE = "/products/fullbleed/product-1-donamour.png"; // real Don Amour render
+const BOTTLE = "/products/fullbleed/product-1-donamour.webp"; // real Don Amour render
 
 /* scattered around the flacon in the frame's DARK negative zones — positioning
    reinforcement, not notes. `anchor` = which screen edge it hangs off (keeps it
@@ -47,16 +47,16 @@ export default function ProductTouch1() {
       gsap.set(q(".p1__img"), { opacity: 0, scale: 1.14 });
 
       const tl = gsap.timeline({
-        scrollTrigger: { trigger: el, start: "top 68%", once: true },
+        scrollTrigger: { trigger: el, start: "top 88%", once: true },
       });
-      tl.to(q(".p1__img"), { opacity: 1, scale: 1, duration: 1.5, ease: "power2.out" })
-        .to(q(".p1__eyebrow"), { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, "-=1.15")
-        .to(q(".p1__name"), { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.0, ease: "power3.out" }, "-=0.4")
-        .to(q(".p1__rule"), { scaleX: 1, duration: 0.6, ease: "power2.out" }, "-=0.5")
-        .to(q(".p1__mark"), { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(2)", stagger: 0.12 }, "-=0.35")
-        .to(q(".p1__note"), { opacity: 1, y: 0, duration: 0.5, ease: "power3.out", stagger: 0.12 }, "<0.05")
-        .to(q(".p1__subhead"), { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, "-=0.3")
-        .to(q(".p1__cta"), { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, "-=0.4");
+      tl.to(q(".p1__img"), { opacity: 1, scale: 1, duration: 0.833, ease: "power2.out" })
+        .to(q(".p1__eyebrow"), { opacity: 1, y: 0, duration: 0.333, ease: "power3.out" }, "-=0.639")
+        .to(q(".p1__name"), { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.556, ease: "power3.out" }, "-=0.222")
+        .to(q(".p1__rule"), { scaleX: 1, duration: 0.333, ease: "power2.out" }, "-=0.278")
+        .to(q(".p1__mark"), { scale: 1, opacity: 1, duration: 0.222, ease: "back.out(2)", stagger: 0.034 }, "-=0.194")
+        .to(q(".p1__note"), { opacity: 1, y: 0, duration: 0.278, ease: "power3.out", stagger: 0.034 }, "<0.028")
+        .to(q(".p1__subhead"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" }, "-=0.167")
+        .to(q(".p1__cta"), { opacity: 1, y: 0, duration: 0.333, ease: "power3.out" }, "-=0.222");
 
       // slow cinematic drift on the scene through the scroll
       gsap.fromTo(
