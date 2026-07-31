@@ -13,6 +13,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { PRODUCTS, type Product } from "./products-data";
 import "./collectionscent.css";
+import { revealTl } from "../_components/reveal-tempo";
 
 // natural reading order (Mon Amour → Heartthrob → Desir → Don Amour) via the frozen `no`
 const ORDERED: Product[] = [...PRODUCTS].sort((a, b) => a.no.localeCompare(b.no));
@@ -35,7 +36,7 @@ export default function CollectionScent() {
       // y: 0 — see Hero.tsx: anim-initial.css mirrors this as a CSS transform,
       // which GSAP would otherwise read as a stacked pixel offset.
       gsap.set(q(".cscent__title .inner"), { yPercent: 115, y: 0 });
-      const mast = gsap.timeline({ scrollTrigger: { trigger: q(".cscent__head"), start: "top 88%", once: true } });
+      const mast = revealTl({ scrollTrigger: { trigger: q(".cscent__head"), start: "top 88%", once: true } });
       mast
         .to(q(".cscent__eyebrow"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" })
         .to(q(".cscent__title .inner"), { yPercent: 0, duration: 0.556, ease: "power4.out" }, "-=0.222")
@@ -45,7 +46,7 @@ export default function CollectionScent() {
       gsap.set(q(".cscent__media"), { clipPath: "inset(0 0 100% 0)" });
       gsap.set(q(".cscent__media img"), { scale: 1.16 });
       gsap.set(q(".cscent__meta"), { opacity: 0, y: 18 });
-      const row = gsap.timeline({ scrollTrigger: { trigger: q(".cscent__row"), start: "top 88%", once: true } });
+      const row = revealTl({ scrollTrigger: { trigger: q(".cscent__row"), start: "top 88%", once: true } });
       row
         .to(q(".cscent__media"), { clipPath: "inset(0 0 0% 0)", duration: 0.556, ease: "power3.inOut", stagger: 0.034 })
         .to(q(".cscent__media img"), { scale: 1, duration: 0.778, ease: "power2.out", stagger: 0.034 }, "<")

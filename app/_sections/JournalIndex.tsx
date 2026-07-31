@@ -14,6 +14,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { JOURNAL_INDEX, ESSAYS } from "./journal-data";
 import "./journalindex.css";
+import { revealTl } from "../_components/reveal-tempo";
 
 export default function JournalIndex() {
   const root = useRef<HTMLElement>(null);
@@ -36,7 +37,7 @@ export default function JournalIndex() {
       // y: 0 — see Hero.tsx: anim-initial.css mirrors this as a CSS transform,
       // which GSAP would otherwise read as a stacked pixel offset.
       gsap.set(q(".jx__headline .inner"), { yPercent: 115, y: 0 });
-      const mast = gsap.timeline({ paused: true, delay: 0.083 });
+      const mast = revealTl({ paused: true, delay: 0.083 });
       intro = mast;
       mast
         .to(q(".jx__eyebrow"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" })
@@ -56,7 +57,7 @@ export default function JournalIndex() {
         gsap.set(img, { scale: 1.14 });
         gsap.set(row.querySelectorAll(".jx__body > *"), { opacity: 0, y: 24 });
 
-        const tl = gsap.timeline({
+        const tl = revealTl({
           scrollTrigger: { trigger: row, start: "top 88%", once: true },
         });
         tl.to(media, { clipPath: "inset(0 0 0 0%)", duration: 0.611, ease: "power3.inOut" })

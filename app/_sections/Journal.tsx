@@ -12,6 +12,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./journal.css";
+import { revealTl } from "../_components/reveal-tempo";
 
 export default function Journal() {
   const root = useRef<HTMLElement>(null);
@@ -29,7 +30,7 @@ export default function Journal() {
       gsap.set(q(".jr__media img"), { scale: 1.18 });
       gsap.set(q(".jr__text > *"), { opacity: 0, y: 26 });
 
-      const tl = gsap.timeline({
+      const tl = revealTl({
         scrollTrigger: { trigger: el, start: "top 88%", once: true },
       });
       tl.to(q(".jr__media"), { clipPath: "inset(0 0 0 0%)", duration: 0.639, ease: "power3.inOut" })

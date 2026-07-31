@@ -12,6 +12,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { Product } from "./products-data";
 import "./pdpcomposition.css";
+import { revealTl } from "../_components/reveal-tempo";
 
 // note label → cutout file (public/products/notes/*.webp)
 const NOTE_IMG: Record<string, string> = {
@@ -83,7 +84,7 @@ export default function PdpComposition({ product }: { product: Product }) {
       gsap.set(q(".comp__group"), { opacity: 0, y: 20 });
       gsap.set(q(".comp__note"), { opacity: 0, scale: 0.6 });
 
-      const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 88%", once: true } });
+      const tl = revealTl({ scrollTrigger: { trigger: el, start: "top 88%", once: true } });
       tl.to(q(".comp__copy > *"), { opacity: 1, y: 0, duration: 0.444, ease: "power3.out", stagger: 0.029 })
         .to(q(".comp__group"), { opacity: 1, y: 0, duration: 0.333, ease: "power3.out", stagger: 0.04 }, "-=0.222")
         .to(q(".comp__note"), { opacity: 1, scale: 1, duration: 0.278, ease: "back.out(1.6)", stagger: 0.014 }, "-=0.389");

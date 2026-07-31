@@ -11,6 +11,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./circularclose.css";
+import { revealTl } from "../_components/reveal-tempo";
 
 export default function CircularClose() {
   const root = useRef<HTMLElement>(null);
@@ -28,7 +29,7 @@ export default function CircularClose() {
       gsap.set(q(".cc__rule"), { scaleX: 0, transformOrigin: "left center" });
       gsap.set(q(".cc__accent, .cc__mark"), { opacity: 0, y: 16 });
 
-      const tl = gsap.timeline({
+      const tl = revealTl({
         scrollTrigger: { trigger: el, start: "top 88%", once: true },
       });
       tl.to(q(".cc__mark"), { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" })

@@ -10,6 +10,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./bridge.css";
+import { revealTl } from "../_components/reveal-tempo";
 
 export default function Bridge() {
   const root = useRef<HTMLElement>(null);
@@ -29,7 +30,7 @@ export default function Bridge() {
       gsap.set(q(".bridge__eyebrow, .bridge__link"), { opacity: 0, y: 24 });
 
       // --- type reveal ---
-      const tl = gsap.timeline({
+      const tl = revealTl({
         scrollTrigger: { trigger: el, start: "top 88%", once: true },
       });
       tl.to(q(".bridge__eyebrow"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" })

@@ -10,6 +10,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./product1.css";
+import { revealTl } from "../_components/reveal-tempo";
 
 const BOTTLE = "/products/fullbleed/product-2-desir-real.webp"; // real Desir render
 
@@ -43,7 +44,7 @@ export default function ProductTouch2() {
       gsap.set(q(".p1__mark"), { scale: 0, opacity: 0 });
       gsap.set(q(".p1__img"), { opacity: 0, scale: 1.14 });
 
-      const tl = gsap.timeline({
+      const tl = revealTl({
         scrollTrigger: { trigger: el, start: "top 88%", once: true },
       });
       tl.to(q(".p1__img"), { opacity: 1, scale: 1, duration: 0.833, ease: "power2.out" })

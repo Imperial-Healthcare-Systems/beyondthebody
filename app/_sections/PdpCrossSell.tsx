@@ -12,6 +12,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { productBySlug, formatPrice, type Product } from "./products-data";
 import "./pdpcrosssell.css";
+import { revealTl } from "../_components/reveal-tempo";
 
 const fromPrice = (p: Product): number | null => {
   const prices = p.sizes.map((s) => s.price).filter((v): v is number => v != null);
@@ -36,7 +37,7 @@ export default function PdpCrossSell({ product }: { product: Product }) {
       gsap.set(q(".xsell__head > *"), { opacity: 0, y: 22 });
       gsap.set(q(".xsell__card"), { opacity: 0, y: 34 });
 
-      const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 88%", once: true } });
+      const tl = revealTl({ scrollTrigger: { trigger: el, start: "top 88%", once: true } });
       tl.to(q(".xsell__head > *"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out", stagger: 0.029 })
         .to(q(".xsell__card"), { opacity: 1, y: 0, duration: 0.444, ease: "power3.out", stagger: 0.034 }, "-=0.167");
     }, el);

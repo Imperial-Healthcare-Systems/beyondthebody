@@ -12,6 +12,7 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import "./collectionmasthead.css";
+import { revealTl } from "../_components/reveal-tempo";
 
 export default function CollectionMasthead() {
   const root = useRef<HTMLElement>(null);
@@ -35,7 +36,7 @@ export default function CollectionMasthead() {
 
       // Paused: the route now carries a Preloader, and an unpaused timeline
       // would run and finish behind the curtain, lifting onto a spent masthead.
-      const tl = gsap.timeline({ paused: true, delay: 0.083 });
+      const tl = revealTl({ paused: true, delay: 0.083 });
       intro = tl;
       tl.to(q(".cmast__eyebrow"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" })
         .to(q(".cmast__rule"), { scaleX: 1, duration: 0.5, ease: "power3.inOut" }, "-=0.222")

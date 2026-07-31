@@ -12,6 +12,7 @@ import { gsap } from "gsap";
 import AddToBag from "../_components/AddToBag";
 import type { Product } from "./products-data";
 import "./pdphero.css";
+import { revealTl } from "../_components/reveal-tempo";
 
 export default function PdpHero({ product }: { product: Product }) {
   const root = useRef<HTMLElement>(null);
@@ -30,7 +31,7 @@ export default function PdpHero({ product }: { product: Product }) {
       gsap.set(q(".pdp__main"), { clipPath: "inset(0 0 100% 0)" });
       gsap.set(q(".pdp__main img"), { scale: 1.16 });
 
-      const tl = gsap.timeline({ delay: 0.067 });
+      const tl = revealTl({ delay: 0.067 });
       tl.to(q(".pdp__main"), { clipPath: "inset(0 0 0% 0)", duration: 0.611, ease: "power3.inOut" })
         .to(q(".pdp__main img"), { scale: 1, duration: 0.889, ease: "power2.out" }, "<")
         .to(q(".pdp__crumb"), { opacity: 1, y: 0, duration: 0.333, ease: "power3.out" }, 0.083)

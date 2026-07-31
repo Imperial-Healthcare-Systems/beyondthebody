@@ -13,6 +13,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ASSURANCES_PRIMARY, ASSURANCES_SECONDARY, LONGEVITY_BADGE } from "./house-copy";
 import "./pdpassurances.css";
+import { revealTl } from "../_components/reveal-tempo";
 
 export default function PdpAssurances() {
   const root = useRef<HTMLElement>(null);
@@ -29,7 +30,7 @@ export default function PdpAssurances() {
       gsap.set(q(".assur__figure, .assur__eyebrow"), { opacity: 0, y: 22 });
       gsap.set(q(".assur__item"), { opacity: 0, y: 16 });
 
-      const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 88%", once: true } });
+      const tl = revealTl({ scrollTrigger: { trigger: el, start: "top 88%", once: true } });
       tl.to(q(".assur__figure, .assur__eyebrow"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out", stagger: 0.029 })
         .to(q(".assur__item"), { opacity: 1, y: 0, duration: 0.278, ease: "power3.out", stagger: 0.014 }, "-=0.139");
     }, el);

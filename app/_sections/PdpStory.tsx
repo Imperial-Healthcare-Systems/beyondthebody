@@ -10,6 +10,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { Product } from "./products-data";
 import "./pdpstory.css";
+import { revealTl } from "../_components/reveal-tempo";
 
 export default function PdpStory({ product }: { product: Product }) {
   const root = useRef<HTMLElement>(null);
@@ -27,7 +28,7 @@ export default function PdpStory({ product }: { product: Product }) {
       gsap.set(q(".story__eyebrow, .story__sign"), { opacity: 0, y: 20 });
       gsap.set(q(".story__s"), { opacity: 0.14 }); // dim, then write in
 
-      const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 88%", once: true } });
+      const tl = revealTl({ scrollTrigger: { trigger: el, start: "top 88%", once: true } });
       tl.to(q(".story__eyebrow"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" })
         .to(q(".story__s"), { opacity: 1, duration: 0.278, ease: "power2.out", stagger: 0.046 }, "-=0.111")
         .to(q(".story__sign"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" }, "-=0.083");

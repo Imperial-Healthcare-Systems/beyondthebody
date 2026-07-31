@@ -7,6 +7,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./origin.css";
+import { revealTl } from "../_components/reveal-tempo";
 
 const HAS_ASSET = true; // Pexels 30987992 (warm raking light on wall)
 
@@ -30,7 +31,7 @@ export default function OriginB() {
       });
       gsap.set(q(".originb__scroll"), { opacity: 0 });
 
-      const tl = gsap.timeline({
+      const tl = revealTl({
         scrollTrigger: { trigger: el, start: "top 88%", once: true },
       });
       tl.to(q(".origin__mark"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" })

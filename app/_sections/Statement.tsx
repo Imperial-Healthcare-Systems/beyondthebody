@@ -11,6 +11,7 @@ import { Fragment, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./statement.css";
+import { revealTl } from "../_components/reveal-tempo";
 
 const STATEMENT =
   "Beyond The Body is a study in presence — its first chapter written in scent.";
@@ -41,7 +42,7 @@ export default function Statement() {
       gsap.set(q(".bs__w"), { opacity: 0, y: "0.5em" });
       gsap.set(q(".bs__attr"), { opacity: 0, y: 20 });
 
-      const tl = gsap.timeline({
+      const tl = revealTl({
         scrollTrigger: { trigger: el, start: "top 88%", once: true },
       });
       tl.to(q(".bs__w"), {

@@ -11,6 +11,7 @@ import { Fragment, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./values.css";
+import { revealTl } from "../_components/reveal-tempo";
 
 const NEGATIONS = ["Neither his nor hers.", "No aisle to stand in."];
 
@@ -39,7 +40,7 @@ export default function Values() {
       gsap.set(q(".hv__resolve"), { opacity: 0, y: 30, filter: "blur(9px)" });
       gsap.set(q(".hv__tile-rule"), { scaleX: 0, transformOrigin: "left center" });
 
-      const tl = gsap.timeline({
+      const tl = revealTl({
         scrollTrigger: { trigger: el, start: "top 88%", once: true },
       });
       tl.to(q(".hv__eyebrow"), { opacity: 1, y: 0, duration: 0.333, ease: "power3.out" })

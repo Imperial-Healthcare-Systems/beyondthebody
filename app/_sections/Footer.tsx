@@ -16,6 +16,7 @@ import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./footer.css";
+import { revealTl, revealTempo } from "../_components/reveal-tempo";
 
 /* Not-yet-live links (Instagram, LinkedIn, Stockists, Press, Contact, legal). They
    carry NO href, so they can never navigate or write "#"/"/#" into the URL — which is
@@ -114,7 +115,7 @@ export default function Footer() {
       // which GSAP would otherwise read as a stacked pixel offset.
       gsap.set(q(".ft__nl-title .inner"), { yPercent: 110, y: 0 });
       gsap.set(q(".ft__nl-sub, .ft__nl-form"), { opacity: 0, y: 20 });
-      const nlTl = gsap.timeline({
+      const nlTl = revealTl({
         scrollTrigger: { trigger: q(".ft__news"), start: "top 88%", once: true },
       });
       nlTl
@@ -125,18 +126,20 @@ export default function Footer() {
 
       // mega nav lines + columns settle in — mega-links animate Y only, so the
       // live scrollspy (below) owns their opacity/colour.
+      /* standalone tweens rather than a timeline, so they carry the viewport
+         tempo themselves — see _components/reveal-tempo. */
       gsap.from(q(".ft__monogram"), {
         opacity: 0, y: 26, duration: 0.444, ease: "power3.out",
         scrollTrigger: { trigger: q(".ft__mega-row"), start: "top 88%", once: true },
-      });
+      }).timeScale(revealTempo());
       gsap.from(q(".ft__mega-link"), {
         y: 26, duration: 0.444, ease: "power3.out", stagger: 0.023,
         scrollTrigger: { trigger: q(".ft__mega-row"), start: "top 88%", once: true },
-      });
+      }).timeScale(revealTempo());
       gsap.from(q(".ft__col"), {
         opacity: 0, y: 22, duration: 0.389, ease: "power3.out", stagger: 0.029,
         scrollTrigger: { trigger: q(".ft__detail"), start: "top 88%", once: true },
-      });
+      }).timeScale(revealTempo());
 
       // THE REVEAL — image scrubs 1.3 → 1 as the sticky frame is unveiled
       gsap.fromTo(

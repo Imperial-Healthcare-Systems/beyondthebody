@@ -11,6 +11,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./product3.css";
+import { revealTl } from "../_components/reveal-tempo";
 
 type Signature = {
   no: string;
@@ -104,7 +105,7 @@ export default function ProductTouch3() {
         const mark = r.querySelector(".col__mark");
         if (mark) gsap.set(mark, { opacity: 0, scale: 0.6 });
 
-        const tl = gsap.timeline({
+        const tl = revealTl({
           scrollTrigger: { trigger: r, start: "top 88%", once: true },
         });
         tl.to(media, { clipPath: clipEnd, duration: 0.611, ease: "power3.inOut" })

@@ -19,6 +19,7 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import "./contactmasthead.css";
+import { revealTl } from "../_components/reveal-tempo";
 
 const EMAIL = "hello@beyondthebody.com"; // ⚠ placeholder — confirm
 const SOCIALS = [
@@ -48,7 +49,7 @@ export default function ContactMasthead() {
 
       // Paused: the route now carries a Preloader, and an unpaused timeline
       // would run and finish behind the curtain, lifting onto a spent masthead.
-      const tl = gsap.timeline({ paused: true, delay: 0.083 });
+      const tl = revealTl({ paused: true, delay: 0.083 });
       intro = tl;
       tl.to(q(".ct__media"), { clipPath: "inset(0 0 0 0%)", duration: 0.611, ease: "power3.inOut" })
         .to(q(".ct__media img"), { scale: 1, duration: 0.833, ease: "power2.out" }, "<")

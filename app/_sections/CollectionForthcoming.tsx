@@ -11,6 +11,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./collectionforthcoming.css";
+import { revealTl } from "../_components/reveal-tempo";
 
 export default function CollectionForthcoming() {
   const root = useRef<HTMLElement>(null);
@@ -27,7 +28,7 @@ export default function CollectionForthcoming() {
       gsap.set(q(".cforth__eyebrow, .cforth__headline, .cforth__sub, .cforth__tag"), { opacity: 0, y: 16 });
       gsap.set(q(".cforth__rule"), { scaleX: 0, transformOrigin: "center" });
 
-      const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 88%", once: true } });
+      const tl = revealTl({ scrollTrigger: { trigger: el, start: "top 88%", once: true } });
       tl.to(q(".cforth__eyebrow"), { opacity: 1, y: 0, duration: 0.333, ease: "power3.out" })
         .to(q(".cforth__headline"), { opacity: 1, y: 0, duration: 0.444, ease: "power3.out" }, "-=0.194")
         .to(q(".cforth__sub"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" }, "-=0.278")

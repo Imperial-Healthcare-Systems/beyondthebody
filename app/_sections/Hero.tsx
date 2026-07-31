@@ -10,6 +10,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./hero.css";
+import { revealTl } from "../_components/reveal-tempo";
 
 /* hero.webp — 1774x887 (2:1). Client asset, 2026-07-28: the Mon Amour bottle on a lit
    vanity, a figure holding the gaze in the mirror behind it. Product-led, which is the
@@ -63,7 +64,7 @@ export default function Hero() {
       // Built paused: the preloader curtain fades over 1s, so playing on mount
       // meant the whole reveal finished behind it. `delay` lets the mask start
       // through the last of the fade, then land in the clear. (Tunable.)
-      const tl = gsap.timeline({ paused: true, delay: 0.306 });
+      const tl = revealTl({ paused: true, delay: 0.306 });
       intro = tl;
       tl.to(q(".hero__title .inner"), {
         yPercent: 0,

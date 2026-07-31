@@ -17,6 +17,7 @@ import type { Product } from "./products-data";
 import { EDP_DISTINCTION, BLUEPRINT, VALUE } from "./house-copy";
 import PdpScale from "./PdpScale";
 import "./pdpblueprint.css";
+import { revealTl } from "../_components/reveal-tempo";
 
 /* Dot colour for the client's Chromatic Waves bg (client-chosen 2026-07-17): a single deep
    red #410505, a touch brighter than the near-black ground (bgColor #1E0000), so the drifting
@@ -94,7 +95,7 @@ export default function PdpBlueprint({ product }: { product: Product }) {
       gsap.set(q(".scale__rule"), { scaleX: 0 });
       gsap.set(q(".scale__mark"), { opacity: 0, y: 12 });
 
-      const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 88%", once: true } });
+      const tl = revealTl({ scrollTrigger: { trigger: el, start: "top 88%", once: true } });
       tl.to(q(".bp__head > *"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out", stagger: 0.029 })
         .to(q(".bp__lede"), { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, "-=0.167")
         .to(

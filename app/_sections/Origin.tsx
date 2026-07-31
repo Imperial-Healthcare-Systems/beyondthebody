@@ -8,6 +8,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./origin.css";
+import { revealTl } from "../_components/reveal-tempo";
 
 export default function Origin() {
   const root = useRef<HTMLElement>(null);
@@ -29,7 +30,7 @@ export default function Origin() {
       });
       gsap.set(q(".origin__scroll"), { opacity: 0 });
 
-      const tl = gsap.timeline({
+      const tl = revealTl({
         scrollTrigger: { trigger: el, start: "top 88%", once: true },
       });
       tl.to(q(".origin__mark"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out" })
