@@ -14,8 +14,14 @@ import { revealTl } from "../_components/reveal-tempo";
 
 const BOTTLE = "/products/fullbleed/product-2-desir-real.webp"; // real Desir render
 
-/* scattered in the frame's dark zones — the bottle sits left-of-centre, so the
-   open dark space is upper-left + the right (above / over the foliage). */
+/* Scattered in the frame's dark zones — the bottle sits left-of-centre, so the
+   open dark space is upper-left + the right (above / over the foliage).
+
+   Numbered 01–04 from array order (see ProductTouch1.tsx). Unlike §4, this beat
+   needed NO reorder: its `top` values already ascend with the array (21 · 24 ·
+   47 · 74), and the texts already run scent → audience → character → longevity,
+   which is the client's scent → audience → climate → craft sequence. Positions
+   are untouched here; only the numerals were added. */
 type Pointer = { text: string; top: string; x: string; anchor: "left" | "right" };
 const POINTERS: Pointer[] = [
   { text: "Gourmand · woody",     top: "21%", x: "22%", anchor: "left" },
@@ -80,7 +86,8 @@ export default function ProductTouch2() {
 
       <p className="p1__eyebrow">— Beyond the body</p>
 
-      <ul className="p1__notes" aria-label="Product positioning">
+      {/* <ol> + numerals — see ProductTouch1.tsx for the reasoning. */}
+      <ol className="p1__notes" aria-label="Product positioning">
         {POINTERS.map((p, i) => (
           <li
             className="p1__note"
@@ -92,14 +99,19 @@ export default function ProductTouch2() {
                 : { top: p.top, right: p.x }
             }
           >
-            <span className="p1__mark" aria-hidden="true" />
+            <span className="p1__mark" aria-hidden="true">
+              {String(i + 1).padStart(2, "0")}
+            </span>
             <span className="p1__ltext">{p.text}</span>
           </li>
         ))}
-      </ul>
+      </ol>
 
       <div className="p1__lead">
-        <h2 className="p1__name">Desir</h2>
+        {/* Linked to its PDP — see ProductTouch1.tsx. */}
+        <h2 className="p1__name">
+          <a className="p1__namelink" href="/fragrance/desir">Desir</a>
+        </h2>
         <span className="p1__rule" aria-hidden="true" />
         <p className="p1__subhead">Depth, drawn out slowly.</p>
         {/* §6 spotlights Desir → its PDP (was /#collection, the home band). */}

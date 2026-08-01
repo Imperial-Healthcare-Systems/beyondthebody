@@ -11,7 +11,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./product3.css";
-import { revealTl } from "../_components/reveal-tempo";
+import { revealTl, revealTempo } from "../_components/reveal-tempo";
 
 type Signature = {
   no: string;
@@ -62,8 +62,9 @@ const COLLECTION: Signature[] = [
   },
 ];
 
-// each frame collapses to its OUTER edge, so left images wipe open left→right and
-// right images wipe open right→left — both resolving to the slanted frame.
+// DESKTOP only: each frame collapses to its OUTER edge, so left images wipe open
+// left→right and right images wipe open right→left — both resolving to the
+// slanted frame. Mobile overrides both ends; see CLIP_START_TOP below.
 const CLIP_START = {
   left: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)",
   right: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)",
@@ -76,6 +77,13 @@ const CLIP_END = {
    wipe has to land on a rectangle there — ending on CLIP_END would re-introduce
    the parallelogram the mobile layout deliberately removes. */
 const CLIP_END_FLAT = "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)";
+/* …and it has to START from the TOP edge there, not an outer side (client
+   direction, 2026-08-01): every row is one full-width column on mobile, so the
+   left/right alternation that gives the horizontal wipe its meaning no longer
+   exists — four frames opening sideways in a single stack just read as
+   inconsistent. Collapsed flat against the top, it opens downward with the
+   scroll. All four rows use this; `side` still governs desktop. */
+const CLIP_START_TOP = "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)";
 const MOBILE_Q = "(max-width: 860px)";
 
 export default function ProductTouch3() {
@@ -91,15 +99,32 @@ export default function ProductTouch3() {
 
     const isMobile = window.matchMedia(MOBILE_Q).matches;
 
+    /* THE IMAGE OPENING PLAYS AT ITS AUTHORED SPEED ON A PHONE (client
+       direction, 2026-08-01: "slow down this image opening animation").
+
+       revealTl runs this whole timeline at timeScale ~1.556 on a phone, which
+       was landing the wipe in ~0.39s — too quick to read a full-width
+       photograph opening. Pre-multiplying just these two durations by the same
+       factor cancels it for them alone: 0.611 x 1.556, played 1.556x faster,
+       is 0.611s again. The text stagger and the ⚥ mark keep the phone tempo,
+       so only the image opening slowed — which is what was asked for.
+
+       Desktop is untouched by construction: revealTempo() is 1 there, so both
+       durations multiply by 1. That is also why this needs no isMobile guard —
+       and why it must NOT use one, since isMobile is 860px here while the tempo
+       breakpoint is 820, and a guard would double-slow the 821–860 band. */
+    const mediaTempo = revealTempo();
+
     const ctx = gsap.context(() => {
       q(".col__row").forEach((row) => {
         const r = row as HTMLElement;
         const side = r.classList.contains("col__row--right") ? "right" : "left";
         const media = r.querySelector(".col__media");
         const img = r.querySelector(".col__media img");
+        const clipStart = isMobile ? CLIP_START_TOP : CLIP_START[side];
         const clipEnd = isMobile ? CLIP_END_FLAT : CLIP_END[side];
 
-        gsap.set(media, { clipPath: CLIP_START[side] });
+        gsap.set(media, { clipPath: clipStart });
         gsap.set(img, { scale: 1.16 });
         gsap.set(r.querySelectorAll(".col__text > *"), { opacity: 0, y: 22 });
         const mark = r.querySelector(".col__mark");
@@ -108,8 +133,8 @@ export default function ProductTouch3() {
         const tl = revealTl({
           scrollTrigger: { trigger: r, start: "top 88%", once: true },
         });
-        tl.to(media, { clipPath: clipEnd, duration: 0.611, ease: "power3.inOut" })
-          .to(img, { scale: 1, duration: 0.833, ease: "power2.out" }, "<")
+        tl.to(media, { clipPath: clipEnd, duration: 0.611 * mediaTempo, ease: "power3.inOut" })
+          .to(img, { scale: 1, duration: 0.833 * mediaTempo, ease: "power2.out" }, "<")
           .to(r.querySelectorAll(".col__text > *"), { opacity: 1, y: 0, duration: 0.389, ease: "power3.out", stagger: 0.029 }, "-=0.417");
         if (mark) tl.to(mark, { opacity: 1, scale: 1, duration: 0.389, ease: "back.out(1.7)" }, "-=0.222");
 
@@ -136,7 +161,14 @@ export default function ProductTouch3() {
             <div className="col__text">
               <span className="col__no">No. {p.no}</span>
               <span className="col__rule" aria-hidden="true" />
-              <h3 className="col__name">{p.name}.</h3>
+              {/* Linked to the same PDP as "Discover" below (client direction,
+                  2026-08-01). The full stop is kept INSIDE the anchor on
+                  purpose: .col__namelink is inline-block, so a long name on a
+                  narrow column fills the box and a full stop left outside it
+                  would orphan onto a line of its own. */}
+              <h3 className="col__name">
+                <a className="col__namelink" href={`/fragrance/${p.slug}`}>{p.name}.</a>
+              </h3>
               <p className="col__tag">{p.tag}</p>
               <span className="col__plabel">Scent Profile</span>
               <p className="col__profile">{p.profile}</p>

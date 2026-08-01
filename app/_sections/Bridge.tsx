@@ -2,9 +2,13 @@
 
 /* §2 · BRIDGE — ylem "Every curve is / an attitude." in BTB's skin.
    Two fragmented display lines (left / right) reveal by mask on enter,
-   drifting apart on scroll. Below them, a full-bleed 21:9 band that
-   parallaxes — the neutral breathing space between sections. Light
-   register. Reduced-motion: everything sits in its end-state. */
+   drifting apart on scroll. Light register. Reduced-motion: everything
+   sits in its end-state.
+
+   The full-bleed sand seam band that used to close this section was REMOVED
+   on client direction, 2026-08-01. §2's bone ground now runs straight into
+   §3 ORIGIN's full-bleed image. Its markup, its CSS and its parallax are all
+   gone — recoverable from git at d774bdf if it is ever wanted back. */
 
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
@@ -53,21 +57,8 @@ export default function Bridge() {
         scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true },
       });
 
-      // gentle parallax on the neutral band
-      gsap.fromTo(
-        q(".bridge__placeholder"),
-        { yPercent: -6 },
-        {
-          yPercent: 6,
-          ease: "none",
-          scrollTrigger: {
-            trigger: q(".bridge__band"),
-            start: "top bottom",
-            end: "bottom top",
-            scrub: true,
-          },
-        }
-      );
+      /* The seam band's parallax was removed with the band itself (client
+         direction, 2026-08-01) — it was the 18th scrub block; 16 remain. */
     }, el);
 
     return () => ctx.revert();
@@ -91,12 +82,6 @@ export default function Bridge() {
             <path d="M0 5h18M14 1l4 4-4 4" stroke="currentColor" strokeWidth="1.4" />
           </svg>
         </a>
-      </div>
-
-      {/* the seam — a neutral full-bleed band that parallaxes */}
-      <div className="bridge__band">
-        <div className="bridge__placeholder" aria-hidden="true" />
-        <div className="bridge__grain" aria-hidden="true" />
       </div>
     </section>
   );

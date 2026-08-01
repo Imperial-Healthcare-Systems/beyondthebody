@@ -2,8 +2,8 @@
 
 /* §4 · PRODUCT TOUCH 1 — Don Amour. Full-bleed cinematic banner: the real
    flacon scene owns the centre. Copy anchors to the corners (eyebrow top-left,
-   name + tagline + CTA bottom-left), and a few positioning pointers are
-   scattered around the bottle as fine crosshair callouts — NOT the olfactory
+   name + tagline + CTA bottom-left), and four positioning pointers are
+   scattered around the bottle as a numbered 01–04 sequence — NOT the olfactory
    pyramid (that lives on the product page), but what the scent IS / is FOR /
    how it's made. Dark resinous register. Reduced-motion: end-state. */
 
@@ -15,16 +15,34 @@ import { revealTl } from "../_components/reveal-tempo";
 
 const BOTTLE = "/products/fullbleed/product-1-donamour.webp"; // real Don Amour render
 
-/* scattered around the flacon in the frame's DARK negative zones — positioning
+/* Scattered around the flacon in the frame's DARK negative zones — positioning
    reinforcement, not notes. `anchor` = which screen edge it hangs off (keeps it
-   on-screen); the crosshair always sits on the side FACING the bottle.
-     upper-left (above driftwood) · upper-right corner · left edge · lower-right rock */
+   on-screen). Rendered as a NUMBERED sequence: the index drives 01–04, so the
+   number can never drift out of step with array order.
+
+   SEQUENCE — client direction, 2026-08-01: scent → audience → climate → craft.
+   ARRAY ORDER IS THE SEQUENCE. It drives the 01–04 numerals in the stacked
+   layout (<=1024px) and the reveal stagger; it is the one thing here that must
+   not be reordered casually.
+
+   `top` deliberately does NOT ascend with it. On the full-bleed the marker is a
+   crosshair, not a number, so there is no visible count for a position to
+   contradict — and the client's instruction (2026-08-01) is that each label
+   holds the exact slot it has always occupied in the frame's validated dark
+   zones: Resinous upper-left above the driftwood · Hand-finished upper-right
+   corner · Sorted the left edge · Composed the lower-right rock.
+
+   The one cost, accepted knowingly: the reveal stagger follows array order, so
+   the four callouts pop 24% → 52% → 64% → 18%, returning to the top for the
+   last. If that ever reads as a glitch, the fix is to sort a COPY of this array
+   by `top` for rendering while keeping array order for the numerals — not to
+   re-sort this array, which would renumber the stacked list. */
 type Pointer = { text: string; top: string; x: string; anchor: "left" | "right" };
 const POINTERS: Pointer[] = [
   { text: "Resinous · warm",        top: "24%", x: "9%", anchor: "left" },
-  { text: "Hand-finished",          top: "18%", x: "6%", anchor: "right" },
   { text: "Sorted for no one",      top: "52%", x: "5%", anchor: "left" },
   { text: "Composed for the heat",  top: "64%", x: "6%", anchor: "right" },
+  { text: "Hand-finished",          top: "18%", x: "6%", anchor: "right" },
 ];
 
 export default function ProductTouch1() {
@@ -89,7 +107,11 @@ export default function ProductTouch1() {
 
       <p className="p1__eyebrow">— Beyond the body</p>
 
-      <ul className="p1__notes" aria-label="Product positioning">
+      {/* <ol>, not <ul>: these are now an explicitly numbered sequence, so the
+          order is semantic and not only visual. The numeral itself is
+          aria-hidden — the list element already conveys ordinality, and a
+          screen reader saying "zero one" over it is noise. */}
+      <ol className="p1__notes" aria-label="Product positioning">
         {POINTERS.map((p, i) => (
           <li
             className="p1__note"
@@ -101,14 +123,21 @@ export default function ProductTouch1() {
                 : { top: p.top, right: p.x }
             }
           >
-            <span className="p1__mark" aria-hidden="true" />
+            <span className="p1__mark" aria-hidden="true">
+              {String(i + 1).padStart(2, "0")}
+            </span>
             <span className="p1__ltext">{p.text}</span>
           </li>
         ))}
-      </ul>
+      </ol>
 
       <div className="p1__lead">
-        <h2 className="p1__name">Don Amour</h2>
+        {/* The name links to the same PDP as "Discover the scent" below it
+            (client direction, 2026-08-01). The <a> sits INSIDE the <h2> so the
+            heading level and .p1__name — which GSAP tweens — are both unchanged. */}
+        <h2 className="p1__name">
+          <a className="p1__namelink" href="/fragrance/don-amour">Don Amour</a>
+        </h2>
         <span className="p1__rule" aria-hidden="true" />
         <p className="p1__subhead">Warmth, worn as your own.</p>
         {/* §4 spotlights Don Amour → its PDP (was /#collection, the home band). */}

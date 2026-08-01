@@ -10,7 +10,6 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./hero.css";
-import { revealTl } from "../_components/reveal-tempo";
 
 /* hero.webp — 1774x887 (2:1). Client asset, 2026-07-28: the Mon Amour bottle on a lit
    vanity, a figure holding the gaze in the mirror behind it. Product-led, which is the
@@ -61,34 +60,49 @@ export default function Hero() {
       gsap.set(q(".hero__sigrule"), { scaleX: 0 });
       gsap.set(q(".hero__sigeyebrow, .hero__signame"), { opacity: 0, y: 18 });
 
-      // Built paused: the preloader curtain fades over 1s, so playing on mount
-      // meant the whole reveal finished behind it. `delay` lets the mask start
-      // through the last of the fade, then land in the clear. (Tunable.)
-      const tl = revealTl({ paused: true, delay: 0.306 });
+      /* Built paused: the preloader curtain fades over 1s, so playing on mount
+         meant the whole reveal finished behind it. `delay` lets the mask start
+         through the last of the fade, then land in the clear. (Tunable.)
+
+         TEMPO — client direction, 2026-08-01: the hero is REVERTED to its
+         original pace and is the one reveal on the site exempt from both tempo
+         passes. Plain `gsap.timeline`, not `revealTl`, so it does not take the
+         mobile speed-up either; this section opens at ONE speed on every
+         viewport (2.53s, curtain-lift to the CTAs landing).
+
+         WHY it is exempt, so this does not get "fixed" back: aaaf4e3 cut all 29
+         reveals by 1.8 and d774bdf sped phones up a further 1.556, both to
+         answer one complaint — "if a mobile user scrolls hastily, he scrolls
+         everything before anything is even shown". That is a SCROLL argument,
+         and it does not reach the hero: this timeline is not scroll-triggered,
+         it is play-on-load, fired by `btb:preload-done` below when the curtain
+         lifts. It is already in frame and nobody can outscroll it. The other 28
+         reveals keep both cuts — only this one was over-corrected by them. */
+      const tl = gsap.timeline({ paused: true, delay: 0.55 });
       intro = tl;
       tl.to(q(".hero__title .inner"), {
         yPercent: 0,
-        duration: 0.583,
+        duration: 1.05,
         ease: "power4.out",
-        stagger: 0.026,
+        stagger: 0.09,
       })
         // the credit draws its rule, then names itself — over the headline's tail
-        .to(q(".hero__sigrule"), { scaleX: 1, duration: 0.389, ease: "power3.inOut" }, "-=0.417")
+        .to(q(".hero__sigrule"), { scaleX: 1, duration: 0.7, ease: "power3.inOut" }, "-=0.75")
         .to(
           q(".hero__sigeyebrow, .hero__signame"),
-          { opacity: 1, y: 0, duration: 0.389, ease: "power3.out", stagger: 0.029 },
-          "-=0.25"
+          { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.1 },
+          "-=0.45"
         )
         .to(
           q(".hero__sub"),
-          { opacity: 1, y: 0, duration: 0.444, ease: "power3.out" },
-          "-=0.278"
+          { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" },
+          "-=0.5"
         )
         // both paths out land together, commerce first
         .to(
           q(".hero__shop, .hero__enter"),
-          { opacity: 1, y: 0, duration: 0.389, ease: "power3.out", stagger: 0.026 },
-          "-=0.333"
+          { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.09 },
+          "-=0.6"
         );
 
       // near-still cinemagraph: an almost-imperceptible breath.

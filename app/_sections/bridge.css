@@ -1,9 +1,8 @@
 /* =================================================================
    §2 · BRIDGE — ylem "Every curve is / an attitude." parallel.
    Asymmetric fragmented display type (left line / right line) over
-   generous bone space, then a full-bleed 21:9 image band that
-   parallaxes. Light register (dark oxblood type). The em-dashes
-   carry the fragmentation.
+   generous bone space. Light register (dark oxblood type). The
+   em-dashes carry the fragmentation.
    ================================================================= */
 .bridge {
   position: relative;
@@ -30,59 +29,13 @@
 .bridge__line--b { align-self: flex-end; text-align: right; color: var(--ink-muted); }
 .bridge__link { align-self: flex-end; color: var(--ink); }
 
-/* -------- the seam band (21:9) — a neutral parallax breathing space -------- */
-.bridge__band {
-  --br-band-bg: var(--sand);
-  position: relative; width: 100%; height: 400px; overflow: hidden;
-  background: var(--br-band-bg);
-}
-/* The seam band's ground. The three linear-gradient stops are DELIBERATE local
-   values, not token drift (DS v0.1 record): #d9c3a7 sits 4.2 from --sand, but
-   #c8a988 is 39 and #b08a72 is 10.5 from --rose-taupe — folding them onto tokens
-   would visibly repaint this band. Ramp stops, not palette.
-
-   REDESIGNED for the dark scheme (v0.2), not remapped. In the light scheme this
-   is the page's one warm-DAYLIGHT wash: a sand/tan panel with an ivory bloom
-   top-left and a taupe pool bottom-right. There is no token substitution that
-   survives the night ramp — a tan panel between two night grounds reads as a
-   hole punched in the page. So the night version keeps the GESTURE and the exact
-   geometry (same angles, sizes, positions and stops) and re-voices the colour:
-   a low warm lamp in a dark room — a champagne bloom crossing from top-left, an
-   oxblood pool bottom-right, over an ember-to-ash night ramp. Geometry, size and
-   position are untouched; only colour and alpha differ. */
-.bridge__placeholder {
-  --br-bloom-a: rgba(245,239,228,.5);   /* ivory bloom, top-left */
-  --br-bloom-b: rgba(174,143,123,.5);   /* taupe pool, bottom-right */
-  --br-g0: #d9c3a7;
-  --br-g1: #c8a988;
-  --br-g2: #b08a72;
-  position: absolute; inset: -8% 0; z-index: 0; will-change: transform;
-  background:
-    radial-gradient(90% 120% at 30% 20%, var(--br-bloom-a), transparent 55%),
-    radial-gradient(70% 90% at 72% 68%, var(--br-bloom-b), transparent 62%),
-    linear-gradient(115deg, var(--br-g0) 0%, var(--br-g1) 44%, var(--br-g2) 100%);
-}
-:root[data-scheme="dark"] .bridge__band { --br-band-bg: var(--night-3); }
-:root[data-scheme="dark"] .bridge__placeholder {
-  --br-bloom-a: rgb(226 203 166 / .13);  /* the warm lamp, held low so it glows */
-  /* Hue-corrected 2026-07-21: this ramp was first cut by darkening oxblood and
-     landed at 317–330°, i.e. plum — the band read aubergine, not ember. Oxblood
-     is an ACCENT (344°); the house's GROUNDS are warm (sand 33°, champagne 37°).
-     Retargeted to ~14–17° at the same lightness. See tokens.css → HUE RULE. */
-  --br-bloom-b: rgb(122 62 44 / .40);    /* warm ember pool — colour, not lift */
-  --br-g0: #3A2620;                      /* ember end of the night ramp  hue 15° */
-  --br-g1: #291A15;                      /*                              hue 15° */
-  --br-g2: #1A110E;                      /* falls away into the room     hue 15° */
-}
-.bridge__grain {
-  position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  opacity: calc(.3 * var(--film-op)); mix-blend-mode: var(--film-blend);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
-}
-
-@media (max-width: 860px) {
-  .bridge__band { height: 300px; }
-}
+/* -------- the seam band — REMOVED 2026-08-01 (client direction) --------
+   A 400px full-bleed sand/tan panel (300px under 860px) used to close this
+   section: a warm daylight wash with an ivory bloom top-left and a taupe pool
+   bottom-right, re-voiced as a low warm lamp for the dark scheme, drifting
+   -6%→+6% on scrub. §2's bone ground now meets §3 ORIGIN's full-bleed image
+   directly. The rules are deleted rather than commented out; the full block,
+   including the dark-scheme hue-correction record, is in git at d774bdf. */
 
 @media (max-width: 640px) {
   .bridge__lines { font-size: clamp(1.9rem, 10vw, 3rem); }
