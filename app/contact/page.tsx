@@ -6,7 +6,7 @@ import ContactMasthead from "../_sections/ContactMasthead";
 import Footer from "../_sections/Footer";
 
 /* /contact — the contact page. Assembled the per-page way (Nav + main + Footer + SiteRuntime).
-   Carries the brief-pace Preloader (2026-07-21): the masthead's linen still wipes in from a
+   Carries the sub-page Preloader (2026-07-21; retimed per device 2026-08-10): the masthead's linen still wipes in from a
    clip-path set in JS, so without a curtain the full-bleed photo painted and then snapped to
    zero width. Preloader FIRST — SiteRuntime reads __btbPreloading in its own effect and must
    see it already set. Editorial single lane (client 2026-07-17):

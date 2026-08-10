@@ -9,7 +9,7 @@ import Footer from "../_sections/Footer";
 
 /* /collection — "The house, in chapters." A house index where scent reads as Chapter One
    of something larger (unnamed forthcoming beyond it). Assembled the per-page way (Nav +
-   main + Footer + SiteRuntime). Carries the brief-pace Preloader (2026-07-21): the masthead's
+   main + Footer + SiteRuntime). Carries the sub-page Preloader (2026-07-21; retimed per device 2026-08-10): the masthead's
    entrance is an on-mount timeline, and without a curtain its copy painted composed for the
    hydration window and then snapped back to play. Preloader FIRST — SiteRuntime reads
    __btbPreloading in its own effect and must see it already set.

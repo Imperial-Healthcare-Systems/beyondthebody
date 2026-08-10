@@ -6,8 +6,9 @@ import JournalIndex from "../_sections/JournalIndex";
 import Footer from "../_sections/Footer";
 
 /* /journal — the Journal index. Server component that assembles the shared chrome
-   the per-page way (Nav + main + Footer + SiteRuntime). Carries the brief-pace Preloader
-   (2026-07-21) so the masthead's on-mount entrance is armed before anything paints.
+   the per-page way (Nav + main + Footer + SiteRuntime). Carries the sub-page Preloader
+   (2026-07-21; retimed per device 2026-08-10) so the masthead's on-mount entrance is
+   armed before anything paints.
    Preloader FIRST — SiteRuntime reads __btbPreloading in its own effect and must see it
    already set. SiteRuntime tracks each section's data-theme for nav inversion:
    JournalIndex is light, Footer is dark. */

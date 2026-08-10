@@ -117,8 +117,27 @@
   font-size: clamp(.62rem, .82vw, .76rem); color: var(--ink-muted);
 }
 
+/* PHONE — the frame stops being "almost empty" and starts being a hole.
+   The desktop composition is a small statement floating in a tall lit room, and
+   it holds there (1440: 217px of type in 844px). Scaled down it does not: the
+   type only shrinks a little while 100vh does not shrink at all, so at 390 it
+   was 210px of content with 283px of dead ground above AND below — 73% of the
+   beat is void, and on a phone that reads as a layout fault rather than as air
+   (client, 2026-08-10).
+
+   min-height is dropped instead of merely lowered so the section is SIZED BY
+   ITS CONTENT: the statement wraps to 5 lines at 390 and 3 at 640, and any
+   fixed vh would keep re-opening the same gap at whichever width wrapped
+   shortest. Padding alone now sets the breath, so it is constant everywhere.
+
+   The reduction is symmetric on purpose. The complaint was about the space
+   BELOW, but the type is flex-centred — trimming only the bottom would push the
+   statement off-centre in its own frame, trading a gap for a worse fault. */
 @media (max-width: 640px) {
-  .bs { min-height: 92vh; }
+  .bs {
+    min-height: auto;
+    padding: clamp(88px, 15vh, 130px) var(--pad);
+  }
   .bs__statement { font-size: clamp(1.7rem, 8vw, 2.4rem); }
 }
 
