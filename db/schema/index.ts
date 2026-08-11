@@ -1,5 +1,4 @@
 /* Schema barrel. Later phases add modules here:
- *   phase 5 → commerce.ts    (order, order_item, inventory_movement)
  *   phase 6 → payments.ts    (payment, webhook_event, refund)
  *
  * A module missing from this list is invisible to drizzle-kit, which then reports
@@ -10,3 +9,4 @@ export * from "./platform";
 export * from "./newsletter";
 export * from "./catalogue";
 export * from "./journal";
+export * from "./commerce";

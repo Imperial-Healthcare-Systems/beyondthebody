@@ -102,6 +102,16 @@ export const RULES = {
   newsletterIp: { name: "newsletter:ip", limit: 5, windowSec: 3_600 },
   newsletterEmail: { name: "newsletter:email", limit: 3, windowSec: 86_400 },
   adminLogin: { name: "admin-login:email", limit: 5, windowSec: 900 },
+
+  /* Quoting is read-only and happens several times in one ordinary visit — opening
+     checkout, changing a quantity, picking a state. It gets its own, generous bucket.
+     Sharing one with order placement was a mistake worth naming: Indian mobile carriers
+     NAT heavily, so a single bucket keyed by IP is shared by many real customers, and a
+     tight limit locks people out of checkout for the crime of looking at their bag. */
+  quoteIp: { name: "quote:ip", limit: 60, windowSec: 3_600 },
+
+  /* Placing orders is the expensive one, and stays tight. The real anti-abuse control
+     for COD is codPhone below — an IP is free to change, a working phone number is not. */
   checkoutIp: { name: "checkout:ip", limit: 10, windowSec: 3_600 },
   /* COD commits stock with no money at risk to the attacker — the cheapest way to empty
      an eight-SKU inventory. Tighter than prepaid on purpose. */

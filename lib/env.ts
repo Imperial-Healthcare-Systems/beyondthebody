@@ -72,6 +72,10 @@ const EnvSchema = z.object({
   /* RFC 5322 address the house sends as, e.g. `Beyond The Body <hello@…>`. Must be on a
      domain whose SPF/DKIM authorise this server, or mail lands in spam. */
   MAIL_FROM: z.string().default("Beyond The Body <no-reply@beyondthebody.com>"),
+  /* Where the house is told an order arrived. Until the admin order list exists this is
+     the ONLY notification, so it falls back to the MAIL_FROM address rather than nowhere.
+     A monitored mailbox someone actually reads in the morning. */
+  ORDERS_EMAIL: z.email().optional(),
 
   /* Optional. Absent = no error reporting beyond structured logs. */
   SENTRY_DSN: z.string().optional(),

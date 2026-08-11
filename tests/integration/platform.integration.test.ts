@@ -27,11 +27,33 @@ describe.skipIf(!hasDb)("phase 0 · platform integration", () => {
   beforeAll(async () => {
     await db.delete(job).where(like(job.kind, `${P}%`));
     await db.delete(rateLimit).where(like(rateLimit.bucket, `${P}%`));
+
+    /* These specs drain the queue with a small batch and then assert that THEIR jobs ran.
+       Claiming is ordered by run_after, so any older due row — the recurring
+       maintenance:cleanup singleton, or mail queued by another suite — is claimed first
+       and eats the batch. The specs then fail for reasons that have nothing to do with
+       what they test. Park everything foreign in the future for the duration; nothing is
+       deleted, and the worker picks it up again afterwards. */
+    await db
+      .update(job)
+      .set({ runAfter: new Date(Date.now() + 3_600_000) })
+      .where(
+        and(
+          sql`${job.kind} not like ${`${P}%`}`,
+          sql`${job.doneAt} is null`,
+          sql`${job.failedAt} is null`
+        )
+      );
   });
 
   afterAll(async () => {
     await db.delete(job).where(like(job.kind, `${P}%`));
     await db.delete(rateLimit).where(like(rateLimit.bucket, `${P}%`));
+    /* Hand the parked rows back — run_after is a schedule, not a state. */
+    await db
+      .update(job)
+      .set({ runAfter: new Date() })
+      .where(and(sql`${job.kind} not like ${`${P}%`}`, sql`${job.doneAt} is null`, sql`${job.failedAt} is null`));
     await closeDb();
   });
 

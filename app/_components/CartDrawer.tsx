@@ -99,10 +99,16 @@ export default function CartDrawer() {
                     : `${CURRENCY} ${subtotal.toLocaleString("en-IN")}`}
                 </span>
               </div>
-              <button className="cart__checkout" type="button" disabled aria-disabled="true">
-                Checkout — coming soon
-              </button>
-              <p className="cart__note">Secure checkout is on the way.</p>
+              {/* A plain <a>, like every other navigation on this site: the full document
+                  load is what the entrance choreography is built around. */}
+              <a className="cart__checkout" href="/checkout" onClick={() => setOpen(false)}>
+                Checkout
+              </a>
+              <p className="cart__note">
+                {hasUnpriced
+                  ? "Some pieces aren't priced yet — write to us and we'll arrange it."
+                  : "Cash on delivery across India."}
+              </p>
             </footer>
           </>
         )}

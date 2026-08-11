@@ -224,10 +224,16 @@
   text-transform: uppercase;
   letter-spacing: 0.2em;
   font-size: 0.68rem;
-  cursor: not-allowed;
-  /* disabled state — a relative dim, so it reads the same on either panel */
-  opacity: 0.55;
+  /* An <a> since checkout became real, so it needs the block box and the underline reset
+     a <button> gave it for free. */
+  display: block;
+  box-sizing: border-box;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity var(--dur-fast, 0.4s) var(--ease);
 }
+.cart__checkout:hover { opacity: 0.88; }
 .cart__note {
   margin: 12px 0 0;
   text-align: center;

@@ -79,6 +79,12 @@ function button(href: string, label: string): string {
   </table>`;
 }
 
+/** Paise → the house's price form. Matches formatPrice() on the site, including the
+ *  non-breaking space that stops ₹ being orphaned at a line break. */
+export function formatMinor(minor: number): string {
+  return `₹ ${(minor / 100).toLocaleString("en-IN")}`;
+}
+
 export function confirmSubscriptionEmail(confirmUrl: string) {
   const text = [
     "Confirm your place on the house list.",
@@ -163,4 +169,199 @@ export function welcomeEmail(unsubscribeUrl: string) {
   });
 
   return { subject: "You're on the list", text, html };
+}
+
+/* ── Orders ────────────────────────────────────────────────────────────────────────
+ *
+ * Two messages, deliberately different in register. The customer's is a house note that
+ * happens to contain an order; the studio's is a worksheet — it is read on a phone at
+ * eight in the morning by someone deciding what to pack, so it leads with the address
+ * and the items, not with a greeting. */
+
+type MailOrder = {
+  orderNumber: string;
+  paymentMethod: "prepaid" | "cod";
+  email: string;
+  phone: string;
+  subtotalMinor: number;
+  shippingMinor: number;
+  codFeeMinor: number;
+  taxMinor: number;
+  totalMinor: number;
+  taxInclusive: boolean;
+  shippingAddress: unknown;
+  notes: string | null;
+};
+
+type MailItem = {
+  nameSnapshot: string;
+  sizeSnapshot: string;
+  qty: number;
+  lineTotalMinor: number;
+};
+
+function addressLines(address: unknown): string[] {
+  const a = (address ?? {}) as Record<string, string>;
+  return [
+    a.name,
+    a.line1,
+    a.line2,
+    a.landmark,
+    [a.city, a.state, a.pincode].filter(Boolean).join(", "),
+  ].filter((line): line is string => Boolean(line && line.trim()));
+}
+
+function itemsTable(items: MailItem[]): string {
+  return items
+    .map(
+      (it) => `<tr>
+        <td style="padding:10px 0;border-bottom:1px solid ${CHAMPAGNE};">
+          <div>${escapeHtml(it.nameSnapshot)}</div>
+          <div style="font-family:Helvetica,Arial,sans-serif;font-size:12px;color:${INK_MUTED};">
+            ${escapeHtml(it.sizeSnapshot)}${it.qty > 1 ? ` &middot; ${it.qty}` : ""}
+          </div>
+        </td>
+        <td align="right" style="padding:10px 0;border-bottom:1px solid ${CHAMPAGNE};white-space:nowrap;">
+          ${escapeHtml(formatMinor(it.lineTotalMinor))}
+        </td>
+      </tr>`
+    )
+    .join("");
+}
+
+function totalsTable(order: MailOrder): string {
+  const row = (label: string, value: string, strong = false) => `<tr>
+      <td style="padding:4px 0;font-family:Helvetica,Arial,sans-serif;font-size:${strong ? 14 : 13}px;
+                 ${strong ? "" : `color:${INK_MUTED};`}">${escapeHtml(label)}</td>
+      <td align="right" style="padding:4px 0;white-space:nowrap;font-size:${strong ? 15 : 13}px;">
+        ${escapeHtml(value)}</td>
+    </tr>`;
+
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:14px;">
+    ${row("Subtotal", formatMinor(order.subtotalMinor))}
+    ${row("Delivery", order.shippingMinor === 0 ? "Included" : formatMinor(order.shippingMinor))}
+    ${order.codFeeMinor > 0 ? row("Cash on delivery", formatMinor(order.codFeeMinor)) : ""}
+    ${order.taxMinor > 0 ? row(order.taxInclusive ? "GST (included)" : "GST", formatMinor(order.taxMinor)) : ""}
+    ${row("Total", formatMinor(order.totalMinor), true)}
+  </table>`;
+}
+
+function totalsText(order: MailOrder): string[] {
+  return [
+    `Subtotal      ${formatMinor(order.subtotalMinor)}`,
+    `Delivery      ${order.shippingMinor === 0 ? "Included" : formatMinor(order.shippingMinor)}`,
+    ...(order.codFeeMinor > 0 ? [`Cash on delivery  ${formatMinor(order.codFeeMinor)}`] : []),
+    ...(order.taxMinor > 0
+      ? [`GST${order.taxInclusive ? " (included)" : ""}  ${formatMinor(order.taxMinor)}`]
+      : []),
+    `Total         ${formatMinor(order.totalMinor)}`,
+  ];
+}
+
+export function orderConfirmationEmail(order: MailOrder, items: MailItem[], statusUrl: string) {
+  const cod = order.paymentMethod === "cod";
+  const address = addressLines(order.shippingAddress);
+
+  /* The house does not promise a date it does not control. "We'll write when it ships"
+     is both true and in register; "arrives in 3-5 days" would be neither. */
+  const payLine = cod
+    ? `Please keep ${formatMinor(order.totalMinor)} ready for the courier.`
+    : "Your payment has been received.";
+
+  const text = [
+    `Thank you — your order is with us.`,
+    "",
+    `Order ${order.orderNumber}`,
+    "",
+    ...items.map((it) => `${it.nameSnapshot} · ${it.sizeSnapshot}${it.qty > 1 ? ` × ${it.qty}` : ""}   ${formatMinor(it.lineTotalMinor)}`),
+    "",
+    ...totalsText(order),
+    "",
+    cod ? "Payment: Cash on delivery." : "Payment: Paid online.",
+    payLine,
+    "",
+    "Sending to:",
+    ...address,
+    "",
+    "We pack by hand and write again the moment it leaves us.",
+    "",
+    `Follow your order: ${statusUrl}`,
+    "",
+    "Beyond The Body — a house that begins with scent.",
+  ].join("\n");
+
+  const html = layout({
+    preheader: `Order ${order.orderNumber} — thank you.`,
+    body: `
+      <p style="margin:0 0 6px;">Thank you &mdash; your order is with us.</p>
+      <p style="margin:0 0 26px;font-family:Helvetica,Arial,sans-serif;font-size:12px;
+                letter-spacing:.14em;text-transform:uppercase;color:${INK_MUTED};">
+        Order ${escapeHtml(order.orderNumber)}
+      </p>
+
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        ${itemsTable(items)}
+      </table>
+      ${totalsTable(order)}
+
+      <p style="margin:26px 0 0;font-size:15px;font-family:Helvetica,Arial,sans-serif;
+                color:${INK_MUTED};line-height:1.8;">
+        ${cod ? "Cash on delivery." : "Paid online."} ${escapeHtml(payLine)}
+      </p>
+
+      <p style="margin:22px 0 0;font-size:15px;font-family:Helvetica,Arial,sans-serif;
+                color:${INK_MUTED};line-height:1.8;">
+        Sending to:<br>${address.map(escapeHtml).join("<br>")}
+      </p>
+
+      ${button(statusUrl, "Follow your order")}
+
+      <p style="margin:0;font-size:13px;font-family:Helvetica,Arial,sans-serif;
+                color:${INK_MUTED};line-height:1.8;">
+        We pack by hand, and write again the moment it leaves us.
+      </p>`,
+  });
+
+  return { subject: `Your order ${order.orderNumber}`, text, html };
+}
+
+export function newOrderNotificationEmail(order: MailOrder, items: MailItem[]) {
+  const address = addressLines(order.shippingAddress);
+  const method = order.paymentMethod === "cod" ? "CASH ON DELIVERY" : "Prepaid";
+
+  const text = [
+    `${order.orderNumber} — ${method} — ${formatMinor(order.totalMinor)}`,
+    "",
+    ...items.map((it) => `${it.qty} × ${it.nameSnapshot} · ${it.sizeSnapshot}`),
+    "",
+    ...address,
+    "",
+    `Phone: ${order.phone}`,
+    `Email: ${order.email}`,
+    ...(order.notes ? ["", `Note from the customer: ${order.notes}`] : []),
+  ].join("\n");
+
+  const html = layout({
+    preheader: `${order.orderNumber} · ${method} · ${formatMinor(order.totalMinor)}`,
+    body: `
+      <p style="margin:0 0 4px;font-family:Helvetica,Arial,sans-serif;font-size:12px;
+                letter-spacing:.14em;text-transform:uppercase;color:${INK_MUTED};">
+        ${escapeHtml(method)} &middot; ${escapeHtml(formatMinor(order.totalMinor))}
+      </p>
+      <p style="margin:0 0 22px;">${escapeHtml(order.orderNumber)}</p>
+
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        ${itemsTable(items)}
+      </table>
+
+      <p style="margin:22px 0 0;font-size:15px;font-family:Helvetica,Arial,sans-serif;
+                color:${INK_MUTED};line-height:1.8;">
+        ${address.map(escapeHtml).join("<br>")}<br>
+        ${escapeHtml(order.phone)}<br>
+        ${escapeHtml(order.email)}
+      </p>
+      ${order.notes ? `<p style="margin:18px 0 0;font-size:14px;font-family:Helvetica,Arial,sans-serif;color:${INK_MUTED};">&ldquo;${escapeHtml(order.notes)}&rdquo;</p>` : ""}`,
+  });
+
+  return { subject: `${order.orderNumber} · ${method} · ${formatMinor(order.totalMinor)}`, text, html };
 }

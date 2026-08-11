@@ -1,6 +1,6 @@
 # Handover checklist — what the backend needs from you
 
-**Living document.** Updated at every safepoint as phases land. Last updated: **2026-08-11 (S4)**.
+**Living document.** Updated at every safepoint as phases land. Last updated: **2026-08-11 (S5)**.
 
 Two audiences, and it matters which is which — sending an infrastructure question to the client or
 a pricing question to a sysadmin is how these things stall for a week:
@@ -26,8 +26,9 @@ reads as an artefact rather than intent.
 | Price for each of the 4 scents × 2 sizes (8 SKUs) | 100 ml and Discovery 10 ml |
 | Whether the two sizes differ in price | They currently do not |
 
-**Not a launch blocker** — these are now editable at `/admin/prices` (owner role) and go live within seconds, no deploy. But
-shipping the placeholder to a live storefront is a commercial decision, not a technical one.
+**Now a launch blocker, where it was not before.** These are editable at `/admin/prices` (owner
+role) and go live within seconds with no deploy — but as of S5 the store takes real orders, and the
+placeholder is what a customer will actually be charged.
 
 ### A2 · GST ☐
 
@@ -42,6 +43,10 @@ the schema is fully tax-ready, so supplying these is a settings change, not a mi
 | GST rate | stored in basis points (1800 = 18%) |
 | Are displayed prices inclusive or exclusive of GST? | changes what the customer pays |
 | Seller's state | decides CGST/SGST vs IGST |
+| The GST **state code** for that state | the numeric code (e.g. 27) — a regulated set we do not guess |
+
+Orders record the buyer's state by **name**, which is unambiguous and enough to decide intra- vs
+inter-state supply. The numeric codes an invoice needs are mapped in when the above arrives.
 
 ### A3 · Shipping ◐
 
@@ -66,6 +71,13 @@ COD is **enabled** per the client's direction (essential in the Indian market).
 Note: a COD order commits stock with **no money received**, and someone must mark it collected in
 admin when the courier remits. There is no webhook for cash.
 
+**How you find out an order came in, today:** an email to `ORDERS_EMAIL` (§B2) the moment it is
+placed, carrying the address, the items and the phone number. Until the admin order screens land,
+that email is the only notification — so it must point at a mailbox somebody opens each morning.
+
+One number can place **three COD orders a day**. That is the anti-abuse limit, not a business rule;
+say the word and it moves.
+
 ### A5 · Legal pages ☐ — **blocks Razorpay**
 
 Razorpay will not activate a live account without these published. They are currently inert `#`
@@ -87,6 +99,9 @@ Still flagged as placeholders in the code:
 Key ID, key secret, and webhook secret, for **test mode first**. S5 delivers a working COD store
 with no Razorpay account at all, so this does not gate commerce going live.
 
+Until they arrive, checkout offers cash on delivery and shows card/UPI as *"opening shortly"* —
+stated rather than hidden, so nobody is left wondering whether the house takes cards at all.
+
 ### A8 · The Journal ☑ *(nothing needed to launch)*
 
 Live at `/admin/journal`. The three existing essays are already loaded and editable; new ones are
@@ -100,6 +115,17 @@ Two things worth knowing rather than deciding:
   the site; an upload button is a half-day's work if you would rather have it.
 - **The editor is deliberately plain** — bold, italic, one heading level, a quote, lists, a rule.
   It is not a page builder, because the page design is fixed and an essay should not carry its own.
+
+### A9 · The store is open at checkout ⚠ ☐ — **read this before launch**
+
+As of S5 a visitor can place a real, fulfillable order and you will be emailed about it. Three
+things follow, and all three are yours to decide rather than ours:
+
+| | |
+|---|---|
+| **Prices are still ₹1,899 placeholders** | §A1 — this is now what a customer actually pays |
+| **Stock is not tracked** | Every SKU is always buyable. Turn tracking on per SKU in `/admin/prices` once real counts exist; until then nothing can read "sold out" by accident |
+| **`store_open` closes checkout instantly** | One setting, no deploy — useful around a drop, or if fulfilment falls behind |
 
 ---
 
@@ -125,6 +151,7 @@ kept current. The ones that need a real decision:
 | `SESSION_SECRET` | ≥32 chars of randomness: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. Rotating it signs everyone out |
 | `TRUSTED_PROXY_HOPS` | **See B3 — easy to get dangerously wrong** |
 | `SMTP_*`, `MAIL_FROM` | See B4 |
+| `ORDERS_EMAIL` | Where the studio is told an order arrived. **Until the admin order screens ship this is the only notification** — point it at a monitored mailbox. Unset falls back to the `MAIL_FROM` address |
 | `SENTRY_DSN` | Optional. Absent = structured logs only, which is supported |
 
 ### B3 · Reverse proxy and client IPs ⚠ ☐
@@ -207,13 +234,18 @@ the Journal. Give `owner` only where prices and the subscriber list are genuinel
 Everything else can follow the site live. These cannot:
 
 1. **§B4 · SMTP working, with SPF/DKIM/DMARC.** Without it nobody can sign into admin and no
-   confirmation email arrives. *Deployment team.*
-2. **§B2 · `APP_URL` correct.** Every emailed link is built from it. *Deployment team.*
-3. **§B3 · `TRUSTED_PROXY_HOPS` matching the real topology.** *Deployment team.*
-4. **§B6 · At least one owner account created.** *Deployment team.*
-5. **§A5 · Legal pages published** — blocks Razorpay activation, so it blocks prepaid payment.
+   confirmation email arrives — **and since S5, no order confirmation either.** A customer who
+   orders and hears nothing assumes it failed. *Deployment team.*
+2. **§B2 · `APP_URL` correct.** Every emailed link is built from it, including the customer's own
+   order page. *Deployment team.*
+3. **§B2 · `ORDERS_EMAIL` pointing at a monitored mailbox.** Until the admin order screens ship it
+   is the only way the house learns an order arrived. *Deployment team.*
+4. **§B3 · `TRUSTED_PROXY_HOPS` matching the real topology.** *Deployment team.*
+5. **§B6 · At least one owner account created.** *Deployment team.*
+6. **§A1 · Real prices.** ₹1,899 is a placeholder, and checkout now charges it. *Client.*
+7. **§A5 · Legal pages published** — blocks Razorpay activation, so it blocks prepaid payment.
    Does **not** block a COD-only store. *Client.*
-6. **§A2 · GST**, if the client is registered — invoices are wrong without it. *Client's accountant.*
+8. **§A2 · GST**, if the client is registered — invoices are wrong without it. *Client's accountant.*
 
 ---
 
