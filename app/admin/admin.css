@@ -122,3 +122,31 @@
 /* Sign-in — centred, no chrome */
 .adm__center { min-height: 100svh; display: grid; place-items: center; padding: 24px; }
 .adm__card { width: 100%; max-width: 400px; background: var(--adm-panel); border: 1px solid var(--adm-line); padding: 32px; }
+
+/* ── Journal editor ─────────────────────────────────────────────────────────── */
+.adm__toolbar {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--adm-line);
+}
+.adm__toolbar .adm__btn { padding: 7px 12px; font-size: 10px; }
+.adm__toolbar .is-active { background: var(--adm-accent); color: #f5efe4; }
+
+/* The writing surface. Deliberately close to the article's own measure and rhythm, so
+   what the client types reads roughly as it will on the site — without pretending to be
+   a live preview, which would need the whole editorial stylesheet in here. */
+.adm__editor {
+  min-height: 420px; padding: 20px 22px;
+  border: 1px solid var(--adm-line); background: #fff;
+  font-family: var(--ff-body, Georgia, serif); font-size: 15px; line-height: 1.8;
+  color: var(--adm-ink); max-width: 68ch;
+}
+.adm__editor:focus { outline: 2px solid var(--adm-accent); outline-offset: -1px; }
+.adm__editor p { margin: 0 0 1.2em; }
+.adm__editor h2 { font-size: 20px; margin: 1.6em 0 .5em; font-weight: 500; }
+.adm__editor h3 { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--adm-muted); margin: 1.4em 0 .4em; }
+.adm__editor blockquote { margin: 1.4em 0; padding-left: 1.1em; border-left: 2px solid var(--adm-line); font-style: italic; }
+.adm__editor ul, .adm__editor ol { padding-left: 1.3em; margin: 0 0 1.2em; }
+.adm__editor hr { border: 0; border-top: 1px solid var(--adm-line); margin: 1.8em 0; }
+.adm__editor:empty::before { content: "Start writing…"; color: var(--adm-muted); }
+
+.adm__row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }

@@ -1,6 +1,6 @@
 # Handover checklist — what the backend needs from you
 
-**Living document.** Updated at every safepoint as phases land. Last updated: **2026-08-11 (S3)**.
+**Living document.** Updated at every safepoint as phases land. Last updated: **2026-08-11 (S4)**.
 
 Two audiences, and it matters which is which — sending an infrastructure question to the client or
 a pricing question to a sysadmin is how these things stall for a week:
@@ -87,6 +87,20 @@ Still flagged as placeholders in the code:
 Key ID, key secret, and webhook secret, for **test mode first**. S5 delivers a working COD store
 with no Razorpay account at all, so this does not gate commerce going live.
 
+### A8 · The Journal ☑ *(nothing needed to launch)*
+
+Live at `/admin/journal`. The three existing essays are already loaded and editable; new ones are
+written, previewed and published from there, and appear on the site within seconds.
+
+Two things worth knowing rather than deciding:
+
+- **Imagery is placed by path, not uploaded.** Each essay names a file that ships with the site
+  (e.g. `/journal/essay-1.webp`). Send new photography to the developer, who adds the file and gives
+  you the path to paste in. This keeps essay imagery inside the same art direction as the rest of
+  the site; an upload button is a half-day's work if you would rather have it.
+- **The editor is deliberately plain** — bold, italic, one heading level, a quote, lists, a rule.
+  It is not a page builder, because the page design is fixed and an essay should not carry its own.
+
 ---
 
 ## §B — Needed from the deployment team
@@ -96,7 +110,6 @@ with no Razorpay account at all, so this does not gate commerce going live.
 - **Node.js 22+** (built and tested on 22.17)
 - **PostgreSQL 13+** — `gen_random_uuid()` is used for primary keys
 - A process supervisor that restarts the app (systemd, pm2, Docker restart policy)
-- A **writable directory for uploads** once the journal portal lands at S4
 
 ### B2 · Environment variables ☐
 
@@ -167,6 +180,9 @@ npm run admin:create -- someone@beyondthebody.com owner "Their Name"
 Roles: `owner` (prices, refunds, subscriber export) · `editor` (journal and media only).
 This grants no password — the person signs in via an emailed link, so **B4 must work first**.
 
+Create at least two: one `owner` for whoever runs the business, and an `editor` for whoever writes
+the Journal. Give `owner` only where prices and the subscriber list are genuinely part of the job.
+
 ### B7 · Operations ☐
 
 - **`GET /api/health`** → `200 {"status":"ok"}`, or `503` when the database is unreachable. Point
@@ -174,8 +190,13 @@ This grants no password — the person signs in via an emailed link, so **B4 mus
 - **Logs** are one JSON object per line on stdout — ship them with whatever you already run.
 - **Backups**: nightly `pg_dump` at minimum, and **rehearse a restore** before launch.
 - **Multiple instances are safe** if you want them: job claiming uses `FOR UPDATE SKIP LOCKED` and
-  rate limiting is an atomic upsert, so nothing needs leader election. Two caveats: uploads need
-  shared storage, and Next's ISR cache is per-instance on local disk.
+  rate limiting is an atomic upsert, so nothing needs leader election.
+  **One caveat, and it is visible to the client:** Next's page cache is per-instance on local disk,
+  so publishing an essay or saving a price only refreshes the instance that handled the request.
+  Other instances keep serving the previous version until their **1-hour** backstop expires — the
+  client presses Publish, sees it live, refreshes, and sees it gone. If you run more than one
+  instance, either pin `/admin` to one via a sticky route, or ask for a shared cache handler
+  (roughly a day's work). **A single instance has none of this** and is the expected shape here.
 - **TLS** terminates at your proxy. `APP_URL` must be `https://` in production or session cookies
   will not be sent.
 

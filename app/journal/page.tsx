@@ -3,6 +3,7 @@ import Preloader from "../_components/Preloader";
 import Nav from "../_components/Nav";
 import SiteRuntime from "../_components/SiteRuntime";
 import JournalIndex from "../_sections/JournalIndex";
+import { getPublishedPosts } from "@/lib/journal";
 import Footer from "../_sections/Footer";
 
 /* /journal — the Journal index. Server component that assembles the shared chrome
@@ -19,13 +20,18 @@ export const metadata: Metadata = {
     "Scent as culture — composition, provenance and memory. Notes from a house that begins with scent.",
 };
 
-export default function JournalPage() {
+/* ISR, like the article route: prerendered, revalidated when the client publishes. */
+export const revalidate = 3600;
+
+export default async function JournalPage() {
+  const essays = await getPublishedPosts();
+
   return (
     <>
       <Preloader />
       <Nav />
       <main id="top">
-        <JournalIndex />
+        <JournalIndex essays={essays} />
       </main>
       <Footer />
       <SiteRuntime />

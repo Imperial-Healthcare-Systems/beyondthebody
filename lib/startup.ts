@@ -11,6 +11,7 @@ import { logger } from "./logger";
 import { ensureRecurringJobs, registerMaintenanceJobs, startWorker } from "./jobs";
 import { registerMailJobs } from "./mail";
 import { checkCatalogueParity, seedVariants } from "./catalogue";
+import { seedPosts } from "./journal";
 import { seedSettings } from "./settings";
 
 let started = false;
@@ -57,6 +58,9 @@ export async function startup() {
     try {
       await seedSettings();
       await seedVariants();
+      /* Migrates the three frozen essays out of journal-data.ts on first boot. Skips any
+         slug already present, so it never overwrites what the client has since edited. */
+      await seedPosts();
       await ensureRecurringJobs();
       startWorker();
 
