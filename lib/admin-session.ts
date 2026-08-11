@@ -17,29 +17,38 @@ import { validateSession, type AdminRole, type AdminUser } from "./auth";
 
 /* The `__Host-` prefix is the strongest cookie guarantee available: the browser refuses
    it unless it is Secure, Path=/ and has no Domain, which means a subdomain cannot set or
-   overwrite it. It requires HTTPS, so development (plain http) uses an unprefixed name. */
-export const SESSION_COOKIE = isProduction() ? "__Host-btb_admin" : "btb_admin";
+   overwrite it. It requires HTTPS, so development (plain http) uses an unprefixed name.
+ *
+ * Computed lazily, NOT at module scope. `next build` imports every route module to
+ * collect page data, and reading the environment at import time makes a full env a build
+ * requirement — which broke the build on a machine with no database. Same trap as the
+ * eager connection pool in db/client.ts; both were caught by building without .env.local. */
+export function sessionCookieName(): string {
+  return isProduction() ? "__Host-btb_admin" : "btb_admin";
+}
 
-const baseCookie = {
-  httpOnly: true, // never readable from JavaScript, so XSS cannot exfiltrate it
-  sameSite: "lax" as const, // survives following a magic link from an email client
-  secure: isProduction(),
-  path: "/",
-};
+function baseCookie() {
+  return {
+    httpOnly: true, // never readable from JavaScript, so XSS cannot exfiltrate it
+    sameSite: "lax" as const, // survives following a magic link from an email client
+    secure: isProduction(),
+    path: "/",
+  };
+}
 
 export async function setSessionCookie(token: string, expiresAt: Date) {
   const jar = await cookies();
-  jar.set(SESSION_COOKIE, token, { ...baseCookie, expires: expiresAt });
+  jar.set(sessionCookieName(), token, { ...baseCookie(), expires: expiresAt });
 }
 
 export async function clearSessionCookie() {
   const jar = await cookies();
-  jar.set(SESSION_COOKIE, "", { ...baseCookie, maxAge: 0 });
+  jar.set(sessionCookieName(), "", { ...baseCookie(), maxAge: 0 });
 }
 
 export async function readSessionToken(): Promise<string | null> {
   const jar = await cookies();
-  return jar.get(SESSION_COOKIE)?.value ?? null;
+  return jar.get(sessionCookieName())?.value ?? null;
 }
 
 /** The current staff user, or null. Safe to call anywhere. */

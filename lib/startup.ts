@@ -10,6 +10,7 @@ import { loadEnv } from "./env";
 import { logger } from "./logger";
 import { ensureRecurringJobs, registerMaintenanceJobs, startWorker } from "./jobs";
 import { registerMailJobs } from "./mail";
+import { checkCatalogueParity, seedVariants } from "./catalogue";
 import { seedSettings } from "./settings";
 
 let started = false;
@@ -55,8 +56,28 @@ export async function startup() {
   if (env.WORKER_ENABLED) {
     try {
       await seedSettings();
+      await seedVariants();
       await ensureRecurringJobs();
       startWorker();
+
+      /* Catalogue parity. The failure this catches: a developer adds a scent to
+         products-data.ts, ships it, and it appears on the site with no commercial row —
+         no price, no stock, no HSN code — and nobody notices until someone tries to buy
+         it. Reported loudly, but not fatal: refusing to boot over it would take the
+         whole editorial site down for one unpriced SKU. */
+      const parity = await checkCatalogueParity();
+      if (parity.missingInDb.length > 0) {
+        logger.error("boot.catalogue_missing_rows", {
+          skus: parity.missingInDb,
+          detail: "SKUs exist in products-data.ts with no product_variant row.",
+        });
+      }
+      if (parity.orphanedInDb.length > 0) {
+        logger.warn("boot.catalogue_orphans", {
+          skus: parity.orphanedInDb,
+          detail: "product_variant rows with no SKU in code — expected for discontinued scents.",
+        });
+      }
     } catch (err) {
       /* The database being briefly unavailable at boot must not stop the site from
          serving. The worker's own loop retries, and settings fall back to defaults. */

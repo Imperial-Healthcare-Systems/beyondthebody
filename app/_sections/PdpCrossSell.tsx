@@ -19,11 +19,23 @@ const fromPrice = (p: Product): number | null => {
   return prices.length ? Math.min(...prices) : null;
 };
 
-export default function PdpCrossSell({ product }: { product: Product }) {
+export default function PdpCrossSell({
+  product,
+  /* Optional: the same scents already resolved against the live prices in the database.
+     The real PDP passes them so the "from" figure matches what the client set in admin;
+     without it we fall back to the price compiled into products-data.ts, which is what
+     the /preview isolation route needs since it renders sections with no server data. */
+  related: resolved,
+}: {
+  product: Product;
+  related?: Product[];
+}) {
   const root = useRef<HTMLElement>(null);
-  const related = product.crossSell
-    .map((slug) => productBySlug(slug))
-    .filter((p): p is Product => Boolean(p));
+  const related =
+    resolved ??
+    product.crossSell
+      .map((slug) => productBySlug(slug))
+      .filter((p): p is Product => Boolean(p));
 
   useEffect(() => {
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
