@@ -110,6 +110,35 @@ export function confirmSubscriptionEmail(confirmUrl: string) {
   return { subject: "Confirm your place on the house list", text, html };
 }
 
+export function adminSignInEmail(signInUrl: string, expiryMinutes: number) {
+  const text = [
+    "Sign in to Beyond The Body",
+    "",
+    `Use the link below to sign in. It works once and expires in ${expiryMinutes} minutes.`,
+    "",
+    signInUrl,
+    "",
+    "If you didn't ask to sign in, ignore this — the link does nothing on its own,",
+    "and no one can sign in without it.",
+  ].join("\n");
+
+  const html = layout({
+    preheader: "Your sign-in link.",
+    body: `
+      <p style="margin:0 0 18px;">Sign in to the house.</p>
+      <p style="margin:0;font-size:15px;color:${INK_MUTED};font-family:Helvetica,Arial,sans-serif;line-height:1.8;">
+        This link works once and expires in ${expiryMinutes} minutes.
+      </p>
+      ${button(signInUrl, "Sign in")}
+      <p style="margin:0;font-size:13px;color:${INK_MUTED};font-family:Helvetica,Arial,sans-serif;line-height:1.8;">
+        If you didn&rsquo;t ask to sign in, ignore this note &mdash; the link does nothing on its
+        own, and no one can sign in without it.
+      </p>`,
+  });
+
+  return { subject: "Your sign-in link", text, html };
+}
+
 export function welcomeEmail(unsubscribeUrl: string) {
   const text = [
     "You're on the list.",

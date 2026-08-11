@@ -1,0 +1,124 @@
+/* Admin styling — plain and utilitarian on purpose.
+ *
+ * This is a tool, not the editorial experience. No GSAP, no preloader, no custom
+ * choreography: the client opens it to change a price or read a subscriber list and
+ * leaves. It borrows the house palette so it does not feel like a different product, and
+ * borrows nothing else — every animation the site carries would be friction here. */
+
+.adm {
+  --adm-bg: #faf7f1;
+  --adm-panel: #ffffff;
+  --adm-line: #e3d9c8;
+  --adm-ink: #2a1019;
+  --adm-muted: #7a6558;
+  --adm-accent: #4e212d;
+
+  min-height: 100svh;
+  background: var(--adm-bg);
+  color: var(--adm-ink);
+  font-family: var(--ff-body, "Archivo", system-ui, sans-serif);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.adm__bar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 14px 24px;
+  background: var(--adm-accent);
+  color: #f5efe4;
+  flex-wrap: wrap;
+}
+
+.adm__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.adm__nav { display: flex; gap: 18px; flex-wrap: wrap; }
+
+.adm__nav a {
+  color: #e6d8c4;
+  text-decoration: none;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
+}
+.adm__nav a:hover, .adm__nav a[aria-current="page"] {
+  color: #fff;
+  border-bottom-color: var(--adm-line);
+}
+
+.adm__who { margin-left: auto; display: flex; align-items: center; gap: 14px; font-size: 12px; color: #e6d8c4; }
+
+.adm__main { max-width: 1080px; margin: 0 auto; padding: 32px 24px 64px; }
+
+.adm__h1 {
+  margin: 0 0 4px;
+  font-family: var(--ff-display, "Fraunces", Georgia, serif);
+  font-weight: 400;
+  font-size: 26px;
+}
+.adm__sub { margin: 0 0 28px; color: var(--adm-muted); font-size: 13px; }
+
+.adm__panel {
+  background: var(--adm-panel);
+  border: 1px solid var(--adm-line);
+  padding: 22px;
+  margin-bottom: 20px;
+}
+
+.adm__stats { display: flex; gap: 20px; flex-wrap: wrap; }
+.adm__stat { flex: 1 1 150px; }
+.adm__statnum { font-size: 30px; font-family: var(--ff-display, Georgia, serif); line-height: 1.1; }
+.adm__statlabel { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--adm-muted); }
+
+.adm__table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.adm__table th {
+  text-align: left; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--adm-muted); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--adm-line);
+}
+.adm__table td { padding: 10px; border-bottom: 1px solid #f0eade; vertical-align: top; }
+.adm__table tr:last-child td { border-bottom: 0; }
+.adm__scroll { overflow-x: auto; }
+
+.adm__tag {
+  display: inline-block; padding: 2px 8px; font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; border: 1px solid var(--adm-line); color: var(--adm-muted);
+}
+.adm__tag--confirmed { border-color: #7f9b7a; color: #4a6b46; }
+.adm__tag--pending { border-color: #c8a86a; color: #8a6a2a; }
+.adm__tag--unsubscribed, .adm__tag--bounced { border-color: #c39a9a; color: #8a4a4a; }
+
+.adm__btn {
+  display: inline-block; padding: 10px 18px; border: 0; cursor: pointer;
+  background: var(--adm-accent); color: #f5efe4;
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  text-decoration: none; font-family: inherit;
+}
+.adm__btn:hover { opacity: 0.9; }
+.adm__btn:disabled { opacity: 0.5; cursor: default; }
+.adm__btn--ghost { background: transparent; color: var(--adm-accent); border: 1px solid var(--adm-line); }
+
+.adm__field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; max-width: 380px; }
+.adm__label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--adm-muted); }
+.adm__input {
+  padding: 11px 12px; border: 1px solid var(--adm-line); background: #fff;
+  font-family: inherit; font-size: 14px; color: var(--adm-ink);
+}
+.adm__input:focus { outline: 2px solid var(--adm-accent); outline-offset: -1px; }
+
+.adm__note { font-size: 13px; color: var(--adm-muted); margin: 12px 0 0; }
+.adm__error { font-size: 13px; color: #8a4a4a; margin: 12px 0 0; }
+
+.adm__empty { padding: 28px; text-align: center; color: var(--adm-muted); font-size: 13px; }
+
+/* Sign-in — centred, no chrome */
+.adm__center { min-height: 100svh; display: grid; place-items: center; padding: 24px; }
+.adm__card { width: 100%; max-width: 400px; background: var(--adm-panel); border: 1px solid var(--adm-line); padding: 32px; }

@@ -223,6 +223,11 @@ export function registerMaintenanceJobs() {
       .delete(job)
       .where(and(sql`${job.doneAt} is not null`, lte(job.doneAt, jobCutoff)));
 
+    /* Spent sign-in tokens and dead sessions. Folded into the existing sweep rather than
+       given its own job kind — same cadence, same purpose, one less moving part. */
+    const { purgeExpiredAuth } = await import("./auth");
+    await purgeExpiredAuth();
+
     logger.info("maintenance.cleanup.done");
   });
 }
