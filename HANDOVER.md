@@ -1,6 +1,6 @@
 # Handover checklist — what the backend needs from you
 
-**Living document.** Updated at every safepoint as phases land. Last updated: **2026-08-11 (S6)**.
+**Living document.** Updated at every safepoint as phases land. Last updated: **2026-08-11 (S7)**.
 
 Two audiences, and it matters which is which — sending an infrastructure question to the client or
 a pricing question to a sysadmin is how these things stall for a week:
@@ -71,9 +71,15 @@ COD is **enabled** per the client's direction (essential in the Indian market).
 Note: a COD order commits stock with **no money received**, and someone must mark it collected in
 admin when the courier remits. There is no webhook for cash.
 
-**How you find out an order came in, today:** an email to `ORDERS_EMAIL` (§B2) the moment it is
-placed, carrying the address, the items and the phone number. Until the admin order screens land,
-that email is the only notification — so it must point at a mailbox somebody opens each morning.
+**How you find out an order came in:** an email to `ORDERS_EMAIL` (§B2) the moment it is placed,
+carrying the address, the items and the phone number — and, since S7, `/admin/orders` opens on
+exactly the orders that need doing something about. The email should still point at a mailbox
+somebody opens each morning; it is the thing that tells you to go and look.
+
+**Recording the cash** is one screen: tick the orders a courier has settled, press one button. It
+takes a batch because that is how couriers remit. It records the **money** and deliberately leaves
+the parcel's status alone — a COD parcel is often delivered days before the money reaches you, and
+the shop should not have to pretend otherwise. `/admin` shows the running total you are owed.
 
 One number can place **three COD orders a day**. That is the anti-abuse limit, not a business rule;
 say the word and it moves.
@@ -146,6 +152,28 @@ things follow, and all three are yours to decide rather than ours:
 | **Stock is not tracked** | Every SKU is always buyable. Turn tracking on per SKU in `/admin/prices` once real counts exist; until then nothing can read "sold out" by accident |
 | **`store_open` closes checkout instantly** | One setting, no deploy — useful around a drop, or if fulfilment falls behind |
 | **Card and UPI arrive the moment the keys do** | §A7. Nothing else changes, and cash on delivery keeps working either way |
+
+### A10 · Courier and despatch ☐ *(new at S7)*
+
+You can now run an order end to end from `/admin/orders`: **start packing → mark shipped → mark
+delivered**, with cancel and "came back to us" where they apply. Marking it shipped emails the
+customer with whatever courier name, tracking number and tracking link you typed, and the same
+details appear on their own order page.
+
+| Needed | Why it is being asked |
+|---|---|
+| Which courier(s) will you use? | So the tracking link can be built for you instead of pasted each time |
+| Do you have an account with them yet? | Nothing in the site depends on it, but nothing ships without it |
+| Who does the packing — you, or someone else? | If it is someone else, they currently need an **owner** login, which also sees prices and refunds |
+
+**No courier API is integrated, on purpose.** At this volume, typing a tracking number takes seconds
+a day; an integration is a per-courier contract, a set of credentials, and a new way for despatch to
+break at four in the afternoon. If volume grows enough that it stops being seconds, it is a
+self-contained piece of work to add later.
+
+**If a separate packer login is wanted**, that is a third role (owner / editor / fulfilment) and
+roughly half a day. It was left out because two or three staff do not need it — but it is the right
+answer the moment somebody who should not see refunds is doing the packing.
 
 ---
 
@@ -241,6 +269,12 @@ the Journal. Give `owner` only where prices and the subscriber list are genuinel
 - **`GET /api/health`** → `200 {"status":"ok"}`, or `503` when the database is unreachable. Point
   the load balancer at it.
 - **Logs** are one JSON object per line on stdout — ship them with whatever you already run.
+  **Two lines are worth an alert rule**, because nothing else will tell you:
+  `"msg":"inventory.drift"` — the stock counter and the stock ledger disagree, checked daily. It
+  means a sale or a restock did not land where it should have, and the count on the site is now
+  fiction. It reports and never repairs, so somebody has to look.
+  `"msg":"boot.razorpay_test_keys_in_production"` — payments will appear to succeed and no money
+  will ever arrive.
 - **Backups**: nightly `pg_dump` at minimum, and **rehearse a restore** before launch.
 - **Multiple instances are safe** if you want them: job claiming uses `FOR UPDATE SKIP LOCKED` and
   rate limiting is an atomic upsert, so nothing needs leader election.
@@ -264,8 +298,8 @@ Everything else can follow the site live. These cannot:
    orders and hears nothing assumes it failed. *Deployment team.*
 2. **§B2 · `APP_URL` correct.** Every emailed link is built from it, including the customer's own
    order page. *Deployment team.*
-3. **§B2 · `ORDERS_EMAIL` pointing at a monitored mailbox.** Until the admin order screens ship it
-   is the only way the house learns an order arrived. *Deployment team.*
+3. **§B2 · `ORDERS_EMAIL` pointing at a monitored mailbox.** The order screens exist now, but this
+   is still what tells the house to go and look at them. *Deployment team.*
 4. **§B3 · `TRUSTED_PROXY_HOPS` matching the real topology.** *Deployment team.*
 5. **§B6 · At least one owner account created.** *Deployment team.*
 6. **§A1 · Real prices.** ₹1,899 is a placeholder, and checkout now charges it. *Client.*

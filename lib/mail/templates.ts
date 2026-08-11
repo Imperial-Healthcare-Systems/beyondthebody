@@ -365,3 +365,80 @@ export function newOrderNotificationEmail(order: MailOrder, items: MailItem[]) {
 
   return { subject: `${order.orderNumber} · ${method} · ${formatMinor(order.totalMinor)}`, text, html };
 }
+
+/** "It's on its way." Sent once, when an order is marked shipped.
+ *
+ * Carries the tracking number only if there is one — a courier line that says "undefined"
+ * reads as a broken shop, and plenty of small consignments genuinely have no number. */
+export function orderShippedEmail(
+  order: MailOrder & { courier?: string | null; trackingNumber?: string | null; trackingUrl?: string | null },
+  items: MailItem[],
+  statusUrl: string
+) {
+  const address = addressLines(order.shippingAddress);
+  const cod = order.paymentMethod === "cod";
+
+  const trackingText = order.trackingNumber
+    ? [`${order.courier ?? "Courier"}: ${order.trackingNumber}`, ...(order.trackingUrl ? [order.trackingUrl] : [])]
+    : [];
+
+  const text = [
+    "It's on its way.",
+    "",
+    `Order ${order.orderNumber}`,
+    "",
+    ...items.map((it) => `${it.nameSnapshot} · ${it.sizeSnapshot}${it.qty > 1 ? ` × ${it.qty}` : ""}`),
+    "",
+    ...trackingText,
+    ...(trackingText.length > 0 ? [""] : []),
+    ...(cod ? [`Please keep ${formatMinor(order.totalMinor)} ready for the courier.`, ""] : []),
+    "Going to:",
+    ...address,
+    "",
+    statusUrl,
+    "",
+    "Beyond The Body — a house that begins with scent.",
+  ].join("\n");
+
+  const html = layout({
+    preheader: `Order ${order.orderNumber} has left the house.`,
+    body: `
+      <p style="margin:0 0 6px;">It&rsquo;s on its way.</p>
+      <p style="margin:0 0 26px;font-family:Helvetica,Arial,sans-serif;font-size:12px;
+                letter-spacing:.14em;text-transform:uppercase;color:${INK_MUTED};">
+        Order ${escapeHtml(order.orderNumber)}
+      </p>
+
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        ${itemsTable(items)}
+      </table>
+
+      ${
+        order.trackingNumber
+          ? `<p style="margin:24px 0 0;font-size:15px;font-family:Helvetica,Arial,sans-serif;
+                       color:${INK_MUTED};line-height:1.8;">
+               ${escapeHtml(order.courier ?? "Courier")}<br>
+               <span style="color:${OXBLOOD};">${escapeHtml(order.trackingNumber)}</span>
+             </p>`
+          : ""
+      }
+
+      ${
+        cod
+          ? `<p style="margin:22px 0 0;font-size:15px;font-family:Helvetica,Arial,sans-serif;
+                       color:${INK_MUTED};line-height:1.8;">
+               Please keep ${escapeHtml(formatMinor(order.totalMinor))} ready for the courier.
+             </p>`
+          : ""
+      }
+
+      <p style="margin:22px 0 0;font-size:15px;font-family:Helvetica,Arial,sans-serif;
+                color:${INK_MUTED};line-height:1.8;">
+        Going to:<br>${address.map(escapeHtml).join("<br>")}
+      </p>
+
+      ${button(order.trackingUrl || statusUrl, order.trackingUrl ? "Track it" : "Follow your order")}`,
+  });
+
+  return { subject: `${order.orderNumber} is on its way`, text, html };
+}

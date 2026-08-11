@@ -226,31 +226,52 @@ export async function releaseOrder(
 
     if (!released) return false;
 
-    const items = await tx.select().from(orderItem).where(eq(orderItem.orderId, orderId));
+    const lines = await restockOrderItems(tx, orderId, to === "expired" ? "order_expired" : "order_cancelled");
 
-    for (const item of items) {
-      /* Mirror of the decrement in placeOrder: only tracked SKUs move, so the ledger's
-         sum and stock_qty stay reconcilable. */
-      const restored = await tx.execute(sql`
-        update product_variant
-           set stock_qty = stock_qty + ${item.qty}
-         where sku = ${item.sku} and stock_tracked
-        returning sku
-      `);
-
-      if (restored.rows.length > 0) {
-        await tx.insert(inventoryMovement).values({
-          sku: item.sku,
-          delta: item.qty,
-          reason: to === "expired" ? "order_expired" : "order_cancelled",
-          orderId,
-        });
-      }
-    }
-
-    logger.info("order.released", { orderId, to, reason, lines: items.length });
+    logger.info("order.released", { orderId, to, reason, lines });
     return true;
   });
+}
+
+/**
+ * Put an order's items back on the shelf.
+ *
+ * Shared by every path that un-sells something — expiry, an admin cancellation, an RTO —
+ * so the ledger reason is the only thing that differs between them. The CALLER is
+ * responsible for having moved the order out of a live status first, in the same
+ * transaction; this function does not check, because the check that matters is the
+ * conditional UPDATE that decided the caller was the one doing it.
+ */
+export async function restockOrderItems(
+  tx: Executor,
+  orderId: string,
+  reason: "order_cancelled" | "order_expired" | "rto_returned",
+  actor?: string
+): Promise<number> {
+  const items = await tx.select().from(orderItem).where(eq(orderItem.orderId, orderId));
+
+  for (const item of items) {
+    /* Mirror of the decrement in placeOrder: only tracked SKUs move, so the ledger's sum
+       and stock_qty stay reconcilable. */
+    const restored = await tx.execute(sql`
+      update product_variant
+         set stock_qty = stock_qty + ${item.qty}
+       where sku = ${item.sku} and stock_tracked
+      returning sku
+    `);
+
+    if (restored.rows.length > 0) {
+      await tx.insert(inventoryMovement).values({
+        sku: item.sku,
+        delta: item.qty,
+        reason,
+        orderId,
+        actor: actor ?? null,
+      });
+    }
+  }
+
+  return items.length;
 }
 
 /* ── Background work ───────────────────────────────────────────────────────────── */

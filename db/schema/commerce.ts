@@ -110,8 +110,20 @@ export const order = pgTable(
        a correct one. */
     idempotencyKey: text("idempotency_key"),
 
+    /* Despatch. Columns rather than a `shipment` table: this house sends one parcel per
+       order, and a table would model a partial-shipment case that does not exist for four
+       fragrances. If it ever does, that is an additive migration — whereas a join table
+       nobody needs is a permanent tax on every query that touches an order. */
+    courier: text("courier"),
+    trackingNumber: text("tracking_number"),
+    trackingUrl: text("tracking_url"),
+
     placedAt: ts("placed_at").notNull().defaultNow(),
+    /* For COD this is stamped by a HUMAN in admin when the courier remits — there is no
+       webhook for cash. For prepaid the gateway decides it. */
     paidAt: ts("paid_at"),
+    shippedAt: ts("shipped_at"),
+    deliveredAt: ts("delivered_at"),
     cancelledAt: ts("cancelled_at"),
     updatedAt: ts("updated_at").notNull().defaultNow(),
   },

@@ -91,6 +91,22 @@ export default async function OrderPage({
             <p className="co__status">{status.label}</p>
             {status.line && <p className="co__lede">{status.line}</p>}
 
+            {/* Only once there is something to track. A courier's name with no number
+                beside it tells the customer nothing they can act on, so both the line and
+                the link appear only when they would be useful. */}
+            {order.trackingNumber && (
+              <p className="co__lede">
+                {order.courier ? `${order.courier} · ` : ""}
+                {order.trackingUrl ? (
+                  <a href={order.trackingUrl} target="_blank" rel="noopener noreferrer">
+                    {order.trackingNumber}
+                  </a>
+                ) : (
+                  order.trackingNumber
+                )}
+              </p>
+            )}
+
             <section className="co__panel">
               <h2>What you ordered</h2>
               <ul className="co__lines">

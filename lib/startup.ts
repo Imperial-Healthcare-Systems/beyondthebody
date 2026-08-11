@@ -10,6 +10,7 @@ import { loadEnv } from "./env";
 import { logger } from "./logger";
 import { ensureRecurringJobs, registerMaintenanceJobs, startWorker } from "./jobs";
 import { registerMailJobs } from "./mail";
+import { registerInventoryJobs } from "./inventory";
 import { registerPaymentJobs } from "./payments";
 import { isRazorpayConfigured, isTestMode } from "./razorpay";
 import { checkCatalogueParity, seedVariants } from "./catalogue";
@@ -72,6 +73,7 @@ export async function startup() {
   registerMaintenanceJobs();
   registerMailJobs();
   registerPaymentJobs();
+  registerInventoryJobs();
 
   if (env.WORKER_ENABLED) {
     try {

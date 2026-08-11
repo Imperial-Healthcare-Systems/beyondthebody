@@ -8,6 +8,7 @@ import { sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { subscriber } from "@/db/schema";
 import { requireAdminPage } from "@/lib/admin-session";
+import { orderCounts } from "@/lib/fulfilment";
 import { queueDepth } from "@/lib/jobs";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +32,13 @@ export default async function AdminHome({
   const admin = await requireAdminPage();
   const { denied } = await searchParams;
 
-  const [counts, queue] = await Promise.all([subscriberCounts(), queueDepth()]);
+  /* Order figures are owner business — an editor writes essays and has no reason to see
+     the day's takings. Fetched conditionally rather than fetched-and-hidden. */
+  const [counts, queue, orders] = await Promise.all([
+    subscriberCounts(),
+    queueDepth(),
+    admin.role === "owner" ? orderCounts() : null,
+  ]);
 
   return (
     <main className="adm__main">
@@ -44,6 +51,33 @@ export default async function AdminHome({
         <p className="adm__error" role="alert">
           That area needs owner access.
         </p>
+      )}
+
+      {orders && (
+        <section className="adm__panel">
+          <p className="adm__label" style={{ marginBottom: 14 }}>
+            Orders
+          </p>
+          <div className="adm__stats">
+            <div className="adm__stat">
+              <div className="adm__statnum">{orders.needsAction}</div>
+              <div className="adm__statlabel">Needs action</div>
+            </div>
+            <div className="adm__stat">
+              <div className="adm__statnum">{orders.shipped}</div>
+              <div className="adm__statlabel">On its way</div>
+            </div>
+            <div className="adm__stat">
+              <div className="adm__statnum">{orders.awaitingCash}</div>
+              <div className="adm__statlabel">
+                Cash to collect · ₹ {(orders.awaitingCashMinor / 100).toLocaleString("en-IN")}
+              </div>
+            </div>
+          </div>
+          <p className="adm__note">
+            <a href="/admin/orders">Open the order list →</a>
+          </p>
+        </section>
       )}
 
       <section className="adm__panel">
