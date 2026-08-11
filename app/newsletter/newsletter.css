@@ -1,0 +1,88 @@
+/* Landing pages for the emailed newsletter links (confirm / unsubscribe).
+   Deliberately quiet: these are transactional moments, not editorial ones. The register
+   borrows the sub-page mastheads (ivory ground, oxblood ink, rose-taupe eyebrow, Fraunces
+   at a light weight) so they still read as the house, without motion or chrome — the
+   visitor arrived here from an inbox to complete one action and leave. */
+
+.nlp {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 40px 24px;
+  background: var(--ivory, #f5efe4);
+  color: var(--oxblood, #4e212d);
+}
+
+.nlp__inner {
+  max-width: 46ch;
+  text-align: center;
+}
+
+.nlp__mark {
+  font-size: 30px;
+  line-height: 1;
+  color: var(--oxblood, #4e212d);
+}
+
+.nlp__eyebrow {
+  margin-top: 22px;
+  font-family: var(--ff-exp, "Archivo", system-ui, sans-serif);
+  font-size: 11px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--rose-taupe, #ae8f7b);
+}
+
+.nlp__title {
+  margin: 16px 0 0;
+  font-family: var(--ff-display, "Fraunces", Georgia, serif);
+  font-weight: 300;
+  font-size: clamp(28px, 5vw, 42px);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.nlp__body {
+  margin: 18px 0 0;
+  font-family: var(--ff-body, "Archivo", system-ui, sans-serif);
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--ink-muted, #7a6558);
+}
+
+.nlp__actions {
+  margin-top: 32px;
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.nlp__btn,
+.nlp__link {
+  font-family: var(--ff-exp, "Archivo", system-ui, sans-serif);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.nlp__btn {
+  padding: 14px 26px;
+  border: 0;
+  background: var(--oxblood, #4e212d);
+  color: var(--ivory, #f5efe4);
+  transition: opacity 0.25s ease;
+}
+
+.nlp__btn:hover { opacity: 0.86; }
+.nlp__btn:disabled { opacity: 0.5; cursor: default; }
+
+.nlp__link {
+  padding: 14px 0;
+  color: var(--ink-muted, #7a6558);
+  border-bottom: 1px solid currentColor;
+}
+
+.nlp__link:hover { color: var(--oxblood, #4e212d); }

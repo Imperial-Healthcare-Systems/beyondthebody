@@ -89,6 +89,13 @@
   margin: 0; font-family: var(--ff-display); font-style: italic; font-weight: 300;
   font-size: clamp(1.2rem, 2vw, 1.6rem); color: var(--ink);
 }
+/* Signup failure (network down, server error). Quiet and in the body face — a failed
+   field is not a moment for alarm colour in this register. */
+.ft__nl-error {
+  margin: 14px 0 0; font-family: var(--ff-body);
+  font-size: .82rem; line-height: 1.7; color: var(--ink-muted);
+}
+.ft__input:disabled, .ft__submit:disabled { opacity: .55; cursor: default; }
 
 /* 1 · mega row — monogram + big-type nav */
 .ft__mega-row {
