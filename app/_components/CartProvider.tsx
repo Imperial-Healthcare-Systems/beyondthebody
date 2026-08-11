@@ -50,6 +50,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(KEY);
+      /* eslint-disable-next-line react-hooks/set-state-in-effect --
+         This is the case the rule cannot express: a one-shot read of an external store
+         (localStorage) AFTER hydration. It cannot move into useState's initialiser — the
+         server has no localStorage, so the server would render an empty bag and the client
+         a full one, which is a hydration mismatch rather than a fix. useSyncExternalStore
+         is the by-the-book alternative and would rewrite the storage layer of a working
+         cart to satisfy a lint rule, changing no behaviour. */
       if (raw) setItems(JSON.parse(raw));
     } catch {
       /* ignore corrupt storage */

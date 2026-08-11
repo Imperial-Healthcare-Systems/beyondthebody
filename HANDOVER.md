@@ -1,6 +1,6 @@
 # Handover checklist — what the backend needs from you
 
-**Living document.** Updated at every safepoint as phases land. Last updated: **2026-08-11 (S7)**.
+**Living document.** Updated at every safepoint as phases land. Last updated: **2026-08-11 (S8)**.
 
 Two audiences, and it matters which is which — sending an infrastructure question to the client or
 a pricing question to a sysadmin is how these things stall for a week:
@@ -84,20 +84,44 @@ the shop should not have to pretend otherwise. `/admin` shows the running total 
 One number can place **three COD orders a day**. That is the anti-abuse limit, not a business rule;
 say the word and it moves.
 
-### A5 · Legal pages ☐ — **blocks Razorpay**
+### A5 · Legal pages ◐ — **written and live; eighteen facts are yours** — **blocks Razorpay**
 
-Razorpay will not activate a live account without these published. They are currently inert `#`
-placeholders in the footer, so this is on the critical path to taking payment.
+Four pages now exist, in the house's own register, linked from the footer and listed in the
+sitemap: **[/privacy](/privacy) · [/terms](/terms) · [/shipping](/shipping) · [/refunds](/refunds)**.
+Razorpay will not activate a live account without them.
 
-- Privacy policy · Terms · **Refund / cancellation policy** · Shipping policy · Contact
+**What we wrote, and what we deliberately did not.** Everything the software actually knows is
+stated plainly and is true today — what is collected and when, that your customers' card details
+never touch this website, that there are no analytics or advertising trackers of any kind, what the
+bag stores in a browser, and the delivery charge, which is read live from the same setting checkout
+uses so the page can never contradict the total.
 
-Who writes them, and do they get the house's editorial treatment or plain legal pages?
+Everything that belongs to the house rather than to the software is left **visibly blank** — an
+amber `« … to confirm »` marker you cannot miss on the page. That is on purpose. A plausible-sounding
+invented refund window is worse than a blank, because a blank gets filled in and a guess gets relied
+upon by a customer and quoted back at you.
 
-### A6 · Real contact details ☐
+**⚠ These pages are live with the blanks showing.** They read as unfinished to anyone who visits,
+which is correct while the site is unlaunched — but they must be filled before launch and before
+Razorpay reviews them.
+
+| Page | What we need from you |
+|---|---|
+| **Privacy** | Registered legal name · registered address · grievance officer's name and contact (required by the IT Rules) · where the database is hosted · how long order records are kept · how quickly you answer a data request |
+| **Terms** | Registered legal name · registered address · GSTIN if registered · city of jurisdiction · any allergen / patch-test / age statement you want to make |
+| **Shipping** | Packing time · delivery window · any regions that take longer · whether you ship internationally · how many delivery attempts a courier makes |
+| **Refunds** | Window to report a damaged or wrong item · whether unopened bottles can be returned, within how many days, and who pays return postage · whether delivery is refunded on a change of mind · typical bank clearing time for a refund |
+
+Send us the answers in any form — a list, an email, a voice note — and we will set them. Or, if you
+would rather a solicitor drafted these from scratch, the pages are a structure they can fill.
+
+### A6 · Real contact details ☐ — **more urgent since S8**
 
 Still flagged as placeholders in the code:
 
-- **`hello@beyondthebody.com`** — is this the real address?
+- **`hello@beyondthebody.com`** — is this the real address? It is now the address the four legal
+  pages tell customers to write to for a refund, a complaint, or a request to see their own data.
+  If nobody reads that mailbox, the site is making a promise it does not keep.
 - Instagram and LinkedIn URLs — currently placeholder links
 
 ### A7 · Razorpay ☐ — **built and waiting; the keys are the only missing piece**
@@ -250,6 +274,29 @@ npm start
 Migrations are a separate step on purpose: several instances starting at once would otherwise
 migrate concurrently. Run it **once** per deploy, before the new version serves traffic.
 
+**Every migration so far is additive** — new tables and nullable columns, no drops, no renames,
+no type changes. That means the previous version of the app keeps working against the new schema,
+so a deploy can be rolled back by putting the old build back without touching the database. Check
+the SQL by eye before assuming that of a future one.
+
+**Before the first deploy, and after any change to the reverse proxy**, run the smoke checks. They
+need a production build and take a couple of minutes:
+
+```bash
+npm run build && npm start                      # in one shell
+node scripts/verify-hardening.mjs https://your-host    # in another
+```
+
+42 checks: the security headers are present and correct, the CSP breaks no page and still lets the
+payment sheet load, the design routes are closed, robots and the sitemap agree about what is public,
+and an unknown address returns a real 404. **Run this against the host as customers reach it, not
+against localhost** — a proxy that strips or rewrites headers is exactly what it is there to catch.
+
+The other verification scripts exist for the same reason and are worth a run after any
+infrastructure change: `verify-checkout.mjs` (a real purchase), `verify-fulfilment.mjs` (running an
+order; needs an owner sign-in link), `verify-payments.mjs` (the webhook path), `verify-journal.mjs`
+(publishing).
+
 ### B6 · First admin account ☐
 
 There is no sign-up page and no way to grant yourself access through the web — deliberate.
@@ -276,6 +323,25 @@ the Journal. Give `owner` only where prices and the subscriber list are genuinel
   `"msg":"boot.razorpay_test_keys_in_production"` — payments will appear to succeed and no money
   will ever arrive.
 - **Backups**: nightly `pg_dump` at minimum, and **rehearse a restore** before launch.
+
+  This one is yours and cannot be done for you — a restore rehearsed against a development
+  database proves nothing about yours. What it needs to prove:
+
+  1. A dump taken by the scheduled job, not by hand, restores into an **empty** database.
+  2. The app boots against the restored copy: `npm run db:migrate` reports nothing to do, and
+     `/api/health` returns 200.
+  3. An order placed before the dump is present and complete — order, its lines, and its
+     `inventory_movement` rows. Orders are the only data here that cannot be reconstructed from
+     anything else; the catalogue and the three seed essays rebuild themselves from code on boot.
+  4. Write down how long the whole thing took. That number is your actual recovery time, and it is
+     usually the surprise.
+
+  **Where the backup is stored matters as much as that it exists.** A dump on the same host as the
+  database is not a backup of that host.
+- **Secrets**: `SESSION_SECRET` and the Razorpay keys are the two that matter. Rotating
+  `SESSION_SECRET` signs every staff member out and is otherwise harmless — worth doing if a laptop
+  is lost. Rotating the Razorpay keys is done in their dashboard and needs a deploy of the new
+  values; the webhook secret is separate from the API key and both must be updated together.
 - **Multiple instances are safe** if you want them: job claiming uses `FOR UPDATE SKIP LOCKED` and
   rate limiting is an atomic upsert, so nothing needs leader election.
   **One caveat, and it is visible to the client:** Next's page cache is per-instance on local disk,
@@ -303,8 +369,10 @@ Everything else can follow the site live. These cannot:
 4. **§B3 · `TRUSTED_PROXY_HOPS` matching the real topology.** *Deployment team.*
 5. **§B6 · At least one owner account created.** *Deployment team.*
 6. **§A1 · Real prices.** ₹1,899 is a placeholder, and checkout now charges it. *Client.*
-7. **§A5 · Legal pages published** — blocks Razorpay activation, so it blocks prepaid payment.
-   Does **not** block a COD-only store. *Client.*
+7. **§A5 · The eighteen blanks in the legal pages filled.** The pages are written and live; they
+   currently show amber `« to confirm »` markers where facts only you have belong. Blocks Razorpay
+   activation, so it blocks prepaid payment. Does **not** block a COD-only store, but it does look
+   unfinished to a visitor. *Client.*
 8. **§A2 · GST**, if the client is registered — invoices are wrong without it. *Client's accountant.*
 
 ---

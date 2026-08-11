@@ -42,6 +42,11 @@ export default function PdpBlueprint({ product }: { product: Product }) {
   // viewers keep the static oxblood ground.
   const [motionOK, setMotionOK] = useState(false);
   useEffect(() => {
+    /* eslint-disable-next-line react-hooks/set-state-in-effect --
+       Reading a media query is exactly the "synchronise with an external system" the rule
+       exists to permit; it just cannot see that from here. Starting false and flipping on
+       mount is deliberate — it is what makes SSR and first paint agree, and it fails to
+       the reduced-motion side, which is the safe one. */
     setMotionOK(!window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   }, []);
 

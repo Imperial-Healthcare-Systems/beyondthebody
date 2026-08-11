@@ -52,6 +52,15 @@ const EnvSchema = z.object({
 
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
 
+  /* /preview/* and /mockup/* are design-comparison routes from the build — half-finished
+     sections, alternate treatments, a collage that exists to be argued over. They are not
+     the site and must not be findable, so they are OFF in production.
+     Kept as a switch rather than a hard `NODE_ENV` test because staging IS production as
+     far as NODE_ENV is concerned, and the designer looking at a treatment on staging is a
+     real thing that will be wanted. Unset means "on everywhere but production" — see
+     designRoutesEnabled(). */
+  DESIGN_ROUTES: z.enum(["true", "false", "1", "0"]).optional(),
+
   /* Background worker. Off during builds and in one-shot scripts; on in a running
      server. Set false on any instance that should not process jobs. */
   WORKER_ENABLED: booleanish("true"),
@@ -126,6 +135,19 @@ export const env = new Proxy({} as Env, {
 });
 
 export const isProduction = () => loadEnv().NODE_ENV === "production";
+
+/**
+ * Are the design-comparison routes (`/preview/*`, `/mockup/*`) reachable?
+ *
+ * Unset is the answer almost everyone wants: on while developing, off once it is the
+ * real site. Setting DESIGN_ROUTES explicitly overrides that in either direction, which
+ * is how a designer gets to look at a treatment on staging.
+ */
+export function designRoutesEnabled(): boolean {
+  const explicit = loadEnv().DESIGN_ROUTES;
+  if (explicit !== undefined) return explicit === "true" || explicit === "1";
+  return !isProduction();
+}
 
 /** Test-only. Lets a suite swap the environment between cases. */
 export function __resetEnvCache() {

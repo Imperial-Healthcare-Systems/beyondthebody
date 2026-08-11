@@ -325,9 +325,13 @@ export default function Footer() {
         <span className="ft__copy">© 2026 Beyond The Body</span>
         <span className="ft__made">Built in India, with care, by Imperial Tech Innovations</span>
         <span className="ft__legal-links">
-          <a {...placeholderProps}>Privacy</a>
-          <a {...placeholderProps}>Terms</a>
-          <a {...placeholderProps}>Cookies</a>
+          {/* Real routes since S8. "Cookies" is gone rather than pointed somewhere: this
+              site sets no advertising or measurement cookie, so a cookie policy would be a
+              page about nothing. What it would have said lives under Privacy. */}
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+          <a href="/shipping">Shipping</a>
+          <a href="/refunds">Returns</a>
         </span>
       </div>
 

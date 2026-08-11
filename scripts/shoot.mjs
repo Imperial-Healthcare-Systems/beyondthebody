@@ -65,7 +65,10 @@ for (const vp of VIEWPORTS) {
       "nextjs-portal,#__next-build-watcher,[data-nextjs-dev-tools-button]{display:none!important}",
   });
   await page.evaluate(async () => {
-    // @ts-ignore
+    /* Runs in the BROWSER, where `document` exists; the checker sees Node's globals here
+       and cannot know that. @ts-expect-error rather than @ts-ignore so this comment
+       becomes an error itself the day the types line up and it is no longer needed. */
+    // @ts-expect-error -- document is the page's, not Node's
     if (document.fonts?.ready) await document.fonts.ready;
   });
   await page.waitForTimeout(2400); // let entrance timelines + easing fully settle
