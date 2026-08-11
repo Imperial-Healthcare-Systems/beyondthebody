@@ -208,16 +208,35 @@
 .co__textarea { resize: vertical; }
 
 /* ── Payment ──────────────────────────────────────────────────────────────── */
+/* One row per method. A <label> when there is a choice to make and a <div> when there is
+   only one — a radio button with nothing to choose between is a control that does
+   nothing, so the markup changes rather than the styling. */
 .co__pay {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 4px;
   padding: 16px 18px;
   border: 1px solid var(--line-dark);
   margin-bottom: 12px;
+  cursor: pointer;
 }
+.co__pay:has(input) .co__payname,
+.co__pay:has(input) .co__paynote { grid-column: 2; }
+.co__pay:not(:has(input)) { grid-template-columns: 1fr; }
+
+.co__pay input[type="radio"] {
+  grid-row: 1 / span 2;
+  width: 15px;
+  height: 15px;
+  accent-color: var(--oxblood);
+  margin: 0;
+}
+
 .co__pay--on { border-color: var(--oxblood); }
-.co__pay--off { opacity: 0.5; }
+.co__pay--off { opacity: 0.5; cursor: default; }
+.co__pay:has(input:focus-visible) { outline: 1px solid var(--oxblood); outline-offset: 2px; }
 
 .co__payname { font-size: 0.95rem; }
 .co__paynote { font-size: 0.82rem; color: var(--rose-taupe); line-height: 1.6; }

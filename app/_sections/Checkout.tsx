@@ -39,9 +39,44 @@ type Quote = {
   totalMinor: number;
   taxInclusive: boolean;
   codAvailable: boolean;
+  prepaidAvailable: boolean;
   storeOpen: boolean;
   needsReview: boolean;
 };
+
+type PaymentMethod = "cod" | "prepaid";
+
+/* Razorpay Checkout is loaded from their CDN — it is a payment sheet, and self-hosting it
+   would mean shipping a stale copy of somebody else's security-critical code. Loaded ONLY
+   on this page and only once the customer has chosen to pay by card, so the rest of the
+   site carries no third-party script at all. */
+const RAZORPAY_SCRIPT = "https://checkout.razorpay.com/v1/checkout.js";
+
+declare global {
+  interface Window {
+    Razorpay?: new (options: Record<string, unknown>) => { open: () => void };
+  }
+}
+
+function loadRazorpay(): Promise<boolean> {
+  if (typeof window === "undefined") return Promise.resolve(false);
+  if (window.Razorpay) return Promise.resolve(true);
+
+  return new Promise((resolve) => {
+    const existing = document.querySelector<HTMLScriptElement>(`script[src="${RAZORPAY_SCRIPT}"]`);
+    if (existing) {
+      existing.addEventListener("load", () => resolve(Boolean(window.Razorpay)), { once: true });
+      existing.addEventListener("error", () => resolve(false), { once: true });
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = RAZORPAY_SCRIPT;
+    script.async = true;
+    script.onload = () => resolve(Boolean(window.Razorpay));
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
 
 const FIELDS = {
   name: "",
@@ -62,6 +97,7 @@ export default function Checkout() {
   const [quote, setQuote] = useState<Quote | null>(null);
   const [quoteFailed, setQuoteFailed] = useState(false);
   const [form, setForm] = useState(FIELDS);
+  const [method, setMethod] = useState<PaymentMethod>("cod");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -93,7 +129,7 @@ export default function Checkout() {
   const latestQuote = useRef(0);
 
   const refreshQuote = useCallback(
-    async (state?: string) => {
+    async (state?: string, paymentMethod: PaymentMethod = "cod") => {
       const ticket = ++latestQuote.current;
 
       /* Nothing sets state before the first await, deliberately: this runs from an effect
@@ -106,7 +142,7 @@ export default function Checkout() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             items: payload,
-            paymentMethod: "cod",
+            paymentMethod,
             ...(state ? { state } : {}),
           }),
         });
@@ -125,17 +161,89 @@ export default function Checkout() {
   );
 
   useEffect(() => {
-    /* Re-quotes on bag change and on state change (state decides GST place of supply);
-       every other keystroke leaves the total alone.
+    /* Re-quotes on bag change, on state change (state decides GST place of supply) and on
+       payment method (COD can carry a fee); every other keystroke leaves the total alone.
        The rule cannot see through the await inside refreshQuote: every setState there
        happens after the fetch resolves, so there is no synchronous cascade to avoid.
        Fetching remote data is what an effect is for. */
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (payload.length > 0) void refreshQuote(form.state || undefined);
-  }, [refreshQuote, form.state, payload.length]);
+    if (payload.length > 0) void refreshQuote(form.state || undefined, method);
+  }, [refreshQuote, form.state, method, payload.length]);
 
   const set = (key: keyof typeof FIELDS) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [key]: e.target.value }));
+
+  /* If the client switches COD off while somebody is mid-checkout, the choice they made
+     is no longer available. Derived rather than corrected with an effect: there is no
+     moment where the form is showing one method and about to submit another. */
+  const chosen: PaymentMethod =
+    quote && !quote.codAvailable && quote.prepaidAvailable ? "prepaid" : method;
+
+  /* Open Razorpay's payment sheet for an order that already exists on our side.
+   *
+   * Nothing here decides whether the order is paid. The handler tells our server what the
+   * gateway told the browser, the server checks it against Razorpay, and the webhook
+   * settles it regardless of whether any of this runs — a customer who closes the tab
+   * mid-payment still gets their order. */
+  async function payWithRazorpay(session: {
+    razorpayKeyId: string;
+    razorpayOrderId: string;
+    amountMinor: number;
+    orderNumber: string;
+    statusUrl: string;
+    prefill?: { name?: string; email?: string; contact?: string };
+  }) {
+    const ready = await loadRazorpay();
+    if (!ready) {
+      setError(
+        "The payment window couldn't load. Check your connection, or choose cash on delivery."
+      );
+      return;
+    }
+
+    const checkout = new window.Razorpay!({
+      key: session.razorpayKeyId,
+      order_id: session.razorpayOrderId,
+      amount: session.amountMinor,
+      currency: "INR",
+      name: "Beyond The Body",
+      description: session.orderNumber,
+      prefill: session.prefill ?? {},
+      theme: { color: "#4E212D" },
+
+      handler: async (response: Record<string, string>) => {
+        try {
+          await fetch("/api/v1/checkout/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+            }),
+          });
+        } catch {
+          /* Swallowed on purpose. The webhook is what actually completes the order, so a
+             failed confirmation call must not tell a customer who has paid that
+             something went wrong. The order page shows the real state. */
+        }
+        window.location.href = `${session.statusUrl}?placed=1`;
+      },
+
+      modal: {
+        ondismiss: () => {
+          /* The order exists and is holding stock; it expires by itself in half an hour
+             if nothing is paid. Say so plainly rather than leaving a dead form. */
+          setSubmitting(false);
+          setError(
+            "Payment wasn't completed. Your order is held for 30 minutes — try again, or choose cash on delivery."
+          );
+        },
+      },
+    });
+
+    checkout.open();
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -154,7 +262,7 @@ export default function Checkout() {
           items: payload,
           email: form.email,
           phone: form.phone,
-          paymentMethod: "cod",
+          paymentMethod: chosen,
           shippingAddress: {
             name: form.name,
             line1: form.line1,
@@ -176,8 +284,13 @@ export default function Checkout() {
         /* A price or stock change is the one failure the customer can act on, so show
            them the new figures immediately rather than making them hunt for what moved. */
         if (data?.error?.code === "price_changed" || data?.error?.code === "out_of_stock") {
-          await refreshQuote(form.state || undefined);
+          await refreshQuote(form.state || undefined, chosen);
         }
+        return;
+      }
+
+      if (chosen === "prepaid") {
+        await payWithRazorpay(data);
         return;
       }
 
@@ -370,24 +483,62 @@ export default function Checkout() {
             <fieldset className="co__set" disabled={submitting || closed}>
               <legend className="co__legend">How you pay</legend>
 
-              <div className="co__pay co__pay--on">
-                <span className="co__payname">Cash on delivery</span>
-                <span className="co__paynote">
-                  Pay the courier when it reaches you.
-                  {quote && quote.codFeeMinor > 0 ? ` A ${inr(quote.codFeeMinor)} handling charge applies.` : ""}
-                </span>
-              </div>
+              {quote?.prepaidAvailable ? (
+                <label className={`co__pay${chosen === "prepaid" ? " co__pay--on" : ""}`}>
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="prepaid"
+                    checked={chosen === "prepaid"}
+                    onChange={() => setMethod("prepaid")}
+                  />
+                  <span className="co__payname">Card, UPI &amp; netbanking</span>
+                  <span className="co__paynote">Pay now, securely, through Razorpay.</span>
+                </label>
+              ) : (
+                /* Present, and honest about not being ready. Hiding it would leave a
+                   customer wondering whether the house takes cards at all. */
+                <div className="co__pay co__pay--off" aria-disabled="true">
+                  <span className="co__payname">Card, UPI &amp; netbanking</span>
+                  <span className="co__paynote">Opening shortly.</span>
+                </div>
+              )}
 
-              {/* Present, and honest about not being ready. Hiding it would leave a
-                  customer wondering whether the house takes cards at all. */}
-              <div className="co__pay co__pay--off" aria-disabled="true">
-                <span className="co__payname">Card, UPI &amp; netbanking</span>
-                <span className="co__paynote">Opening shortly.</span>
-              </div>
+              {quote?.codAvailable !== false &&
+                (quote?.prepaidAvailable ? (
+                  <label className={`co__pay${chosen === "cod" ? " co__pay--on" : ""}`}>
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="cod"
+                      checked={chosen === "cod"}
+                      onChange={() => setMethod("cod")}
+                    />
+                    <span className="co__payname">Cash on delivery</span>
+                    <span className="co__paynote">
+                      Pay the courier when it reaches you.
+                      {quote && quote.codFeeMinor > 0
+                        ? ` A ${inr(quote.codFeeMinor)} handling charge applies.`
+                        : ""}
+                    </span>
+                  </label>
+                ) : (
+                  /* The only method available — a radio button with nothing to choose
+                     between is a control that does nothing. */
+                  <div className="co__pay co__pay--on">
+                    <span className="co__payname">Cash on delivery</span>
+                    <span className="co__paynote">
+                      Pay the courier when it reaches you.
+                      {quote && quote.codFeeMinor > 0
+                        ? ` A ${inr(quote.codFeeMinor)} handling charge applies.`
+                        : ""}
+                    </span>
+                  </div>
+                ))}
 
-              {quote && !quote.codAvailable && (
+              {quote && !quote.codAvailable && !quote.prepaidAvailable && (
                 <p className="co__issue" role="alert">
-                  Cash on delivery isn&rsquo;t available just now.
+                  No payment method is available just now. Please try again shortly.
                 </p>
               )}
             </fieldset>
@@ -409,9 +560,11 @@ export default function Checkout() {
               disabled={submitting || quoteFailed || closed || !quote || quote.lines.length === 0}
             >
               {submitting
-                ? "Placing your order…"
+                ? chosen === "prepaid"
+                  ? "Opening payment…"
+                  : "Placing your order…"
                 : quote
-                  ? `Place order — ${inr(quote.totalMinor)}`
+                  ? `${chosen === "prepaid" ? "Pay" : "Place order —"} ${inr(quote.totalMinor)}`
                   : "Place order"}
             </button>
 

@@ -1,6 +1,6 @@
 # Handover checklist — what the backend needs from you
 
-**Living document.** Updated at every safepoint as phases land. Last updated: **2026-08-11 (S5)**.
+**Living document.** Updated at every safepoint as phases land. Last updated: **2026-08-11 (S6)**.
 
 Two audiences, and it matters which is which — sending an infrastructure question to the client or
 a pricing question to a sysadmin is how these things stall for a week:
@@ -94,13 +94,32 @@ Still flagged as placeholders in the code:
 - **`hello@beyondthebody.com`** — is this the real address?
 - Instagram and LinkedIn URLs — currently placeholder links
 
-### A7 · Razorpay ☐ *(needed at S6, not before)*
+### A7 · Razorpay ☐ — **built and waiting; the keys are the only missing piece**
 
-Key ID, key secret, and webhook secret, for **test mode first**. S5 delivers a working COD store
-with no Razorpay account at all, so this does not gate commerce going live.
+Card, UPI and netbanking are fully implemented. Supplying three values turns them on: **no code
+change, no migration, no deploy flag.** Until then checkout offers cash on delivery and shows
+card/UPI as *"opening shortly"* — stated rather than hidden, so nobody wonders whether the house
+takes cards at all.
 
-Until they arrive, checkout offers cash on delivery and shows card/UPI as *"opening shortly"* —
-stated rather than hidden, so nobody is left wondering whether the house takes cards at all.
+| Needed | Where it comes from |
+|---|---|
+| `RAZORPAY_KEY_ID` | Dashboard → Settings → API Keys |
+| `RAZORPAY_KEY_SECRET` | shown once, at the moment the key is generated |
+| `RAZORPAY_WEBHOOK_SECRET` | a value **you choose** when creating the webhook |
+
+Plus one dashboard setting, which is not an environment variable and is easy to forget:
+
+> **Webhook URL:** `https://<your-domain>/api/webhooks/razorpay`
+> **Events:** `payment.captured` and `payment.failed`
+
+**Start in test mode.** Test keys begin `rzp_test_`, live keys `rzp_live_`. The app logs an error at
+every boot if a test key is used in production — that combination takes no money while appearing to
+work perfectly, which is the single most expensive way to get this wrong.
+
+The webhook is what actually completes an order — a customer whose UPI app swallows the redirect
+never returns to the site, and their order must still complete. If the webhook is never configured,
+payments still succeed at Razorpay but orders sit unpaid until a reconciliation job notices, which
+it does every ten minutes with a loud warning. That is a safety net, not a substitute.
 
 ### A8 · The Journal ☑ *(nothing needed to launch)*
 
@@ -126,6 +145,7 @@ things follow, and all three are yours to decide rather than ours:
 | **Prices are still ₹1,899 placeholders** | §A1 — this is now what a customer actually pays |
 | **Stock is not tracked** | Every SKU is always buyable. Turn tracking on per SKU in `/admin/prices` once real counts exist; until then nothing can read "sold out" by accident |
 | **`store_open` closes checkout instantly** | One setting, no deploy — useful around a drop, or if fulfilment falls behind |
+| **Card and UPI arrive the moment the keys do** | §A7. Nothing else changes, and cash on delivery keeps working either way |
 
 ---
 
@@ -152,7 +172,13 @@ kept current. The ones that need a real decision:
 | `TRUSTED_PROXY_HOPS` | **See B3 — easy to get dangerously wrong** |
 | `SMTP_*`, `MAIL_FROM` | See B4 |
 | `ORDERS_EMAIL` | Where the studio is told an order arrived. **Until the admin order screens ship this is the only notification** — point it at a monitored mailbox. Unset falls back to the `MAIL_FROM` address |
+| `RAZORPAY_*` | See §A7. All three together, or card/UPI stays closed. Also needs a webhook configured in their dashboard — the variable alone is not enough |
 | `SENTRY_DSN` | Optional. Absent = structured logs only, which is supported |
+
+**One thing about the webhook that is easy to miss:** `/api/webhooks/razorpay` must be reachable
+from the public internet and must **not** sit behind basic auth, an IP allow-list, or a WAF rule
+that strips request bodies. Its signature covers the raw body byte for byte, so anything in front
+of the app that reformats JSON will make every genuine delivery fail verification.
 
 ### B3 · Reverse proxy and client IPs ⚠ ☐
 

@@ -10,6 +10,8 @@ import { loadEnv } from "./env";
 import { logger } from "./logger";
 import { ensureRecurringJobs, registerMaintenanceJobs, startWorker } from "./jobs";
 import { registerMailJobs } from "./mail";
+import { registerPaymentJobs } from "./payments";
+import { isRazorpayConfigured, isTestMode } from "./razorpay";
 import { checkCatalogueParity, seedVariants } from "./catalogue";
 import { seedPosts } from "./journal";
 import { seedSettings } from "./settings";
@@ -49,10 +51,27 @@ export async function startup() {
     });
   }
 
+  /* Razorpay. Absent keys are a supported state — prepaid stays closed and checkout
+     offers cash on delivery — so this is informational, not a failure. The dangerous
+     case is the opposite: TEST keys on a live site take nobody's money while appearing
+     to work perfectly, which can go unnoticed for days. */
+  if (!isRazorpayConfigured()) {
+    logger.info("boot.razorpay_disabled", {
+      detail: "No Razorpay keys — card and UPI are closed, cash on delivery is unaffected.",
+    });
+  } else if (env.NODE_ENV === "production" && isTestMode()) {
+    logger.error("boot.razorpay_test_keys_in_production", {
+      detail:
+        "RAZORPAY_KEY_ID is an rzp_test_ key in production. Payments will appear to " +
+        "succeed and no money will ever arrive.",
+    });
+  }
+
   /* 3 · Jobs. Handlers must be registered before the worker can claim their rows —
      an unknown kind is parked as failed rather than retried. */
   registerMaintenanceJobs();
   registerMailJobs();
+  registerPaymentJobs();
 
   if (env.WORKER_ENABLED) {
     try {

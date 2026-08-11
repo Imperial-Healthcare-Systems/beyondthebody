@@ -1,5 +1,4 @@
-/* Schema barrel. Later phases add modules here:
- *   phase 6 → payments.ts    (payment, webhook_event, refund)
+/* Schema barrel.
  *
  * A module missing from this list is invisible to drizzle-kit, which then reports
  * "no schema changes" and generates nothing — silently, since an unexported table is
@@ -10,3 +9,4 @@ export * from "./newsletter";
 export * from "./catalogue";
 export * from "./journal";
 export * from "./commerce";
+export * from "./payments";

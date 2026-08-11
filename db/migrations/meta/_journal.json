@@ -43,6 +43,13 @@
       "when": 1786442026319,
       "tag": "0005_commerce_orders",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786455526488,
+      "tag": "0006_payments_razorpay",
+      "breakpoints": true
     }
   ]
 }

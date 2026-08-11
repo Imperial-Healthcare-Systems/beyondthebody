@@ -27,6 +27,11 @@ export const ErrorCode = {
   COD_UNAVAILABLE: "cod_unavailable",
   STORE_CLOSED: "store_closed",
   PAYMENT_VERIFICATION_FAILED: "payment_verification_failed",
+  /* The gateway is not configured at all — distinct from a payment that failed, because
+     the customer can do nothing about it and should be offered COD instead. */
+  PAYMENT_UNAVAILABLE: "payment_unavailable",
+  /* The gateway is configured but did not complete this payment. */
+  PAYMENT_FAILED: "payment_failed",
 
   /* server */
   INTERNAL: "internal_error",
@@ -49,6 +54,8 @@ const DEFAULT_STATUS: Record<ErrorCodeValue, number> = {
   [ErrorCode.COD_UNAVAILABLE]: 409,
   [ErrorCode.STORE_CLOSED]: 503,
   [ErrorCode.PAYMENT_VERIFICATION_FAILED]: 400,
+  [ErrorCode.PAYMENT_UNAVAILABLE]: 409,
+  [ErrorCode.PAYMENT_FAILED]: 502,
   [ErrorCode.INTERNAL]: 500,
 };
 

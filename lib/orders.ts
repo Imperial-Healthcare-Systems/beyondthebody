@@ -24,6 +24,7 @@ import { newOrderNotificationEmail, orderConfirmationEmail, queueMail } from "./
 import { getSettings } from "./settings";
 import { generateToken, normaliseEmail } from "./tokens";
 import { quoteCart, type Quote, type QuoteItem } from "./pricing";
+import { isRazorpayConfigured } from "./razorpay";
 import type { Address } from "./address";
 
 export type PlaceOrderInput = {
@@ -204,16 +205,21 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlacedOrder> {
         );
       }
 
-      /* Queued inside the transaction — the outbox. If these rows commit, the order
-         committed; if the order rolls back, so does the promise to email about it.
-         Rendered here rather than in a handler so the message is a snapshot of the order
-         as placed, and so no new job kind is needed. */
-      const statusUrl = `${env.APP_URL}/order/${accessToken}`;
-      await queueMail({ to: email, ...orderConfirmationEmail(row, items, statusUrl) }, tx);
-      await queueMail(
-        { to: ordersInboxAddress(), ...newOrderNotificationEmail(row, items) },
-        tx
-      );
+      /* CONFIRMATION EMAILS ONLY FOR COD, and the asymmetry is the point.
+         A COD order is complete the moment it is placed — there is no payment to wait
+         for. A prepaid order is not: it is `pending_payment`, and it may never be paid at
+         all. Telling that customer "thank you, your order is with us" before their money
+         has moved is a claim they would act on, and it would be followed by a second,
+         contradictory email when payment actually landed. Prepaid is emailed from
+         markOrderPaid instead, once, when it is true.
+
+         Queued inside the transaction — the outbox. If these rows commit, the order
+         committed; if the order rolls back, so does the promise to email about it. */
+      if (input.paymentMethod === "cod") {
+        const statusUrl = `${env.APP_URL}/order/${accessToken}`;
+        await queueMail({ to: email, ...orderConfirmationEmail(row, items, statusUrl) }, tx);
+        await queueMail({ to: ordersInboxAddress(), ...newOrderNotificationEmail(row, items) }, tx);
+      }
 
       logger.info("order.placed", {
         orderNumber: row.orderNumber,
@@ -311,6 +317,9 @@ export function publicQuote(quote: Quote) {
     totalMinor: quote.totalMinor,
     taxInclusive: quote.taxInclusive,
     codAvailable: quote.codAvailable,
+    /* Derived from whether the gateway is configured at all, so checkout offers card and
+       UPI the moment the keys land and never before. No flag to remember to flip. */
+    prepaidAvailable: isRazorpayConfigured(),
     storeOpen: quote.storeOpen,
     needsReview: quote.needsReview,
   };

@@ -77,6 +77,19 @@ const EnvSchema = z.object({
      A monitored mailbox someone actually reads in the morning. */
   ORDERS_EMAIL: z.email().optional(),
 
+  /* ── Razorpay ──────────────────────────────────────────────────────────────────
+     All three optional, and all three required TOGETHER: with any of them missing the
+     gateway reports itself unconfigured and prepaid checkout stays closed behind a plain
+     message. That is the state the site ships in until the client's account exists —
+     adding these three values turns card and UPI on, with no code change and no
+     migration. Half-configured fails closed rather than half-working.
+
+     KEY_SECRET signs the browser's return from checkout; WEBHOOK_SECRET signs webhook
+     deliveries. They are different secrets and are not interchangeable. */
+  RAZORPAY_KEY_ID: z.string().optional(),
+  RAZORPAY_KEY_SECRET: z.string().optional(),
+  RAZORPAY_WEBHOOK_SECRET: z.string().optional(),
+
   /* Optional. Absent = no error reporting beyond structured logs. */
   SENTRY_DSN: z.string().optional(),
 });
