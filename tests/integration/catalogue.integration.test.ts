@@ -111,6 +111,24 @@ describe.skipIf(!hasDb)("phase 3 · live prices", () => {
     expect(product.sizes.find((s) => s.sku === SKU)!.price).toBe(1899);
   });
 
+  it("removes a hidden size from the storefront view", async () => {
+    await updateVariant(SKU, { status: "hidden" }, ACTOR);
+    const product = await getResolvedProduct("mon-amour");
+
+    /* The PDP size toggle renders product.sizes verbatim, so hiding must happen here —
+       checkout and /api/v1/catalogue already refuse the SKU, but the button must go too. */
+    expect(product!.sizes.find((s) => s.sku === SKU)).toBeUndefined();
+    expect(product!.sizes.length).toBeGreaterThan(0); // the other size is untouched
+  });
+
+  it("keeps a sold-out size visible", async () => {
+    /* sold_out is "shown, not buyable" (db/schema/catalogue.ts) — only hidden and
+       discontinued disappear. */
+    await updateVariant(SKU, { status: "sold_out" }, ACTOR);
+    const product = await getResolvedProduct("mon-amour");
+    expect(product!.sizes.find((s) => s.sku === SKU)).toBeDefined();
+  });
+
   it("records a price change with the old and new value", async () => {
     await updateVariant(SKU, { priceMinor: 210_000 }, ACTOR, { note: "client update" });
 

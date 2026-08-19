@@ -14,7 +14,22 @@ export default function AddToBag({ product }: { product: Product }) {
   const { add } = useCart();
   const [sizeIdx, setSizeIdx] = useState(0);
   const [qty, setQty] = useState(1);
-  const size = product.sizes[sizeIdx];
+  /* Clamped: sizes come from the live catalogue (admin can hide a variant), so two PDPs
+     can have different counts — and client-side navigation between them keeps this
+     component's state. An index picked on a two-size page must not read off the end of
+     a one-size page. */
+  const activeIdx = Math.min(sizeIdx, product.sizes.length - 1);
+  const size = product.sizes[activeIdx];
+
+  /* Every size hidden in admin: the scent is not buyable right now. A quiet line, not a
+     broken control. */
+  if (!size) {
+    return (
+      <div className="buy">
+        <p className="buy__price buy__unavailable">Currently unavailable</p>
+      </div>
+    );
+  }
 
   const onAdd = () => {
     add(
@@ -40,8 +55,8 @@ export default function AddToBag({ product }: { product: Product }) {
             key={s.sku}
             type="button"
             role="radio"
-            aria-checked={i === sizeIdx}
-            className={`buy__size${i === sizeIdx ? " is-active" : ""}`}
+            aria-checked={i === activeIdx}
+            className={`buy__size${i === activeIdx ? " is-active" : ""}`}
             onClick={() => setSizeIdx(i)}
           >
             {s.label}

@@ -35,6 +35,12 @@
   color: var(--buy-fg);
 }
 
+/* every size hidden in admin — a quiet line in the price's place, dimmed like an
+   inactive size label */
+.buy__unavailable {
+  opacity: var(--buy-dim);
+}
+
 /* size toggle */
 .buy__sizes {
   display: inline-flex;

@@ -122,14 +122,24 @@ export function applyOverlay(product: Product, overlay: Overlay): Product {
 
   return {
     ...product,
-    sizes: product.sizes.map((size) => {
-      const row = overlay.get(size.sku);
-      if (!row) return size;
-      return {
-        ...size,
-        price: row.priceMinor == null ? null : paiseToRupees(row.priceMinor),
-      };
-    }),
+    sizes: product.sizes
+      /* A size the client set to hidden/discontinued disappears from the storefront view,
+         matching the /api/v1/catalogue filter — the size toggle, cross-sell "from" price
+         and checkout must all agree on what exists. sold_out stays visible (shown, not
+         buyable — see variantStatus in db/schema/catalogue.ts). No row means the DB has
+         not been seeded for this SKU yet, which is not a reason to hide it. */
+      .filter((size) => {
+        const status = overlay.get(size.sku)?.status;
+        return status !== "hidden" && status !== "discontinued";
+      })
+      .map((size) => {
+        const row = overlay.get(size.sku);
+        if (!row) return size;
+        return {
+          ...size,
+          price: row.priceMinor == null ? null : paiseToRupees(row.priceMinor),
+        };
+      }),
   };
 }
 
