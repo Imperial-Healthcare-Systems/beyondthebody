@@ -293,15 +293,39 @@
   color: var(--rose-taupe);
 }
 
+/* Two chips, not one: where the parcel is, and — for cash on delivery — whether the money
+   has reached us. They are separate facts and are allowed to disagree, so they sit side by
+   side rather than being merged into a single status that would have to lie about one. */
+.co__statusrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 26px;
+}
+
 .co__status {
   display: inline-block;
-  margin-bottom: 26px;
   padding: 6px 12px;
   border: 1px solid var(--line-dark);
   font-family: var(--ff-exp);
   font-size: 0.6rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+}
+
+/* Filled, where the parcel chip is outlined. Cash collected is the one settled, final
+   thing on this page — it earns the only solid shape in the column. */
+.co__status--paid {
+  background: var(--ink);
+  color: var(--ivory);
+  border-color: var(--ink);
+}
+
+/* Sits directly under the parcel's own line, so the two ledes need to read as a pair
+   rather than as one paragraph twice. */
+.co__lede--paid {
+  margin-top: -18px;
 }
 
 .co__panel {

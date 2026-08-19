@@ -16,9 +16,15 @@
  * database blip must not take the storefront down — a slightly stale price is far better
  * than a 500 on a product page. */
 
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { db, type Executor } from "@/db/client";
-import { priceChange, productVariant, type ProductVariant } from "@/db/schema";
+import {
+  priceChange,
+  productImage,
+  productVariant,
+  type ProductImage as ProductImageRow,
+  type ProductVariant,
+} from "@/db/schema";
 import { PRODUCTS, type Product } from "@/app/_sections/products-data";
 import { logger } from "./logger";
 import { audit } from "./audit";
@@ -127,16 +133,87 @@ export function applyOverlay(product: Product, overlay: Overlay): Product {
   };
 }
 
+/* ── The PDP gallery ───────────────────────────────────────────────────────────── */
+
+export type GalleryOverlay = Map<string, ProductImageRow[]>;
+
+let galleryFailureReported = false;
+
+/**
+ * Client-managed product photography, by slug.
+ *
+ * Fails soft to an EMPTY map for the same two reasons the price overlay does: `next build`
+ * prerenders every PDP and must work with no database, and a database blip must show
+ * yesterday's photographs rather than a 500.
+ */
+export async function getGalleryOverlay(): Promise<GalleryOverlay> {
+  try {
+    const rows = await db
+      .select()
+      .from(productImage)
+      .orderBy(asc(productImage.productSlug), asc(productImage.sortOrder));
+
+    galleryFailureReported = false;
+
+    const map: GalleryOverlay = new Map();
+    for (const row of rows) {
+      const list = map.get(row.productSlug);
+      if (list) list.push(row);
+      else map.set(row.productSlug, [row]);
+    }
+    return map;
+  } catch (err) {
+    if (!galleryFailureReported) {
+      galleryFailureReported = true;
+      logger.error("catalogue.gallery_unavailable", {
+        err,
+        detail: "Falling back to the gallery compiled into products-data.ts.",
+      });
+    } else {
+      logger.debug("catalogue.gallery_unavailable.repeat");
+    }
+    return new Map();
+  }
+}
+
+/**
+ * Swap in the client's photographs, if they have supplied any.
+ *
+ * ALL OR NOTHING, per product, and deliberately so. A merge — code images plus uploaded
+ * ones — would mean the client could never remove a shipped placeholder, which is the main
+ * thing they want to do. Rows present: those rows ARE the gallery, in their order. No rows:
+ * the code array, untouched. That also makes "reset to the original images" a DELETE, with
+ * nothing to restore from.
+ */
+export function applyGallery(product: Product, gallery: GalleryOverlay): Product {
+  const rows = gallery.get(product.slug);
+  if (!rows || rows.length === 0) return product;
+
+  return {
+    ...product,
+    gallery: rows.map((r) => ({
+      src: r.path,
+      alt: r.alt,
+      /* Measured on upload, never typed by a person — see db/schema/catalogue.ts.
+         Consumed by CollectionScent, which looks for a "3 / 4" card image; an uploaded
+         gallery will rarely match that exactly, and it falls through to gallery[0] — which
+         is the image the client put first, so the fallback is the right answer anyway. */
+      ratio: `${r.width} / ${r.height}`,
+    })),
+  };
+}
+
 /** The catalogue as the pages should render it. */
 export async function getResolvedProducts(): Promise<Product[]> {
-  const overlay = await getOverlay();
-  return PRODUCTS.map((p) => applyOverlay(p, overlay));
+  const [overlay, gallery] = await Promise.all([getOverlay(), getGalleryOverlay()]);
+  return PRODUCTS.map((p) => applyGallery(applyOverlay(p, overlay), gallery));
 }
 
 export async function getResolvedProduct(slug: string): Promise<Product | undefined> {
   const product = PRODUCTS.find((p) => p.slug === slug);
   if (!product) return undefined;
-  return applyOverlay(product, await getOverlay());
+  const [overlay, gallery] = await Promise.all([getOverlay(), getGalleryOverlay()]);
+  return applyGallery(applyOverlay(product, overlay), gallery);
 }
 
 export type VariantPatch = {

@@ -77,7 +77,8 @@ export async function updatePriceAction(
     revalidatePath("/fragrance/[slug]", "page");
     revalidatePath("/collection");
     revalidatePath("/");
-    revalidatePath("/admin/prices");
+    revalidatePath("/admin/products");
+    revalidatePath("/admin/products/[slug]", "page");
 
     logger.info("admin.price_updated", { sku, priceMinor, status, by: admin.email });
     return { ok: `${sku} saved.` };

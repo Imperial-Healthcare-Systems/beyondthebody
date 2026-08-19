@@ -1,10 +1,18 @@
 "use client";
 
+/* One SKU's price + availability. Lives under /admin/products because a price is a fact
+   about a product, and the client asked for one screen per product rather than one screen
+   per kind-of-field (2026-08-12). Moved here verbatim from the old /admin/prices table. */
+
 import { useActionState } from "react";
-import { updatePriceAction, type PriceFormState } from "./actions";
+import { updatePriceAction, type PriceFormState } from "./price-actions";
 
 type Props = {
   sku: string;
+  /* The scent's name is the page's <h1> on the product screen, so the row leads with the
+     SIZE — repeating "Desir" down a column of Desir's own sizes is noise. `productName` is
+     still taken, for the aria-labels: a screen reader arriving at this input out of context
+     needs "Price in rupees for Desir 100 ml", not "price". */
   productName: string;
   sizeLabel: string;
   priceRupees: string;
@@ -27,10 +35,8 @@ export default function PriceRow({ sku, productName, sizeLabel, priceRupees, sta
   return (
     <tr>
       <td>
-        <strong>{productName}</strong>
-        <div style={{ color: "var(--adm-muted)", fontSize: 12 }}>
-          {sizeLabel} · {sku}
-        </div>
+        <strong>{sizeLabel}</strong>
+        <div style={{ color: "var(--adm-muted)", fontSize: 12 }}>{sku}</div>
       </td>
       <td colSpan={3}>
         <form action={formAction} style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>

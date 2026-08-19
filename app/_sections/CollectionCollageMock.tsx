@@ -5,43 +5,16 @@
    edges. Static end-state (no motion) — the point is the look, not the reveal. Not wired into
    the site; delete or fold into CollectionMasthead once a direction is chosen. */
 
+import CollageBackdrop from "../_components/CollageBackdrop";
 import "./collectioncollagemock.css";
-
-const IMAGES = [
-  "/hero/hero.webp",
-  "/journal/index-lead.webp",
-  "/journal/essay-1-patience.webp",
-  "/journal/essay-2-towns.webp",
-  "/journal/essay-3-heat.webp",
-  "/sections/origin-bg.webp",
-  "/sections/journal.webp",
-  "/sections/banner-1.webp",
-  "/footer/reveal-desktop.webp",
-  "/products/collection/mon-amour.webp",
-  "/products/collection/don-amour.webp",
-  "/products/notes/don-amour-notes-grid.webp",
-];
-
-// enough tiles to cover the section; a few span 2 to break the grid into a collage
-const TILES = Array.from({ length: 48 }, (_, i) => {
-  const src = IMAGES[i % IMAGES.length];
-  const span = i % 5 === 0 ? "s2r" : i % 7 === 3 ? "s2c" : "";
-  return { src, span, key: i };
-});
 
 export default function CollectionCollageMock() {
   return (
     <section className="mock" data-theme="light">
-      <div className="mock__collage" aria-hidden="true">
-        {TILES.map((t) => (
-          <figure className={`mock__tile ${t.span}`} key={t.key}>
-            <img src={t.src} alt="" loading="lazy" />
-          </figure>
-        ))}
-      </div>
-      <div className="mock__tint" aria-hidden="true" />
-      <div className="mock__scrim" aria-hidden="true" />
-      <div className="mock__grain" aria-hidden="true" />
+      {/* The mosaic used to be inline here. It was promoted to a shared component when the
+          404 adopted it (2026-08-12) — one copy, so the comp and the live page cannot
+          drift apart, and the comp still shows what was actually signed off. */}
+      <CollageBackdrop />
 
       <div className="mock__inner">
         <div className="mock__frame">

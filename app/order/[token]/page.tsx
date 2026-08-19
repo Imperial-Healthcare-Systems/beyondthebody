@@ -68,6 +68,13 @@ export default async function OrderPage({
   const status = STATUS_COPY[order.status] ?? { label: order.status, line: "" };
   const cod = order.paymentMethod === "cod";
 
+  /* Cash is the one payment this house takes that no webhook can confirm — somebody in
+     admin records it when the courier remits (lib/fulfilment.ts → markCodCollected), which
+     stamps paidAt and deliberately leaves the status alone. So the money gets its own line
+     here rather than being folded into the parcel's status: for COD the two are genuinely
+     different facts, and an order can be delivered days before the cash reaches us. */
+  const cashCollected = cod && order.paidAt != null;
+
   return (
     <>
       {/* Arriving here from checkout means the order exists; the bag has done its job.
@@ -88,8 +95,20 @@ export default async function OrderPage({
               {dateFmt.format(order.placedAt)}
             </p>
 
-            <p className="co__status">{status.label}</p>
+            <div className="co__statusrow">
+              <span className="co__status">{status.label}</span>
+              {cashCollected && (
+                <span className="co__status co__status--paid">Cash collected</span>
+              )}
+            </div>
             {status.line && <p className="co__lede">{status.line}</p>}
+
+            {cashCollected && (
+              <p className="co__lede co__lede--paid">
+                We received {inr(order.totalMinor)} on{" "}
+                {dateFmt.format(order.paidAt as Date)}. Nothing further is owed.
+              </p>
+            )}
 
             {/* Only once there is something to track. A courier's name with no number
                 beside it tells the customer nothing they can act on, so both the line and
@@ -146,7 +165,9 @@ export default async function OrderPage({
                   </div>
                 )}
                 <div className="co__total">
-                  <dt>{cod ? "Due on delivery" : "Total"}</dt>
+                  {/* Once the cash is in, "Due on delivery" is a lie about money the
+                      customer has already handed over. */}
+                  <dt>{cod ? (cashCollected ? "Paid in cash" : "Due on delivery") : "Total"}</dt>
                   <dd>{inr(order.totalMinor)}</dd>
                 </div>
               </dl>

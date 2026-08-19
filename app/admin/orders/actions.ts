@@ -15,7 +15,13 @@ import { z } from "zod";
 import { requireAdminApi } from "@/lib/admin-session";
 import { isAppError } from "@/lib/errors";
 import { logger } from "@/lib/logger";
-import { markCodCollected, refundOrder, transitionOrder } from "@/lib/fulfilment";
+import {
+  markCodCollected,
+  readable,
+  refundOrder,
+  transitionOrder,
+  undoOrderStatus,
+} from "@/lib/fulfilment";
 import { rupeesToPaise } from "@/lib/catalogue";
 
 export type OrderFormState = { ok?: string; error?: string };
@@ -90,6 +96,38 @@ export async function transitionAction(
               ? "Recorded as returned, and the stock is back."
               : `Marked ${moved.status}.`,
     };
+  });
+}
+
+/* Corrections. A separate action from transitionAction for the same reason undoOrderStatus
+   is a separate function: it must not be reachable from the forward buttons. */
+const UndoSchema = z.object({
+  id: Id,
+  to: z.enum(["paid", "confirmed", "processing", "shipped"]),
+  note: z.string().trim().max(300).optional(),
+});
+
+export async function undoAction(
+  _prev: OrderFormState,
+  formData: FormData
+): Promise<OrderFormState> {
+  return withOwner(async (admin) => {
+    const parsed = UndoSchema.safeParse({
+      id: formData.get("id"),
+      to: formData.get("to"),
+      note: formData.get("undoNote") || undefined,
+    });
+    if (!parsed.success) return { error: "That didn't look right." };
+
+    const moved = await undoOrderStatus(parsed.data.id, parsed.data.to, admin, {
+      note: parsed.data.note,
+    });
+
+    revalidateOrders(parsed.data.id);
+    /* Nothing to revalidate for the customer: /order/[token] is force-dynamic and re-reads
+       the order on every request, so their page is already correct. */
+
+    return { ok: `Put back to ${readable(moved.status)} — the customer's page says so too.` };
   });
 }
 

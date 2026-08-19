@@ -36,12 +36,18 @@ export type OrderStatus = Order["status"];
  */
 export const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   pending_payment: ["cancelled", "expired"],
-  paid: ["processing", "cancelled"],
-  confirmed: ["processing", "cancelled"],
+  /* `shipped` direct from paid/confirmed (2026-08-12): the house packs and hands over in
+     one sitting, and requiring "start packing" first made the common case two clicks and
+     two page loads. `processing` remains for the day a parcel is packed but not collected —
+     it is a real state, just not a mandatory one. */
+  paid: ["processing", "shipped", "cancelled"],
+  confirmed: ["processing", "shipped", "cancelled"],
   processing: ["shipped", "cancelled"],
   shipped: ["delivered", "rto_returned"],
-  /* Terminal. A delivered order can still be refunded, but that is a payment event
-     recorded against it, not a status it moves to. */
+  /* Not terminal any more (2026-08-12). `delivered` is a human's assertion about the
+     physical world, made by pressing a button next to another button, and there was no way
+     back from a misclick — the order was stuck delivered forever. See UNDO_TRANSITIONS:
+     the way back is a separate, explicitly-labelled move, not a forward one. */
   delivered: [],
   cancelled: [],
   refunded: [],
@@ -49,6 +55,42 @@ export const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   expired: [],
   rto_returned: [],
 };
+
+/**
+ * Corrections — moves BACKWARD, for when the wrong button was pressed.
+ *
+ * Deliberately a second table rather than extra entries in the first. They are different
+ * kinds of act: a forward transition asserts something happened in the world, an undo
+ * asserts the previous assertion was a mistake. Keeping them apart means the admin can
+ * label them differently, confirm them differently, and audit them under their own action
+ * name — and it means a correction can never be reached by accident from the normal row of
+ * buttons, which is how the original misclick happened.
+ *
+ * Only ever one step back, and only while the order is still live. Undoing all the way out
+ * of a cancellation or an RTO is NOT here: both put stock back, so reversing them means
+ * taking stock out again and possibly overselling. Those are re-orders, not undos.
+ */
+export const UNDO_TRANSITIONS: Partial<Record<OrderStatus, OrderStatus[]>> = {
+  delivered: ["shipped"],
+  shipped: ["processing"],
+  processing: ["paid", "confirmed"],
+};
+
+/** Which undos are legal for this order, given how it was paid for. */
+export function undosFor(row: Pick<Order, "status" | "paymentMethod">): OrderStatus[] {
+  const candidates = UNDO_TRANSITIONS[row.status] ?? [];
+  /* `processing` came from `paid` on a prepaid order and `confirmed` on a COD one; offering
+     both would let a COD order be walked into a prepaid-only status. */
+  return candidates.filter((to) => {
+    if (to === "paid") return row.paymentMethod === "prepaid";
+    if (to === "confirmed") return row.paymentMethod === "cod";
+    return true;
+  });
+}
+
+export function canUndo(row: Pick<Order, "status" | "paymentMethod">, to: OrderStatus): boolean {
+  return undosFor(row).includes(to);
+}
 
 /** Statuses whose stock is still committed — moving OUT of one puts the items back. */
 const HOLDS_STOCK: OrderStatus[] = ["pending_payment", "paid", "confirmed", "processing", "shipped"];
@@ -156,6 +198,91 @@ export async function transitionOrder(
       from: before.status,
       to,
       restocked: unsold,
+      by: actor.email,
+    });
+
+    return moved;
+  });
+}
+
+/**
+ * Undo the last status move, because the wrong button was pressed.
+ *
+ * Separate from transitionOrder rather than an extra edge in it, and the differences are
+ * the reason:
+ *   · it consults UNDO_TRANSITIONS, so a correction can never be reached from the ordinary
+ *     row of forward buttons — which is how the misclick happened in the first place;
+ *   · it CLEARS the timestamp the undone status set. Leaving `delivered_at` on an order
+ *     that is no longer delivered would put a delivery date in front of the customer for a
+ *     parcel still in transit, and would quietly corrupt any future report that counts
+ *     deliveries by date;
+ *   · it sends nothing. The customer was already told the parcel shipped; telling them it
+ *     un-delivered is noise about a mistake that was ours.
+ *
+ * No stock moves. None of the undo edges cross the restock boundary — that only happens on
+ * the way into cancelled/rto_returned/expired, and there is deliberately no way back out of
+ * those (see UNDO_TRANSITIONS). Reversing a restock could oversell.
+ *
+ * Audited under its own action name so `order.undo.shipped` is distinguishable from
+ * `order.shipped` months later — "was this parcel shipped twice, or corrected once?" needs
+ * an answer the trail can actually give.
+ */
+export async function undoOrderStatus(
+  orderId: string,
+  to: OrderStatus,
+  actor: Pick<AdminUser, "id" | "email">,
+  opts: { note?: string | null } = {}
+): Promise<Order> {
+  return db.transaction(async (tx) => {
+    const [before] = await tx.select().from(order).where(eq(order.id, orderId)).limit(1);
+    if (!before) throw new AppError(ErrorCode.NOT_FOUND, "No such order.");
+
+    if (!canUndo(before, to)) {
+      throw new AppError(
+        ErrorCode.CONFLICT,
+        `An order that is ${readable(before.status)} can't be put back to ${readable(to)}.`,
+        { logContext: { orderId, from: before.status, to } }
+      );
+    }
+
+    const now = new Date();
+    const [moved] = await tx
+      .update(order)
+      .set({
+        status: to,
+        updatedAt: now,
+        /* Clear what the status being undone had stamped. Undoing `shipped` also clears the
+           shipped date, which is what re-arms the tracking email if the parcel really does
+           go out later — transitionOrder sends on the way INTO shipped, and this makes that
+           a genuine first arrival again. Courier and tracking number are deliberately kept:
+           they are usually still correct, and retyping them is friction for no gain. */
+        ...(before.status === "delivered" && { deliveredAt: null }),
+        ...(before.status === "shipped" && { shippedAt: null }),
+        ...(opts.note ? { notes: sql`coalesce(${order.notes} || ' · ', '') || ${opts.note}` } : {}),
+      })
+      /* Same conditional guard as the forward move: two people correcting at once must not
+         both apply. */
+      .where(and(eq(order.id, orderId), eq(order.status, before.status)))
+      .returning();
+
+    if (!moved) {
+      throw new AppError(ErrorCode.CONFLICT, "That order just changed. Reload and try again.");
+    }
+
+    await audit({
+      actor,
+      action: `order.undo.${before.status}`,
+      entity: "order",
+      entityId: orderId,
+      before: { status: before.status },
+      after: { status: to, corrected: true },
+      exec: tx,
+    });
+
+    logger.info("order.undone", {
+      orderNumber: moved.orderNumber,
+      from: before.status,
+      to,
       by: actor.email,
     });
 

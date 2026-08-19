@@ -1,23 +1,27 @@
 import type { Metadata } from "next";
 import Nav from "./_components/Nav";
 import SiteRuntime from "./_components/SiteRuntime";
-import Footer from "./_sections/Footer";
-import "./_sections/legal.css";
+import NotFoundCollage from "./_sections/NotFoundCollage";
 
 /* The 404.
  *
- * It carries the full chrome — nav, footer, the house list — because someone who has
- * mistyped an address or followed a dead link is not a dead end, they are a visitor
- * standing in the wrong room. The useful thing is a way onward, not an apology.
+ * The house mosaic behind it (2026-08-12, client direction) was the /mockup/collection-collage
+ * comp; the treatment was promoted out of that throwaway route and is now a production
+ * surface. What used to be here was the legal-page template with a list of links.
  *
- * No Preloader. The curtain exists to hide entrance animations that have not started yet,
- * and there is nothing here to animate; a curtain would only delay the one thing this page
- * is for.
+ * It keeps the Nav — someone standing in the wrong room should have the whole house
+ * available, not just the three doors the copy offers — and drops the full Footer for the
+ * minimal foot inside the section. The full one carries a newsletter, a mega-nav and a
+ * full-bleed image reveal: a second page to get lost in, appended to the page that told
+ * you that you were lost.
  *
- * Reached by every unmatched address, and by notFound() from the routes that call it —
- * a draft essay's public address, a stranger's order token, /preview in production. All of
- * those must look identical from outside: an address that does not exist tells you nothing
- * about whether it once did. */
+ * No Preloader. The curtain exists to hide entrance choreography on a page someone chose to
+ * visit; nobody chose this one, and a curtain would only delay the way out.
+ *
+ * Reached by every unmatched address, and by notFound() from the routes that call it — a
+ * draft essay's public address, a stranger's order token, /preview and /mockup in
+ * production. All of those must look identical from outside: an address that does not exist
+ * tells you nothing about whether it once did. */
 
 export const metadata: Metadata = {
   title: "Not found — Beyond The Body",
@@ -29,34 +33,8 @@ export default function NotFound() {
     <>
       <Nav />
       <main id="top">
-        <section className="lg" data-theme="light">
-          <div className="lg__inner">
-            <p className="lg__eyebrow">404</p>
-            <h1 className="lg__title">This address doesn&rsquo;t exist.</h1>
-            <div className="lg__body" style={{ marginTop: 24 }}>
-              <p>
-                It may have been a mistyped address, or something that has since moved. The
-                house is still here.
-              </p>
-              <ul>
-                <li>
-                  <a href="/">The house</a> — where everything begins
-                </li>
-                <li>
-                  <a href="/collection">The collection</a> — four unisex fragrances
-                </li>
-                <li>
-                  <a href="/journal">The Journal</a> — scent as culture
-                </li>
-                <li>
-                  <a href="/contact">Contact</a> — if you were looking for a person
-                </li>
-              </ul>
-            </div>
-          </div>
-        </section>
+        <NotFoundCollage />
       </main>
-      <Footer />
       <SiteRuntime />
     </>
   );

@@ -284,6 +284,58 @@ export async function getOrderByToken(token: string): Promise<OrderWithItems | n
   return { order: row, items };
 }
 
+/* ── Finding your own order without the emailed link ───────────────────────────── */
+
+/** Accepts what a person actually types off a confirmation email. `btb-2026-0507`,
+ *  `BTB 2026 0507`, `BTB20260507` and the bare `2026-0507` all mean the same order.
+ *  Returns the canonical form as stored, or null if it isn't an order number at all. */
+export function normaliseOrderNumber(input: string): string | null {
+  const cleaned = input
+    .trim()
+    .toUpperCase()
+    .replace(/[\s_–—]+/g, "-") // en/em dashes: what a phone keyboard autocorrects a hyphen into
+    .replace(/-{2,}/g, "-")
+    .replace(/^-|-$/g, "");
+
+  const m = /^(?:BTB-?)?(\d{4})-?(\d{1,10})$/.exec(cleaned);
+  if (!m) return null;
+  /* Padded to four the same way formatOrderNumber pads it, so `2026-7` finds BTB-2026-0007
+     while a five-digit sequence is left alone. */
+  return `BTB-${m[1]}-${m[2].padStart(4, "0")}`;
+}
+
+/**
+ * The access token for an order, given the number a customer can read off their email and
+ * the address it was placed with.
+ *
+ * BOTH must match, and that is the whole point. Order numbers come from a sequence, so
+ * `BTB-2026-0507` tells you `BTB-2026-0508` exists — on its own it is an identifier, not a
+ * credential. The email beside it is what makes the pair one, and lib/ratelimit.ts is what
+ * stops the pair being guessed at leisure.
+ *
+ * Returns null for every kind of miss — malformed number, no such order, wrong email — so
+ * no caller can turn this into a way to test whether a given order or address exists.
+ */
+export async function findOrderTokenByNumberAndEmail(
+  orderNumber: string,
+  email: string
+): Promise<string | null> {
+  const number = normaliseOrderNumber(orderNumber);
+  if (!number) return null;
+
+  const [row] = await db
+    .select({ accessToken: order.accessToken, email: order.email })
+    .from(order)
+    .where(eq(order.orderNumber, number))
+    .limit(1);
+
+  if (!row) return null;
+  /* Stored lowercased on the way in, so comparing normalised forms is the whole check. */
+  if (row.email !== normaliseEmail(email)) return null;
+
+  return row.accessToken;
+}
+
 export async function getOrderById(id: string): Promise<OrderWithItems | null> {
   const [row] = await db.select().from(order).where(eq(order.id, id)).limit(1);
   if (!row) return null;

@@ -4,8 +4,9 @@
  * as markup, so there is no HTML to sanitise and no `dangerouslySetInnerHTML` anywhere in
  * the Journal — an unknown node type is skipped rather than guessed at.
  *
- * Class names hook into journalarticle.css so the essay inherits the house's typographic
- * scale rather than carrying its own. */
+ * Class names hook into the editorial-article archetype (app/_archetypes/) so the essay
+ * inherits the house's typographic scale rather than carrying its own. Every node type
+ * below has a rule there — an unstyled one would be a hole an admin post could fall into. */
 
 import { Fragment, type ReactNode } from "react";
 import type { RichNode } from "@/lib/rich-text";
@@ -21,7 +22,7 @@ function marksFor(node: RichNode, children: ReactNode): ReactNode {
       const external = /^https?:\/\//i.test(href);
       out = (
         <a
-          className="ja__link"
+          className="ea__link"
           href={href}
           /* noopener/noreferrer on every external link: without noopener the opened page
              can reach back through window.opener and navigate this one. */
@@ -46,32 +47,32 @@ function RenderNode({ node }: { node: RichNode }): ReactNode {
       return <Fragment>{marksFor(node, node.text ?? "")}</Fragment>;
 
     case "paragraph":
-      return <p className="ja__p">{renderNodes(node.content)}</p>;
+      return <p className="ea__p">{renderNodes(node.content)}</p>;
 
     case "heading": {
       const level = (node.attrs?.level as number) ?? 2;
       /* Only h2/h3 are permitted by the schema — h1 belongs to the article title. */
       return level === 3 ? (
-        <h3 className="ja__h3">{renderNodes(node.content)}</h3>
+        <h3 className="ea__h3">{renderNodes(node.content)}</h3>
       ) : (
-        <h2 className="ja__h2">{renderNodes(node.content)}</h2>
+        <h2 className="ea__h2">{renderNodes(node.content)}</h2>
       );
     }
 
     case "blockquote":
-      return <blockquote className="ja__quote">{renderNodes(node.content)}</blockquote>;
+      return <blockquote className="ea__quote">{renderNodes(node.content)}</blockquote>;
 
     case "bulletList":
-      return <ul className="ja__list">{renderNodes(node.content)}</ul>;
+      return <ul className="ea__list">{renderNodes(node.content)}</ul>;
 
     case "orderedList":
-      return <ol className="ja__list ja__list--num">{renderNodes(node.content)}</ol>;
+      return <ol className="ea__list ea__list--num">{renderNodes(node.content)}</ol>;
 
     case "listItem":
       return <li>{renderNodes(node.content)}</li>;
 
     case "horizontalRule":
-      return <hr className="ja__rule" />;
+      return <hr className="ea__divider" />;
 
     case "hardBreak":
       return <br />;

@@ -15,6 +15,7 @@ import {
   markCollectedAction,
   refundAction,
   transitionAction,
+  undoAction,
   type OrderFormState,
 } from "../actions";
 
@@ -26,6 +27,16 @@ const LABELS: Record<string, string> = {
   rto_returned: "Came back to us",
 };
 
+/* Corrections read as corrections. "Not shipped yet" is what the client is thinking when
+   they realise they clicked the wrong row; "Move to processing" is what a database is
+   thinking. */
+const UNDO_LABELS: Record<string, string> = {
+  paid: "Not packed yet",
+  confirmed: "Not packed yet",
+  processing: "Not shipped yet",
+  shipped: "Not delivered yet",
+};
+
 /* Moves that put stock back and cannot be undone. Worth a second of friction. */
 const CONFIRM: Record<string, string> = {
   cancelled: "Cancel this order? The stock goes back and the money, if any, does not return by itself.",
@@ -35,6 +46,11 @@ const CONFIRM: Record<string, string> = {
 type Props = {
   id: string;
   allowed: string[];
+  /* Statuses this order may be put BACK to, computed on the server from UNDO_TRANSITIONS.
+     Empty for an order that has not moved anywhere yet, or one that is cancelled/returned —
+     both of those have restocked, and un-restocking could oversell. */
+  undoable: string[];
+  statusLabel: string;
   courier: string | null;
   trackingNumber: string | null;
   trackingUrl: string | null;
@@ -48,6 +64,8 @@ type Props = {
 export default function OrderControls({
   id,
   allowed,
+  undoable,
+  statusLabel,
   courier,
   trackingNumber,
   trackingUrl,
@@ -55,6 +73,10 @@ export default function OrderControls({
   collect,
 }: Props) {
   const [state, formAction, pending] = useActionState<OrderFormState, FormData>(transitionAction, {});
+  const [undoState, undoFormAction, undoing] = useActionState<OrderFormState, FormData>(
+    undoAction,
+    {}
+  );
   const [refundState, refundFormAction, refunding] = useActionState<OrderFormState, FormData>(
     refundAction,
     {}
@@ -186,6 +208,54 @@ export default function OrderControls({
             {state.error && (
               <p className="adm__error" role="alert">
                 {state.error}
+              </p>
+            )}
+          </form>
+        </section>
+      )}
+
+      {/* Corrections. Below the forward moves and visually quieter on purpose: the mistake
+          this exists to fix is pressing the wrong button in a row of buttons, so putting
+          the fix into that same row would reproduce it. */}
+      {undoable.length > 0 && (
+        <section className="adm__panel adm__panel--quiet">
+          <p className="adm__label" style={{ marginBottom: 6 }}>
+            Pressed the wrong button?
+          </p>
+          <p className="adm__note" style={{ margin: "0 0 14px" }}>
+            This order is marked <strong>{statusLabel}</strong>. Putting it back changes what
+            the customer sees and clears the date that was stamped. Nobody is emailed.
+          </p>
+
+          <form action={undoFormAction}>
+            <input type="hidden" name="id" value={id} />
+            <div className="adm__field" style={{ maxWidth: 520 }}>
+              <span className="adm__label">Why (optional, kept on the order)</span>
+              <input className="adm__input" name="undoNote" maxLength={300} disabled={undoing} />
+            </div>
+            <div className="adm__row">
+              {undoable.map((to) => (
+                <button
+                  key={to}
+                  className="adm__btn adm__btn--ghost"
+                  type="submit"
+                  name="to"
+                  value={to}
+                  disabled={undoing}
+                >
+                  {undoing ? "Working…" : (UNDO_LABELS[to] ?? `Back to ${to}`)}
+                </button>
+              ))}
+            </div>
+
+            {undoState.ok && (
+              <p role="status" style={{ color: "#4a6b46", fontSize: 13 }}>
+                {undoState.ok}
+              </p>
+            )}
+            {undoState.error && (
+              <p className="adm__error" role="alert">
+                {undoState.error}
               </p>
             )}
           </form>

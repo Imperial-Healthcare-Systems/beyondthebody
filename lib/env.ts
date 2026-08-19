@@ -52,6 +52,18 @@ const EnvSchema = z.object({
 
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
 
+  /* Where client-uploaded product photography is written.
+     NOT inside `public/`. That directory is part of the build output: on a container
+     deploy it is baked into the image, so every upload would vanish at the next release,
+     and on a rollback the images would silently revert with the code. Point this at a
+     path that outlives a deploy — a mounted volume, or a directory beside the app that
+     the supervisor does not replace. Relative paths resolve from the process's working
+     directory. Files are served by /media/[...path], never by Next's static handler. */
+  UPLOAD_DIR: z.string().min(1).default("./var/uploads"),
+  /* Ceiling on a single upload, in megabytes. The route re-encodes to WebP and caps the
+     long edge, so this only has to be generous enough for a camera original. */
+  UPLOAD_MAX_MB: z.coerce.number().int().min(1).max(64).default(20),
+
   /* /preview/* and /mockup/* are design-comparison routes from the build — half-finished
      sections, alternate treatments, a collage that exists to be argued over. They are not
      the site and must not be findable, so they are OFF in production.

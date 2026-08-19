@@ -26,7 +26,8 @@ reads as an artefact rather than intent.
 | Price for each of the 4 scents × 2 sizes (8 SKUs) | 100 ml and Discovery 10 ml |
 | Whether the two sizes differ in price | They currently do not |
 
-**Now a launch blocker, where it was not before.** These are editable at `/admin/prices` (owner
+**Now a launch blocker, where it was not before.** These are editable at `/admin/products` — open a scent, and price, availability and its
+pictures are all on that one screen (owner
 role) and go live within seconds with no deploy — but as of S5 the store takes real orders, and the
 placeholder is what a customer will actually be charged.
 
@@ -173,7 +174,7 @@ things follow, and all three are yours to decide rather than ours:
 | | |
 |---|---|
 | **Prices are still ₹1,899 placeholders** | §A1 — this is now what a customer actually pays |
-| **Stock is not tracked** | Every SKU is always buyable. Turn tracking on per SKU in `/admin/prices` once real counts exist; until then nothing can read "sold out" by accident |
+| **Stock is not tracked** | Every SKU is always buyable. Turn tracking on per SKU in `/admin/products` once real counts exist; until then nothing can read "sold out" by accident |
 | **`store_open` closes checkout instantly** | One setting, no deploy — useful around a drop, or if fulfilment falls behind |
 | **Card and UPI arrive the moment the keys do** | §A7. Nothing else changes, and cash on delivery keeps working either way |
 
@@ -208,6 +209,17 @@ answer the moment somebody who should not see refunds is doing the packing.
 - **Node.js 22+** (built and tested on 22.17)
 - **PostgreSQL 13+** — `gen_random_uuid()` is used for primary keys
 - A process supervisor that restarts the app (systemd, pm2, Docker restart policy)
+- **A writable directory that survives a deploy**, for `UPLOAD_DIR` ⚠
+  The client uploads product photography from `/admin/products`, and those files are the
+  live images on the storefront. They are deliberately **not** in `public/` — that is build
+  output, so on a container deploy every upload would vanish at the next release and revert
+  to the old picture on a rollback. Give it a **mounted volume** (or a directory beside the
+  app the supervisor does not replace), and **include it in the backup that covers the
+  database**: the `product_image` rows and the files are one thing, and either without the
+  other leaves broken images on live product pages.
+  Optional but worth it: point nginx at the same directory under `/media/` so it serves
+  them directly. The app serves them correctly on its own, so this is a speed choice, not a
+  requirement.
 
 ### B2 · Environment variables ☐
 

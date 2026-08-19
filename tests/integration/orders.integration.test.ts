@@ -9,7 +9,7 @@ import { afterAll, afterEach, beforeEach, describe, expect, it } from "vitest";
 import { and, eq, inArray, like, sql } from "drizzle-orm";
 import { closeDb, db } from "@/db/client";
 import { inventoryMovement, job, order, orderItem, productVariant } from "@/db/schema";
-import { getOrderByToken, placeOrder } from "@/lib/orders";
+import { findOrderTokenByNumberAndEmail, getOrderByToken, placeOrder } from "@/lib/orders";
 import { seedVariants } from "@/lib/catalogue";
 import { __clearSettingsCache, setSetting } from "@/lib/settings";
 import type { Address } from "@/lib/address";
@@ -310,4 +310,30 @@ describe.skipIf(!hasDb)("phase 5 · placing an order", () => {
       expect(await getOrderByToken(token)).toBeNull();
     }
   );
+
+  /* The lookup bar at the bottom of the bag. The number alone is NOT a credential — it
+     comes from a sequence, so knowing one hands you the next — and these three cases are
+     the whole reason the email is asked for beside it. */
+  it("finds an order from its number and the email it was placed with", async () => {
+    const { order: row } = await placeOrder(input());
+
+    /* Typed the way a customer types it off a phone, not the way we store it. */
+    const token = await findOrderTokenByNumberAndEmail(
+      row.orderNumber.toLowerCase().replace(/-/g, " "),
+      ` ${EMAIL.toUpperCase()} `
+    );
+    expect(token).toBe(row.accessToken);
+  });
+
+  it("gives nothing when the email doesn't match the order number", async () => {
+    const { order: row } = await placeOrder(input());
+
+    expect(
+      await findOrderTokenByNumberAndEmail(row.orderNumber, "someone-else@beyondthebody.invalid")
+    ).toBeNull();
+  });
+
+  it("gives nothing for an order number nobody has been given", async () => {
+    expect(await findOrderTokenByNumberAndEmail("BTB-1999-0001", EMAIL)).toBeNull();
+  });
 });

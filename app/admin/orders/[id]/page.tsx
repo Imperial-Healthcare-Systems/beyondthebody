@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 import type { Address } from "@/lib/address";
 import { formatAddress, formatPhone } from "@/lib/address";
 import { requireAdminPage } from "@/lib/admin-session";
-import { ALLOWED_TRANSITIONS, getOrderDetail, readable } from "@/lib/fulfilment";
+import { ALLOWED_TRANSITIONS, getOrderDetail, readable, undosFor } from "@/lib/fulfilment";
 import { isRazorpayConfigured } from "@/lib/razorpay";
 import OrderControls from "./OrderControls";
 
@@ -257,6 +257,11 @@ export default async function AdminOrderPage({ params }: { params: Promise<{ id:
       <OrderControls
         id={order.id}
         allowed={ALLOWED_TRANSITIONS[order.status]}
+        /* Computed here, not in the component: what may follow what — forwards or back —
+           is the server's single answer, so the screen can never offer a move the action
+           will then refuse. */
+        undoable={undosFor(order)}
+        statusLabel={readable(order.status)}
         courier={order.courier}
         trackingNumber={order.trackingNumber}
         trackingUrl={order.trackingUrl}

@@ -7,7 +7,14 @@
 
 import { describe, expect, it } from "vitest";
 import { orderStatus } from "@/db/schema";
-import { ALLOWED_TRANSITIONS, canTransition, readable, type OrderStatus } from "@/lib/fulfilment";
+import {
+  ALLOWED_TRANSITIONS,
+  canTransition,
+  canUndo,
+  readable,
+  undosFor,
+  type OrderStatus,
+} from "@/lib/fulfilment";
 
 const ALL = orderStatus.enumValues as readonly OrderStatus[];
 
@@ -44,15 +51,58 @@ describe("the order transition table", () => {
     }
   });
 
+  /* ── corrections ────────────────────────────────────────────────────────────────
+     A second, separate table. `delivered` is a human's assertion about the physical
+     world made by pressing a button next to another button, and before 2026-08-12 there
+     was no way back from a misclick. */
+
+  it("offers a way back from delivered and shipped", () => {
+    expect(undosFor({ status: "delivered", paymentMethod: "cod" })).toEqual(["shipped"]);
+    expect(undosFor({ status: "shipped", paymentMethod: "cod" })).toEqual(["processing"]);
+  });
+
+  it("puts an order back on the rail it came in on", () => {
+    /* processing is reached from `paid` on prepaid and `confirmed` on COD; offering both
+       would let a COD order be walked into a prepaid-only status. */
+    expect(undosFor({ status: "processing", paymentMethod: "prepaid" })).toEqual(["paid"]);
+    expect(undosFor({ status: "processing", paymentMethod: "cod" })).toEqual(["confirmed"]);
+  });
+
+  it("never undoes anything that put stock back", () => {
+    /* cancelled and rto_returned both restock. Reversing one means taking stock out
+       again, which can oversell — those are re-orders, not undos. */
+    for (const status of ["cancelled", "rto_returned", "expired", "refunded", "failed"] as const) {
+      expect(undosFor({ status, paymentMethod: "cod" }), `${status} should have no undo`).toEqual([]);
+    }
+  });
+
+  it("does not let an undo travel more than one step", () => {
+    expect(canUndo({ status: "delivered", paymentMethod: "cod" }, "processing")).toBe(false);
+    expect(canUndo({ status: "delivered", paymentMethod: "cod" }, "confirmed")).toBe(false);
+    expect(canUndo({ status: "shipped", paymentMethod: "cod" }, "confirmed")).toBe(false);
+  });
+
   it("never lets an order move to itself", () => {
     for (const status of ALL) {
       expect(canTransition(status, status), `${status} → ${status}`).toBe(false);
     }
   });
 
-  it("only ships something that was being packed", () => {
+  it("ships from anywhere the parcel is genuinely in hand", () => {
+    /* Was ["processing"] alone. The house packs and hands over in one sitting, so
+       requiring a separate "start packing" click first made the common case two clicks
+       and two page loads (client, 2026-08-12). `processing` survives as a real state for
+       a parcel packed but not yet collected — it is just no longer compulsory. */
     const sources = ALL.filter((s) => canTransition(s, "shipped"));
-    expect(sources).toEqual(["processing"]);
+    expect(sources).toEqual(["paid", "confirmed", "processing"]);
+  });
+
+  it("never ships something unpaid, cancelled or already gone", () => {
+    /* The half of the old assertion that still matters: widening the entry points must not
+       have opened one from a status where there is nothing legitimate to send. */
+    for (const status of ["pending_payment", "shipped", "delivered", "cancelled", "refunded", "failed", "expired", "rto_returned"] as const) {
+      expect(canTransition(status, "shipped"), `${status} → shipped`).toBe(false);
+    }
   });
 
   it("only accepts a return of something that went out", () => {

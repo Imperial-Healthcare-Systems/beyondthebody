@@ -12,7 +12,14 @@ import { closeDb, db } from "@/db/client";
 import { inventoryMovement, job, order, orderItem, productVariant } from "@/db/schema";
 import type { Address } from "@/lib/address";
 import { seedVariants } from "@/lib/catalogue";
-import { canTransition, markCodCollected, transitionOrder, listOrders, orderCounts } from "@/lib/fulfilment";
+import {
+  canTransition,
+  markCodCollected,
+  transitionOrder,
+  undoOrderStatus,
+  listOrders,
+  orderCounts,
+} from "@/lib/fulfilment";
 import { auditInventory } from "@/lib/inventory";
 import { placeOrder } from "@/lib/orders";
 import { __clearSettingsCache, setSetting } from "@/lib/settings";
@@ -126,14 +133,87 @@ describe.skipIf(!hasDb)("phase 7 · running an order", () => {
 
   it("refuses a move the table doesn't allow", async () => {
     const placed = await placeTracked();
-    expect(canTransition("confirmed", "shipped")).toBe(false);
+    /* confirmed → shipped became legal on 2026-08-12 (the house packs and hands over in
+       one go), so this case now uses a move that is still genuinely impossible: a parcel
+       cannot come back before it has gone out. */
+    expect(canTransition("confirmed", "rto_returned")).toBe(false);
 
-    await expect(transitionOrder(placed.id, "shipped", ACTOR)).rejects.toThrow(/can't be marked/i);
+    await expect(transitionOrder(placed.id, "rto_returned", ACTOR)).rejects.toThrow(
+      /can't be marked/i
+    );
 
     /* And the refusal changed nothing. */
     const [row] = await db.select().from(order).where(eq(order.id, placed.id));
     expect(row!.status).toBe("confirmed");
     expect(row!.shippedAt).toBeNull();
+  });
+
+  it("takes back a delivery that was marked by mistake", async () => {
+    /* THE case this exists for: `delivered` sits next to `came back to us` in a row of
+       buttons, and before 2026-08-12 pressing the wrong one left the order stuck delivered
+       for good. */
+    const placed = await placeTracked();
+    await transitionOrder(placed.id, "shipped", ACTOR, { trackingNumber: "TRK-UNDO" });
+    const delivered = await transitionOrder(placed.id, "delivered", ACTOR);
+    expect(delivered.deliveredAt).toBeInstanceOf(Date);
+
+    const back = await undoOrderStatus(placed.id, "shipped", ACTOR, { note: "wrong row" });
+
+    expect(back.status).toBe("shipped");
+    /* The stamp goes with the status. A delivery date left on an undelivered parcel would
+       show the customer a date for something still in transit. */
+    expect(back.deliveredAt).toBeNull();
+    /* But the parcel really did ship, so that stamp and its tracking stay. */
+    expect(back.shippedAt).toBeInstanceOf(Date);
+    expect(back.trackingNumber).toBe("TRK-UNDO");
+    expect(back.notes).toMatch(/wrong row/);
+  });
+
+  it("moves no stock when a status is corrected", async () => {
+    const placed = await placeTracked();
+    const before = await stock();
+
+    await transitionOrder(placed.id, "shipped", ACTOR);
+    await transitionOrder(placed.id, "delivered", ACTOR);
+    await undoOrderStatus(placed.id, "shipped", ACTOR);
+    await undoOrderStatus(placed.id, "processing", ACTOR);
+
+    /* An undo is a correction to a record, not an event in the warehouse. */
+    expect(await stock()).toBe(before);
+    expect(await movements(placed.id)).toHaveLength(1);
+  });
+
+  it("re-arms the tracking email if a shipment is undone and really ships later", async () => {
+    /* Counted the same way the email test below does — one query shape for "mail queued to
+       this customer", rather than two that could drift apart. */
+    const mailTo = async (email: string) =>
+      (
+        await db
+          .select()
+          .from(job)
+          .where(and(eq(job.kind, "mail:send"), sql`${job.payload}->>'to' = ${email}`))
+      ).length;
+
+    const placed = await placeTracked();
+    await transitionOrder(placed.id, "shipped", ACTOR);
+    const afterFirst = await mailTo(placed.email);
+
+    await undoOrderStatus(placed.id, "processing", ACTOR);
+    await transitionOrder(placed.id, "shipped", ACTOR);
+
+    /* Undoing clears shipped_at, so the second departure is a genuine first arrival as far
+       as the customer is concerned, and they are told about it. */
+    expect(await mailTo(placed.email)).toBe(afterFirst + 1);
+  });
+
+  it("refuses to undo out of a status that already restocked", async () => {
+    const placed = await placeTracked();
+    await transitionOrder(placed.id, "cancelled", ACTOR);
+
+    /* Reversing a restock could oversell, so there is deliberately no way back. */
+    await expect(undoOrderStatus(placed.id, "processing", ACTOR)).rejects.toThrow(
+      /can't be put back/i
+    );
   });
 
   it("emails the customer when the parcel goes out, and only then", async () => {

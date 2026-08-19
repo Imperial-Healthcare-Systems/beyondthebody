@@ -116,4 +116,14 @@ export const RULES = {
   /* COD commits stock with no money at risk to the attacker — the cheapest way to empty
      an eight-SKU inventory. Tighter than prepaid on purpose. */
   codPhone: { name: "cod:phone", limit: 3, windowSec: 86_400 },
+
+  /* Order lookup (the bar at the bottom of the bag). Order numbers are sequential, so
+     BTB-2026-0507 hands you BTB-2026-0508 for free; the email beside it is what makes the
+     pair a credential, and a credential that can be tried without limit is not one. Two
+     buckets doing different jobs: per-IP stops one source walking the sequence, per-number
+     stops a single known order being paired with guessed addresses from anywhere.
+     Looser per IP than adminLogin because Indian carriers NAT heavily and this is a form
+     a real customer, standing over a parcel, may well fumble twice. */
+  orderLookupIp: { name: "order-lookup:ip", limit: 20, windowSec: 3_600 },
+  orderLookupNumber: { name: "order-lookup:number", limit: 8, windowSec: 3_600 },
 } as const satisfies Record<string, RateLimitRule>;

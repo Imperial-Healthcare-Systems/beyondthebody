@@ -39,10 +39,13 @@ try {
   console.log(`PDP price before: ${before}`);
 
   await page.goto(magicLink, { waitUntil: "domcontentloaded" });
-  await page.goto(`${baseUrl}/admin/prices`, { waitUntil: "domcontentloaded" });
+  /* MA-100's price lives on the scent's own screen since price and pictures merged. */
+  await page.goto(`${baseUrl}/admin/products/mon-amour`, { waitUntil: "domcontentloaded" });
 
   const heading = await page.locator("h1").first().textContent();
-  if (heading?.trim() !== "Prices") {
+  /* Price editing moved onto each product's own screen (2026-08-12), so the heading this
+     lands on is the scent's name, not "Prices". */
+  if (heading?.trim() !== "Mon Amour") {
     throw new Error(`Not signed in — landed on "${heading?.trim()}"`);
   }
 
