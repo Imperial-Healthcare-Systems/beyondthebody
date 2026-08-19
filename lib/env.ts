@@ -156,7 +156,14 @@ export const env = new Proxy({} as Env, {
   getOwnPropertyDescriptor: () => ({ enumerable: true, configurable: true }),
 });
 
-export const isProduction = () => loadEnv().NODE_ENV === "production";
+/* isProduction and designRoutesEnabled read process.env DIRECTLY, not through
+   loadEnv() — deliberately, and this is the one file allowed to. Both are called
+   during `next build`'s page-data collection (generateStaticParams on
+   /preview/[section], cookie naming), and routing them through the full contract
+   made DATABASE_URL a BUILD requirement through the back door: a machine with no
+   env at all failed to build (caught 2026-08-19 — a fresh deploy with unset vars
+   died collecting page data). The build must never need the backend's env. */
+export const isProduction = () => process.env.NODE_ENV === "production";
 
 /**
  * Are the design-comparison routes (`/preview/*`, `/mockup/*`) reachable?
@@ -166,7 +173,7 @@ export const isProduction = () => loadEnv().NODE_ENV === "production";
  * is how a designer gets to look at a treatment on staging.
  */
 export function designRoutesEnabled(): boolean {
-  const explicit = loadEnv().DESIGN_ROUTES;
+  const explicit = process.env.DESIGN_ROUTES;
   if (explicit !== undefined) return explicit === "true" || explicit === "1";
   return !isProduction();
 }

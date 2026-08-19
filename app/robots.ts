@@ -1,6 +1,12 @@
 import type { MetadataRoute } from "next";
 import { env } from "@/lib/env";
 
+/* Rendered per request, not at build: the body needs APP_URL, and evaluating it during
+   `next build` made APP_URL a build requirement — a machine with no env failed to build
+   (2026-08-19). At runtime the env is guaranteed (boot refuses without it), and a
+   robots.txt computed per request costs nothing at this traffic. Same fix in sitemap.ts. */
+export const dynamic = "force-dynamic";
+
 /* What a crawler may look at.
  *
  * Everything disallowed here is either private, per-person, or not the site:
