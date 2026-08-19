@@ -134,6 +134,11 @@ export const adminUser = pgTable(
     name: text("name"),
     role: adminRole("role").notNull().default("editor"),
     status: adminStatus("status").notNull().default("active"),
+    /* Nullable BY DESIGN (added 2026-08-19, client request): password sign-in is
+       opt-in per account, set only by scripts/set-admin-password.mjs. Null keeps the
+       original contract — that account signs in by emailed link alone. The format and
+       verification live in lib/auth.ts (scrypt, constant-time). */
+    passwordHash: text("password_hash"),
     lastLoginAt: ts("last_login_at"),
     createdAt: ts("created_at").notNull().defaultNow(),
   },

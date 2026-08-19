@@ -50,6 +50,21 @@
   filter: brightness(var(--img-dim)) saturate(var(--img-sat));
 }
 
+/* The whole photograph is a link (see ProductTouch3.tsx). Laid OVER the image rather than
+   wrapped around it, so neither the img's containing block nor the reveal's selectors
+   move. z-index keeps it above the img's own stacking position; the seam roundel
+   (.col__mark) sits outside this figure and is unaffected. */
+.col__medialink { position: absolute; inset: 0; z-index: 1; }
+
+/* The one affordance the register allows: the photograph lifts a little under the cursor.
+   FILTER, never transform — GSAP owns this image's transform (the reveal's scale and the
+   parallax scrub) and the two would fight. It also keeps the promise at the top of this
+   file: the tweens touch clipPath/scale, never filter, so these two never meet. */
+.col__media img { transition: filter .5s var(--ease); }
+.col__media:hover img {
+  filter: brightness(calc(var(--img-dim) * 1.05)) saturate(var(--img-sat));
+}
+
 /* text block */
 .col__text { display: flex; flex-direction: column; align-items: flex-start; }
 .col__no {
@@ -124,6 +139,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .col__media img { will-change: auto; }
+  .col__media img { will-change: auto; transition: none; }
   .col__namelink::after { transition: none; }
 }

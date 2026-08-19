@@ -160,6 +160,13 @@
 
 .adm__note { font-size: 13px; color: var(--adm-muted); margin: 12px 0 0; }
 .adm__error { font-size: 13px; color: #8a4a4a; margin: 12px 0 0; }
+/* Inline mode-switch on the login card ("email me a link instead") — a button that
+   reads as a link, because it changes the form, not the world. */
+.adm__link {
+  background: none; border: 0; padding: 0; font: inherit; font-size: 13px;
+  color: var(--adm-muted); text-decoration: underline; cursor: pointer;
+}
+.adm__link:hover { color: var(--adm-ink, inherit); }
 
 .adm__empty { padding: 28px; text-align: center; color: var(--adm-muted); font-size: 13px; }
 

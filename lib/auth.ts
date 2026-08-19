@@ -8,11 +8,19 @@
  * can also be driven from a CLI script (see scripts/create-admin.mjs). The cookie layer
  * lives in lib/admin-session.ts. */
 
+import { randomBytes, scrypt as scryptCb, timingSafeEqual } from "node:crypto";
+import { promisify } from "node:util";
 import { and, eq, gt, isNull, lt, or, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { adminSession, adminUser, loginToken } from "@/db/schema";
 import { generateToken, hashToken, normaliseEmail } from "./tokens";
 import { logger, maskEmail } from "./logger";
+
+const scrypt = promisify(scryptCb) as (
+  password: string,
+  salt: Buffer,
+  keylen: number
+) => Promise<Buffer>;
 
 export type AdminUser = typeof adminUser.$inferSelect;
 export type AdminRole = AdminUser["role"];
@@ -107,6 +115,70 @@ export async function consumeLoginToken(
 
   logger.info("auth.signed_in", { email: maskEmail(user.email), role: user.role });
   return { ok: true, user, sessionToken };
+}
+
+/* ── Password sign-in (added 2026-08-19, client request) ──────────────────────────
+   The original design was magic-link only; a password is now an OPT-IN alternative per
+   account (admin_user.password_hash, null = link only). Hashing is scrypt via
+   node:crypto — no new dependency — in the format `scrypt:<salt hex>:<hash hex>`. */
+
+export async function hashPassword(password: string): Promise<string> {
+  const salt = randomBytes(16);
+  const hash = await scrypt(password, salt, 64);
+  return `scrypt:${salt.toString("hex")}:${hash.toString("hex")}`;
+}
+
+export async function verifyPassword(stored: string, password: string): Promise<boolean> {
+  const [scheme, saltHex, hashHex] = stored.split(":");
+  if (scheme !== "scrypt" || !saltHex || !hashHex) return false;
+  const hash = await scrypt(password, Buffer.from(saltHex, "hex"), 64);
+  const expected = Buffer.from(hashHex, "hex");
+  return hash.length === expected.length && timingSafeEqual(hash, expected);
+}
+
+/* A real hash of a throwaway string. Verified against when the account is missing,
+   disabled, or link-only, so those paths spend the same scrypt cost as a wrong
+   password — response time must not separate "bad password" from "no such account". */
+const DUMMY_HASH =
+  "scrypt:7a3a01080794c1d1dd68e59352b09a15:e9fd929cd9ae98381737d502ff1082832c94f2e8974ee9a42d0a1c4b081f84303881a207eb43edf98b9f5416beafdf7e04f37930630c15883593a0f20018b7bb";
+
+/**
+ * Email + password → session, or null. **The caller must respond identically for every
+ * kind of failure** — same body, same status — for the same enumeration reason as
+ * issueLoginToken above.
+ */
+export async function authenticateWithPassword(
+  email: string,
+  password: string,
+  meta: { ipHash?: string; userAgent?: string } = {}
+): Promise<{ user: AdminUser; sessionToken: string } | null> {
+  const normalised = normaliseEmail(email);
+
+  const [user] = await db
+    .select()
+    .from(adminUser)
+    .where(and(eq(adminUser.email, normalised), eq(adminUser.status, "active")))
+    .limit(1);
+
+  if (!user?.passwordHash) {
+    await verifyPassword(DUMMY_HASH, password);
+    logger.info("auth.password_rejected", { email: maskEmail(normalised) });
+    return null;
+  }
+
+  if (!(await verifyPassword(user.passwordHash, password))) {
+    logger.info("auth.password_rejected", { email: maskEmail(normalised) });
+    return null;
+  }
+
+  const sessionToken = await createSession(user.id, meta);
+  await db
+    .update(adminUser)
+    .set({ lastLoginAt: new Date() })
+    .where(eq(adminUser.id, user.id));
+
+  logger.info("auth.signed_in", { email: maskEmail(user.email), role: user.role, via: "password" });
+  return { user, sessionToken };
 }
 
 export async function createSession(
