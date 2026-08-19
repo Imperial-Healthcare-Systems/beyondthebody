@@ -137,6 +137,7 @@ html.btb-anim .pdp__main img { transform: scale(1.16); }
 html.btb-anim .story__eyebrow,
 html.btb-anim .story__sign { opacity: 0; transform: translateY(20px); }
 html.btb-anim .story__s { opacity: 0.14; }   /* dim, then writes in */
+html.btb-anim .story__phase { opacity: 0; transform: translateY(18px); }
 
 html.btb-anim .comp__copy > * { opacity: 0; transform: translateY(26px); }
 html.btb-anim .comp__group { opacity: 0; transform: translateY(20px); }

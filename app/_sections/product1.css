@@ -28,8 +28,15 @@
 }
 
 /* -------- full-bleed scene (owns the frame) -------- */
+/* The scene is a link to its PDP (client, 2026-08-19). The LINK carries the
+   layout — it is what the <=1024px band layout re-positions as a flex child —
+   and .p1__img keeps only the fill. The split is load-bearing: both beats'
+   GSAP timelines tween `.p1__img` (opacity/scale/yPercent), so the <img> and
+   its class must survive the wrap untouched. */
+.p1__imglink { position: absolute; inset: 0; z-index: 0; display: block; }
+.p1__imglink:focus-visible { outline: 1px solid var(--accent); outline-offset: -3px; }
 .p1__img {
-  position: absolute; inset: 0; z-index: 0;
+  position: absolute; inset: 0;
   width: 100%; height: 100%; object-fit: cover; object-position: center;
   will-change: transform;
 }
@@ -45,9 +52,14 @@
 /* -------- notes · numbered positioning pointers -------- */
 /* <ol>, so the browser default list padding/markers must be reset — it would
    otherwise indent the whole stacked column by 40px. */
+/* pointer-events: this <ol> blankets the whole banner (inset: 0) ABOVE the
+   image link, so left alone it would swallow every click meant for the scene.
+   The container goes transparent to the pointer; each note opts back in so its
+   label text stays selectable. */
 .p1__notes {
   position: absolute; inset: 0; z-index: 2;
   list-style: none; margin: 0; padding: 0;
+  pointer-events: none;
 }
 /* THE MARKER HAS TWO STATES (client direction, 2026-08-01), and which one shows
    follows where the pointers sit — not an extra flag:
@@ -63,6 +75,9 @@
      moment the reveal ran, and only reduced-motion rendered these correctly. */
   position: absolute; translate: 0 -50%;
   display: flex; align-items: center; gap: 11px; white-space: nowrap;
+  /* the container above is pointer-transparent; each note opts back in so its
+     label stays selectable without blocking the image link around it. */
+  pointer-events: auto;
 }
 /* the crosshair always faces the bottle: left-anchored pointers grow rightward
    with the mark on the right (toward centre); right-anchored grow leftward with
@@ -146,9 +161,9 @@
     display: flex; flex-direction: column; align-items: flex-start;
     min-height: auto; padding: 0 0 clamp(50px, 9vh, 84px);
   }
-  .p1__img {
+  .p1__imglink {
     position: relative; inset: auto; order: 0;
-    width: 100%; height: 56vh; object-position: center;
+    width: 100%; height: 56vh;
   }
   .p1__eyebrow {
     position: static; order: 1; top: auto; left: auto;

@@ -99,11 +99,16 @@ export default function ProductTouch1() {
        over from when §4 was "Beyond The Body · The Signature", which left that
        link dead. §6 already matches this convention with id="desir". */
     <section className="p1" data-theme="dark" id="don-amour" ref={root}>
-      <img
-        className="p1__img"
-        src={BOTTLE}
-        alt="Don Amour — faceted black glass flacon with a gold cap, on dark stone with driftwood, warm directional light"
-      />
+      {/* The whole scene links to the PDP (client, 2026-08-19). The <a> carries
+          the layout and the <img> keeps .p1__img — the GSAP tween target — see
+          product1.css. The img's alt names the link. */}
+      <a className="p1__imglink" href="/fragrance/don-amour">
+        <img
+          className="p1__img"
+          src={BOTTLE}
+          alt="Don Amour — faceted black glass flacon with a gold cap, on dark stone with driftwood, warm directional light"
+        />
+      </a>
 
       <p className="p1__eyebrow">— Beyond the body</p>
 

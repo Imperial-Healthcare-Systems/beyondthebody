@@ -47,7 +47,9 @@ export default function PdpDetails({ product }: { product: Product }) {
       <div className="det__inner">
         <header className="det__head">
           <p className="det__eyebrow">The Particulars</p>
-          <h2 className="det__title">Made once, kept close.</h2>
+          {/* Per-product since 2026-08-19 (client copy drop) — was one shared
+              "Made once, kept close.", which Desir alone keeps. */}
+          <h2 className="det__title">{product.wearTitle}</h2>
           {product.wear && <p className="det__wear">{product.wear}</p>}
         </header>
 

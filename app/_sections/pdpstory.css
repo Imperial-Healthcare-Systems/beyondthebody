@@ -1,5 +1,8 @@
 /* =================================================================
-   PDP · Story — the quiet, light, typographic beat.
+   PDP · Story — the quiet, light, typographic beat. Since 2026-08-19
+   it renders the client's Sensory Experience Story: a centered display
+   quote, then three timed phases as hairline-ruled left-aligned rows
+   (kin of .det__row in pdpdetails.css), signed off by the tagline.
    ================================================================= */
 
 .story {
@@ -20,8 +23,9 @@
   color: var(--ink-muted);
   margin: 0 0 clamp(32px, 5vh, 52px);
 }
-.story__body {
+.story__quote {
   font-family: var(--ff-display);
+  font-style: italic;
   font-weight: 300;
   letter-spacing: -0.01em;
   font-size: clamp(1.4rem, 2.5vw, 2.05rem);
@@ -32,6 +36,52 @@
 }
 .story__s {
   /* inline — opacity-only reveal so the line never reflows */
+}
+
+/* -------- the three timed phases · hairline rows -------- */
+.story__phases {
+  list-style: none;
+  margin: clamp(44px, 7vh, 72px) 0 0;
+  padding: 0;
+  text-align: left;
+}
+.story__phase {
+  border-top: 1px solid var(--hairline);
+  padding: clamp(18px, 3vh, 28px) 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.2vh, 12px);
+}
+.story__phase:last-child { border-bottom: 1px solid var(--hairline); }
+.story__phasehead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+.story__phasename {
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  font-size: clamp(0.6rem, 0.8vw, 0.7rem);
+  color: var(--ink-muted);
+}
+.story__phasewindow {
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(0.58rem, 0.76vw, 0.66rem);
+  color: var(--ink-muted);
+}
+.story__phasebody {
+  margin: 0;
+  font-family: var(--ff-display);
+  font-weight: 300;
+  font-size: clamp(1.02rem, 1.5vw, 1.25rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  text-wrap: pretty;
 }
 .story__sign {
   margin: clamp(38px, 6vh, 60px) 0 0;
