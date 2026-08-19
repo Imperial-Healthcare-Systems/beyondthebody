@@ -102,6 +102,11 @@ export const RULES = {
   newsletterIp: { name: "newsletter:ip", limit: 5, windowSec: 3_600 },
   newsletterEmail: { name: "newsletter:email", limit: 3, windowSec: 86_400 },
   adminLogin: { name: "admin-login:email", limit: 5, windowSec: 900 },
+  /* Password sign-in: unlike the link, a wrong password is free to retry, so brute
+     force is the failure mode. Keyed both ways — per account so one address cannot be
+     hammered from many IPs, per IP so one machine cannot walk a list of addresses. */
+  adminPasswordEmail: { name: "admin-password:email", limit: 8, windowSec: 900 },
+  adminPasswordIp: { name: "admin-password:ip", limit: 20, windowSec: 3_600 },
 
   /* Quoting is read-only and happens several times in one ordinary visit — opening
      checkout, changing a quantity, picking a state. It gets its own, generous bucket.

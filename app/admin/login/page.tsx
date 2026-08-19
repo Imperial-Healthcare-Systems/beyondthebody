@@ -1,7 +1,9 @@
-/* /admin/login — request a sign-in link.
+/* /admin/login — sign in with a password, or request a sign-in link.
  *
- * No password field, because there is no password: the schema has no column for one.
- * A signed-in visitor is sent straight through rather than shown a form. */
+ * Originally link-only; a password became an opt-in alternative per account on
+ * 2026-08-19 (client request) — see scripts/set-admin-password.mjs. Accounts without
+ * one still sign in exactly as before. A signed-in visitor is sent straight through
+ * rather than shown a form. */
 
 import { redirect } from "next/navigation";
 import { getAdmin } from "@/lib/admin-session";
@@ -26,7 +28,7 @@ export default async function AdminLoginPage({
         </p>
         <h1 className="adm__h1">Sign in</h1>
         <p className="adm__sub">
-          We&rsquo;ll email you a link. There&rsquo;s no password to remember.
+          Sign in with your password, or have a link emailed to you.
         </p>
         <LoginForm error={error} />
       </div>
