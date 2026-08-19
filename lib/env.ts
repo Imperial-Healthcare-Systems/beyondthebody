@@ -113,6 +113,16 @@ const EnvSchema = z.object({
 
   /* Optional. Absent = no error reporting beyond structured logs. */
   SENTRY_DSN: z.string().optional(),
+
+  /* ── TEMPORARY · demo access (2026-08-19) ──────────────────────────────────────
+     When set, GET /admin/demo-access?key=<value> signs the visitor in as a synthetic
+     demo "owner" with no email round-trip — so the client can open admin on the demo
+     deployment, where SMTP is absent and the magic-link mail would only ever be logged.
+     The key IS the credential: generate ≥32 random chars, share the full URL privately,
+     and UNSET this var the moment real hosting goes live — unset, the route is a 404
+     and this feature does not exist. Min length enforced so a guessable key cannot be
+     configured at all. */
+  DEMO_ADMIN_KEY: z.string().min(32).optional(),
 });
 
 export type Env = z.infer<typeof EnvSchema>;
