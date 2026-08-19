@@ -3,9 +3,12 @@ import { PRODUCTS } from "./_sections/products-data";
 import { env } from "@/lib/env";
 import { getPublishedPosts } from "@/lib/journal";
 
-/* Revalidated on the same clock as the Journal, so an essay published in admin appears in
-   the sitemap without a deploy — the same promise the rest of the site makes. */
-export const revalidate = 3600;
+/* Rendered per request (was ISR-hourly): the body needs APP_URL, and evaluating it at
+   build made APP_URL a build requirement — a machine with no env failed to build
+   (2026-08-19). Per-request keeps the same promise the revalidate made — an essay
+   published in admin appears without a deploy — just fresher, and a sitemap request is
+   rare enough that the extra render is free. Same fix in robots.ts. */
+export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = env.APP_URL;
