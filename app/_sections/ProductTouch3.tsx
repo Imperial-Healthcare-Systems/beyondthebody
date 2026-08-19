@@ -156,6 +156,21 @@ export default function ProductTouch3() {
           <article className={`col__row col__row--${p.side}`} key={p.no}>
             <figure className="col__media">
               <img src={p.img} alt={`${p.name} — Beyond The Body`} />
+              {/* The photograph opens the PDP too (client direction, 2026-08-19).
+                  An overlay rather than a wrapper around the img: the img is absolutely
+                  positioned against this figure and the reveal reaches it as
+                  `.col__media img`, so wrapping it would move its containing block and
+                  deepen that selector for no gain. It is the LAST child for the same
+                  reason — the reveal takes the row's FIRST `.col__media img`.
+                  Hidden from assistive tech and from the tab order on purpose: the name
+                  above and "Discover" below already link here, and a third stop on one
+                  destination is noise to anyone not using a mouse. */}
+              <a
+                className="col__medialink"
+                href={`/fragrance/${p.slug}`}
+                aria-hidden="true"
+                tabIndex={-1}
+              />
             </figure>
 
             <div className="col__text">
