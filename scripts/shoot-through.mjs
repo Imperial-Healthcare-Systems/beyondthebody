@@ -18,15 +18,34 @@ const base = "http://localhost:3000";
 const args = process.argv.slice(2);
 const home = args.includes("--home");
 const journal = args.includes("--journal");   // the /journal index (Sprint 02)
+const article = args.includes("--article");   // a /journal/<slug> essay (Sprint 02)
 const fragrance = args.includes("--fragrance"); // a /fragrance/<slug> PDP (Sprint 03)
 const key = args.find((a) => !a.startsWith("--"));
-if (!home && !journal && !fragrance && !key) {
-  console.error("usage: node scripts/shoot-through.mjs <beatKey> | --home | --journal | --fragrance <slug>");
+if (!home && !journal && !article && !fragrance && !key) {
+  console.error(
+    "usage: node scripts/shoot-through.mjs <beatKey> | --home | --journal | --article <slug> | --fragrance <slug>"
+  );
   process.exit(2);
 }
-const slug = fragrance ? key || "don-amour" : null;
-const route = fragrance ? `/fragrance/${slug}` : journal ? "/journal" : home ? "/" : `/preview/${key}`;
-const name = fragrance ? `fragrance-${slug}` : journal ? "journal-index" : home ? "home-through" : key;
+const slug = fragrance ? key || "don-amour" : article ? key || "the-long-patience-of-composition" : null;
+const route = fragrance
+  ? `/fragrance/${slug}`
+  : article
+    ? `/journal/${slug}`
+    : journal
+      ? "/journal"
+      : home
+        ? "/"
+        : `/preview/${key}`;
+const name = fragrance
+  ? `fragrance-${slug}`
+  : article
+    ? `journal-${slug}`
+    : journal
+      ? "journal-index"
+      : home
+        ? "home-through"
+        : key;
 
 await mkdir(OUT, { recursive: true });
 const browser = await chromium.launch();
@@ -40,7 +59,7 @@ const browser = await chromium.launch();
 const MAX_DEVICE_PX = 16384;
 // Whole-page routes (home, /journal) go at dSF 1 — the tall footer reveal pushes
 // them past Chromium's 16384 device-px cap at dSF 2. Short per-beat previews stay at 2.
-const dsf = home || journal || fragrance ? 1 : 2;
+const dsf = home || journal || article || fragrance ? 1 : 2;
 
 const shots = [
   { label: "desktop", width: 1440, height: 900 },

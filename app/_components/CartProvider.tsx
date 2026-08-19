@@ -32,6 +32,8 @@ type CartCtx = {
   add: (item: Omit<CartItem, "qty">, qty?: number) => void;
   setQty: (sku: string, qty: number) => void;
   remove: (sku: string) => void;
+  /** Emptied once an order exists — see app/order/[token]/ClearBagOnPlaced.tsx. */
+  clear: () => void;
   open: boolean;
   setOpen: (o: boolean) => void;
 };
@@ -48,6 +50,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(KEY);
+      /* eslint-disable-next-line react-hooks/set-state-in-effect --
+         This is the case the rule cannot express: a one-shot read of an external store
+         (localStorage) AFTER hydration. It cannot move into useState's initialiser — the
+         server has no localStorage, so the server would render an empty bag and the client
+         a full one, which is a hydration mismatch rather than a fix. useSyncExternalStore
+         is the by-the-book alternative and would rewrite the storage layer of a working
+         cart to satisfy a lint rule, changing no behaviour. */
       if (raw) setItems(JSON.parse(raw));
     } catch {
       /* ignore corrupt storage */
@@ -90,6 +99,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems((prev) => prev.filter((p) => p.sku !== sku));
   }, []);
 
+  /* Clears storage as well as state, and that is load-bearing rather than tidy.
+     A child's effect runs BEFORE its parent's, so the order confirmation page calls this
+     while `hydrated` is still false — and the hydrate effect above would then read the
+     old bag straight back out of storage and restore it. The customer would land on
+     "thank you for your order" with the order still in their bag, and quite reasonably
+     buy it again. Removing the key means hydration finds nothing whichever order the two
+     effects run in. */
+  const clear = useCallback(() => {
+    try {
+      localStorage.removeItem(KEY);
+    } catch {
+      /* storage unavailable — the state reset below is still correct */
+    }
+    setItems([]);
+  }, []);
+
   const count = items.reduce((n, p) => n + p.qty, 0);
   const hasUnpriced = items.some((p) => p.price == null);
   const subtotal = hasUnpriced
@@ -98,7 +123,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   return (
     <Ctx.Provider
-      value={{ items, count, subtotal, hasUnpriced, add, setQty, remove, open, setOpen }}
+      value={{ items, count, subtotal, hasUnpriced, add, setQty, remove, clear, open, setOpen }}
     >
       {children}
     </Ctx.Provider>

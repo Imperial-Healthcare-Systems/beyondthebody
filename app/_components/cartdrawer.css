@@ -224,14 +224,105 @@
   text-transform: uppercase;
   letter-spacing: 0.2em;
   font-size: 0.68rem;
-  cursor: not-allowed;
-  /* disabled state — a relative dim, so it reads the same on either panel */
-  opacity: 0.55;
+  /* An <a> since checkout became real, so it needs the block box and the underline reset
+     a <button> gave it for free. */
+  display: block;
+  box-sizing: border-box;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity var(--dur-fast, 0.4s) var(--ease);
 }
+.cart__checkout:hover { opacity: 0.88; }
 .cart__note {
   margin: 12px 0 0;
   text-align: center;
   font-family: var(--ff-body);
   font-size: 0.72rem;
   color: var(--rose-taupe);
+}
+
+/* order lookup — the last thing in the panel, under both the empty and the full bag.
+   Borrows the footer newsletter's field language (hairline underline, transparent input,
+   the rule brightening on focus) so the two forms in this house read as one hand, but
+   painted from the PANEL tokens like the rest of this drawer. */
+.cart__track {
+  padding: clamp(16px, 2.2vh, 22px) clamp(22px, 3vw, 34px) clamp(20px, 2.8vh, 28px);
+  border-top: 1px solid color-mix(in srgb, var(--panel-ink) 14%, transparent);
+  /* The bag list above scrolls; this must not be scrolled past to be found. */
+  flex: 0 0 auto;
+}
+.cart__tracklabel {
+  display: block;
+  margin-bottom: 10px;
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: 0.6rem;
+  color: var(--rose-taupe);
+}
+.cart__trackfield {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid color-mix(in srgb, var(--panel-ink) 20%, transparent);
+  transition: border-color var(--dur-fast, 0.4s) var(--ease);
+}
+.cart__trackfield + .cart__trackfield {
+  margin-top: 12px;
+}
+.cart__trackfield:focus-within {
+  border-bottom-color: var(--panel-ink);
+}
+.cart__trackinput {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  padding: 5px 1px;
+  color: var(--panel-ink);
+  /* A transparent-background field does not dependably take its caret from `color` —
+     the same pinning the footer field needs. */
+  caret-color: var(--panel-ink);
+  font-family: var(--ff-body);
+  font-size: 0.88rem;
+}
+.cart__trackinput::placeholder {
+  color: var(--rose-taupe);
+  opacity: 0.9;
+}
+.cart__trackgo {
+  flex: 0 0 auto;
+  background: transparent;
+  border: 0;
+  padding: 4px 0 4px 4px;
+  cursor: pointer;
+  color: var(--panel-ink);
+  font-family: var(--ff-exp);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.62rem;
+  transition: opacity var(--dur-fast, 0.4s) var(--ease);
+}
+.cart__trackgo:hover {
+  opacity: 0.7;
+}
+.cart__trackinput:disabled,
+.cart__trackgo:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+/* Quiet and in the body face — a form that didn't find something is not a moment for
+   alarm colour in this register. Collapses to nothing while there is no message. */
+.cart__trackmsg {
+  margin: 0;
+  font-family: var(--ff-body);
+  font-size: 0.72rem;
+  line-height: 1.6;
+  color: var(--rose-taupe);
+}
+.cart__trackmsg:not(:empty) {
+  margin-top: 12px;
 }

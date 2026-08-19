@@ -86,6 +86,36 @@ html.btb-anim .jx__media { clip-path: inset(0 0 0 100%); }
 html.btb-anim .jx__media img { transform: scale(1.14); }
 html.btb-anim .jx__body > * { opacity: 0; transform: translateY(24px); }
 
+/* ---------- editorial-article archetype — _archetypes/EditorialArticle.tsx ----------
+   The article route never had a mirror here. The public route's preloader curtain hid
+   the consequence; the admin draft preview has no curtain, so an editor saw the whole
+   masthead paint and then snap back to hidden in order to play. Mirrors the archetype,
+   not the Journal — every page built on it is covered by these six rules.
+   .ea__foot and .ea__body > * are deliberately ABSENT: both are ScrollTrigger-driven and
+   nothing above the fold depends on them.
+   The back link is scoped to .ea__mast — the SECOND one lives in the foot, which the
+   intro timeline never touches, so an unscoped rule would hide it permanently. */
+html.btb-anim .ea__mast .ea__back,
+html.btb-anim .ea__meta,
+html.btb-anim .ea__standfirst { opacity: 0; transform: translateY(20px); }
+html.btb-anim .ea__rule { transform: scaleX(0); transform-origin: center; }
+html.btb-anim .ea__title .inner { transform: translateY(115%); }
+html.btb-anim .ea__media { clip-path: inset(0 0 100% 0); }
+html.btb-anim .ea__media img { transform: scale(1.12); }
+
+/* ---------- the 404 — _sections/NotFoundCollage.tsx ----------
+   This route carries no Preloader by design, so there is no curtain to hide the
+   flash-of-final-state between paint and hydration. These rules are the whole defence. */
+html.btb-anim .nf__eyebrow,
+html.btb-anim .nf__intro,
+html.btb-anim .nf__door,
+html.btb-anim .nf__foot { opacity: 0; transform: translateY(18px); }
+html.btb-anim .nf__rule { transform: scaleX(0); transform-origin: center; }
+html.btb-anim .nf__headline .inner { transform: translateY(115%); }
+/* The mosaic settles from 0 / scale(1.06). Scoped to .nf — the same backdrop renders in
+   the /mockup comp, which is static and must NOT start hidden. */
+html.btb-anim .nf .cb__collage { opacity: 0; transform: scale(1.06); }
+
 /* ---------- /contact · masthead — ContactMasthead.tsx ---------- */
 html.btb-anim .ct__rule { transform: scaleX(0); transform-origin: left; }
 html.btb-anim .ct__eyebrow,
@@ -107,6 +137,7 @@ html.btb-anim .pdp__main img { transform: scale(1.16); }
 html.btb-anim .story__eyebrow,
 html.btb-anim .story__sign { opacity: 0; transform: translateY(20px); }
 html.btb-anim .story__s { opacity: 0.14; }   /* dim, then writes in */
+html.btb-anim .story__phase { opacity: 0; transform: translateY(18px); }
 
 html.btb-anim .comp__copy > * { opacity: 0; transform: translateY(26px); }
 html.btb-anim .comp__group { opacity: 0; transform: translateY(20px); }

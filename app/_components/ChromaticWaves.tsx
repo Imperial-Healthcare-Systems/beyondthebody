@@ -321,14 +321,14 @@ export default function ChromaticWaves({
   const effectivePlay = true;
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const perlinProgramRef = useRef<any>(null);
-  const dotProgramRef = useRef<any>(null);
-  const rendererRef = useRef<any>(null);
-  const cameraRef = useRef<any>(null);
-  const perlinMeshRef = useRef<any>(null);
-  const dotMeshRef = useRef<any>(null);
-  const renderTargetRef = useRef<any>(null);
-  const glRef = useRef<any>(null);
+  const perlinProgramRef = useRef<Program | null>(null);
+  const dotProgramRef = useRef<Program | null>(null);
+  const rendererRef = useRef<Renderer | null>(null);
+  const cameraRef = useRef<Camera | null>(null);
+  const perlinMeshRef = useRef<Mesh | null>(null);
+  const dotMeshRef = useRef<Mesh | null>(null);
+  const renderTargetRef = useRef<OglRenderTarget | null>(null);
+  const glRef = useRef<Renderer['gl'] | null>(null);
   const rafIdRef = useRef<number | null>(null);
   const lastTimeRef = useRef(0);
   const isPlayingRef = useRef(effectivePlay);

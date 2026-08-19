@@ -1,0 +1,1 @@
+ALTER TABLE "setting" ALTER COLUMN "value" DROP NOT NULL;

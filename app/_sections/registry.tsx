@@ -11,6 +11,7 @@ import ProductTouch3 from "./ProductTouch3";
 import Journal from "./Journal";
 import CircularClose from "./CircularClose";
 import Footer from "./Footer";
+import ArticleStress from "../_archetypes/ArticleStress";
 
 /* The accumulating page spine. Each approved beat is APPENDED here verbatim
    (page_build loop). page.tsx renders BEATS in order; the /preview/[section]
@@ -40,4 +41,8 @@ export const BEATS: Beat[] = [
 /* Preview-only alternates (comparisons); NOT part of the live page. */
 export const VARIANTS: Beat[] = [
   { key: "origin-a", label: "§3 · ORIGIN (Variant A — vertical BTB)", Component: Origin },
+  /* Not an alternate — a fixture. The Journal is authored from the admin portal, so the
+     editorial-article archetype has to be checked against content nobody has written yet.
+     Shoot this alongside a real essay whenever the archetype changes. */
+  { key: "article-stress", label: "ARCHETYPE · editorial article (stress fixture)", Component: ArticleStress },
 ];

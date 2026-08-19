@@ -1,0 +1,98 @@
+/* The legal pages — privacy, terms, shipping, refunds.
+   Same ivory ground and measured column as /checkout and the Journal article. These are
+   read once, under mild duress, usually to answer one question; so the register is quiet,
+   the measure is narrow, and the headings are findable at a glance. No motion at all. */
+
+.lg {
+  background: var(--ivory);
+  color: var(--ink);
+  padding: clamp(90px, 12vh, 150px) 0 clamp(70px, 10vh, 120px);
+}
+
+.lg__inner {
+  width: min(100% - 2 * var(--gutter, 24px), 720px);
+  margin-inline: auto;
+}
+
+.lg__eyebrow {
+  margin: 0 0 14px;
+  font-family: var(--ff-exp);
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rose-taupe);
+}
+
+.lg__title {
+  margin: 0;
+  font-family: var(--ff-display);
+  font-weight: 300;
+  font-size: clamp(2rem, 4.6vw, 3.2rem);
+  line-height: 1.06;
+  letter-spacing: -0.015em;
+}
+
+.lg__meta {
+  margin: 16px 0 clamp(34px, 5vh, 56px);
+  font-size: 0.85rem;
+  color: var(--rose-taupe);
+}
+
+.lg__body h2 {
+  margin: clamp(34px, 5vh, 52px) 0 12px;
+  font-family: var(--ff-display);
+  font-weight: 300;
+  font-size: clamp(1.15rem, 2.2vw, 1.5rem);
+  line-height: 1.2;
+}
+
+.lg__body h3 {
+  margin: 26px 0 8px;
+  font-family: var(--ff-exp);
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--rose-taupe);
+}
+
+.lg__body p,
+.lg__body li {
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+
+.lg__body p { margin: 0 0 1.1em; }
+
+.lg__body ul {
+  margin: 0 0 1.4em;
+  padding-left: 1.1em;
+}
+.lg__body li { margin-bottom: 0.5em; }
+
+.lg__body a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.22em;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--rose-taupe);
+}
+.lg__body a:hover { text-decoration-color: currentColor; }
+
+/* A fact only the house can supply.
+   Loud on purpose. Every one of these is a sentence somebody has to write before this
+   page is true, and a quiet placeholder is one that goes live. */
+.lg__todo {
+  background: #f7e8c9;
+  color: #6b4a12;
+  padding: 0.1em 0.45em;
+  border-bottom: 1px solid #c9a24a;
+  font-style: italic;
+}
+
+.lg__note {
+  margin-top: clamp(40px, 6vh, 64px);
+  padding-top: 20px;
+  border-top: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
+  font-size: 0.85rem;
+  color: var(--rose-taupe);
+}

@@ -1,0 +1,345 @@
+/* /checkout and /order/[token] — the transactional pages.
+   Same ivory ground and oxblood ink as the Journal, same type scale, no motion. These
+   are the two pages on the site where the visitor is doing something rather than looking
+   at something, so the art direction gets out of the way: a measured column, generous
+   line height, and fields large enough to type an address into on a phone. */
+
+.co {
+  background: var(--ivory);
+  color: var(--ink);
+  padding: clamp(90px, 12vh, 150px) 0 clamp(70px, 10vh, 120px);
+}
+
+.co__inner {
+  width: min(100% - 2 * var(--gutter, 24px), 1080px);
+  margin-inline: auto;
+}
+.co__inner--empty { text-align: center; max-width: 46ch; }
+
+.co__head { margin-bottom: clamp(34px, 5vh, 56px); }
+
+.co__eyebrow {
+  margin: 0 0 14px;
+  font-family: var(--ff-exp);
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rose-taupe);
+}
+
+.co__title {
+  margin: 0;
+  font-family: var(--ff-display);
+  font-weight: 300;
+  font-size: clamp(2rem, 4.6vw, 3.2rem);
+  line-height: 1.06;
+  letter-spacing: -0.015em;
+}
+
+.co__lede {
+  margin: 16px 0 30px;
+  font-size: 0.95rem;
+  color: var(--rose-taupe);
+}
+
+/* Summary first on a phone — the customer wants to see what they are paying for before
+   they start typing. Two columns from the point there is room for both. */
+.co__grid {
+  display: grid;
+  gap: clamp(34px, 5vw, 64px);
+}
+@media (min-width: 900px) {
+  .co__grid {
+    grid-template-columns: 1fr minmax(0, 1.15fr);
+    align-items: start;
+  }
+  /* The summary stays in view while the form is filled in. */
+  .co__summary {
+    position: sticky;
+    top: clamp(80px, 12vh, 120px);
+  }
+}
+
+/* ── Summary ──────────────────────────────────────────────────────────────── */
+.co__lines { list-style: none; margin: 0; padding: 0; }
+
+.co__line {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line-dark);
+}
+.co__line:first-child { padding-top: 0; }
+
+.co__linebody { display: flex; flex-direction: column; gap: 6px; }
+
+.co__name { font-family: var(--ff-display); font-weight: 300; font-size: 1.05rem; }
+
+.co__size {
+  font-family: var(--ff-exp);
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--rose-taupe);
+}
+
+.co__lineprice { white-space: nowrap; font-size: 0.95rem; }
+
+.co__qty {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+  font-size: 0.85rem;
+}
+.co__qty button {
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--line-dark);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+.co__qty button:hover { border-color: var(--ink); }
+
+/* Anything that changed under the customer. Stated plainly, never in red — a price that
+   moved is information, not an error they made. */
+.co__issue {
+  margin: 6px 0 0;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--rose-taupe);
+}
+.co__was { text-decoration: line-through; }
+
+.co__dropped {
+  margin: 14px 0 0;
+  font-size: 0.85rem;
+  color: var(--rose-taupe);
+}
+
+.co__link {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.co__totals { margin: 26px 0 0; }
+.co__totals > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 7px 0;
+  font-size: 0.9rem;
+  color: var(--rose-taupe);
+}
+.co__totals dt, .co__totals dd { margin: 0; }
+
+.co__total {
+  margin-top: 8px;
+  padding-top: 16px !important;
+  border-top: 1px solid var(--line-dark);
+  color: var(--ink) !important;
+  font-size: 1.1rem !important;
+}
+
+/* ── Form ─────────────────────────────────────────────────────────────────── */
+.co__set { border: 0; margin: 0 0 34px; padding: 0; }
+.co__set:disabled { opacity: 0.55; }
+
+.co__legend {
+  padding: 0;
+  margin-bottom: 18px;
+  font-family: var(--ff-exp);
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rose-taupe);
+}
+
+.co__field { display: block; margin-bottom: 16px; }
+
+.co__row {
+  display: grid;
+  gap: 16px;
+}
+@media (min-width: 560px) {
+  .co__row { grid-template-columns: 1fr 1fr; }
+}
+
+.co__label {
+  display: block;
+  margin-bottom: 7px;
+  font-family: var(--ff-exp);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--rose-taupe);
+}
+.co__opt { text-transform: none; letter-spacing: 0.04em; opacity: 0.7; }
+
+.co__input {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid var(--line-dark);
+  background: color-mix(in srgb, var(--ivory) 60%, #fff);
+  color: var(--ink);
+  font-family: var(--ff-body);
+  /* 16px so iOS does not zoom the viewport when a field takes focus. */
+  font-size: 1rem;
+  line-height: 1.4;
+}
+.co__input:focus-visible {
+  outline: 1px solid var(--oxblood);
+  outline-offset: -1px;
+  border-color: var(--oxblood);
+}
+.co__input::placeholder { color: color-mix(in srgb, var(--rose-taupe) 75%, transparent); }
+
+.co__select { appearance: none; background-image: none; cursor: pointer; }
+.co__textarea { resize: vertical; }
+
+/* ── Payment ──────────────────────────────────────────────────────────────── */
+/* One row per method. A <label> when there is a choice to make and a <div> when there is
+   only one — a radio button with nothing to choose between is a control that does
+   nothing, so the markup changes rather than the styling. */
+.co__pay {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 4px;
+  padding: 16px 18px;
+  border: 1px solid var(--line-dark);
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+.co__pay:has(input) .co__payname,
+.co__pay:has(input) .co__paynote { grid-column: 2; }
+.co__pay:not(:has(input)) { grid-template-columns: 1fr; }
+
+.co__pay input[type="radio"] {
+  grid-row: 1 / span 2;
+  width: 15px;
+  height: 15px;
+  accent-color: var(--oxblood);
+  margin: 0;
+}
+
+.co__pay--on { border-color: var(--oxblood); }
+.co__pay--off { opacity: 0.5; cursor: default; }
+.co__pay:has(input:focus-visible) { outline: 1px solid var(--oxblood); outline-offset: 2px; }
+
+.co__payname { font-size: 0.95rem; }
+.co__paynote { font-size: 0.82rem; color: var(--rose-taupe); line-height: 1.6; }
+
+/* ── Actions ──────────────────────────────────────────────────────────────── */
+.co__btn {
+  display: inline-block;
+  width: 100%;
+  padding: 17px 26px;
+  border: 0;
+  background: var(--oxblood);
+  color: var(--ivory);
+  font-family: var(--ff-exp);
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity var(--dur-fast, 0.4s) var(--ease);
+}
+.co__btn:hover { opacity: 0.88; }
+.co__btn:disabled { opacity: 0.4; cursor: default; }
+
+.co__btn--ghost {
+  width: auto;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line-dark);
+}
+
+.co__error {
+  margin: 0 0 16px;
+  padding: 13px 16px;
+  border: 1px solid color-mix(in srgb, var(--oxblood) 40%, transparent);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.co__fineprint {
+  margin: 18px 0 0;
+  font-size: 0.78rem;
+  line-height: 1.7;
+  color: var(--rose-taupe);
+}
+
+/* ── Confirmation ─────────────────────────────────────────────────────────── */
+.co__number {
+  margin: 0 0 30px;
+  font-family: var(--ff-exp);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--rose-taupe);
+}
+
+/* Two chips, not one: where the parcel is, and — for cash on delivery — whether the money
+   has reached us. They are separate facts and are allowed to disagree, so they sit side by
+   side rather than being merged into a single status that would have to lie about one. */
+.co__statusrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 26px;
+}
+
+.co__status {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 1px solid var(--line-dark);
+  font-family: var(--ff-exp);
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* Filled, where the parcel chip is outlined. Cash collected is the one settled, final
+   thing on this page — it earns the only solid shape in the column. */
+.co__status--paid {
+  background: var(--ink);
+  color: var(--ivory);
+  border-color: var(--ink);
+}
+
+/* Sits directly under the parcel's own line, so the two ledes need to read as a pair
+   rather than as one paragraph twice. */
+.co__lede--paid {
+  margin-top: -18px;
+}
+
+.co__panel {
+  padding: 24px 26px;
+  border: 1px solid var(--line-dark);
+  margin-bottom: 22px;
+}
+.co__panel h2 {
+  margin: 0 0 14px;
+  font-family: var(--ff-exp);
+  font-weight: 400;
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rose-taupe);
+}
+.co__address { margin: 0; font-style: normal; line-height: 1.8; font-size: 0.95rem; }

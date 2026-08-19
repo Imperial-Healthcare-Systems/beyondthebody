@@ -55,9 +55,11 @@ export default function PdpHero({ product }: { product: Product }) {
 
         <div className="pdp__hero">
           <div className="pdp__gallery">
-            <figure className="pdp__main" style={{ aspectRatio: img.ratio }}>
-              {/* key swaps → CSS cross-fade on thumbnail change; frame follows each
-                  image's own ratio so wide art (banner, notes grid) shows uncropped */}
+            <figure className="pdp__main">
+              {/* key swaps → CSS cross-fade on thumbnail change. The frame is a FIXED
+                  1:1 (pdphero.css) so switching images never reflows the page; the image
+                  is `object-fit: contain`, so wide art (banner, notes grid) still shows
+                  uncropped — it letterboxes inside the constant square. */}
               <img key={active} src={img.src} alt={img.alt} />
             </figure>
 

@@ -63,7 +63,14 @@ const NAV_SPY: Record<string, string> = {
 
 export default function Footer() {
   const root = useRef<HTMLElement>(null);
-  const [submitted, setSubmitted] = useState(false);
+  /* Newsletter. Until 2026-08-11 this was `onSubmit → setSubmitted(true)` with no request
+     anywhere: the form told the visitor "You're on the list" and stored nothing. It now
+     posts to /api/v1/newsletter/subscribe, which records the address and emails a
+     confirmation link (double opt-in) — so the copy also changed, because a subscription
+     is not real until that link is followed. */
+  const [nlState, setNlState] = useState<"idle" | "sending" | "done" | "error">("idle");
+  const [nlMessage, setNlMessage] = useState("");
+  const submitted = nlState === "done";
   const [activeNav, setActiveNav] = useState("The House");
 
   // live active-section indicator — the footer link for the section nearest the
@@ -189,27 +196,75 @@ export default function Footer() {
           <p className="ft__nl-sub">Notes from the studio, and word of each drop before it opens.</p>
           <form
             className="ft__nl-form"
-            onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }}
+            onSubmit={async (e) => {
+              e.preventDefault();
+              if (nlState === "sending") return; // ignore a double-submit
+
+              const form = e.currentTarget;
+              const data = new FormData(form);
+              setNlState("sending");
+
+              try {
+                const res = await fetch("/api/v1/newsletter/subscribe", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    email: data.get("email"),
+                    company: data.get("company"), // honeypot — see the field below
+                  }),
+                });
+                const payload = await res.json();
+
+                if (!res.ok) throw new Error(payload?.error?.message ?? "Request failed");
+
+                /* The API answers identically for a new address, one already on the list,
+                   and one that is rate-limited — so the form cannot be used to test who
+                   is a subscriber. There is nothing to branch on here, deliberately. */
+                setNlMessage(payload.message ?? "Check your inbox to confirm.");
+                setNlState("done");
+              } catch {
+                setNlState("error");
+                setNlMessage("That didn't go through. Please try again in a moment.");
+              }
+            }}
           >
             {submitted ? (
-              <p className="ft__nl-done" role="status">You&rsquo;re on the list. Watch your inbox.</p>
+              <p className="ft__nl-done" role="status">{nlMessage}</p>
             ) : (
-              <div className="ft__field">
+              <>
+                <div className="ft__field">
+                  <input
+                    className="ft__input"
+                    type="email"
+                    name="email"
+                    required
+                    placeholder="Your email"
+                    aria-label="Your email address"
+                    autoComplete="email"
+                    disabled={nlState === "sending"}
+                  />
+                  <button className="ft__submit" type="submit" disabled={nlState === "sending"}>
+                    {nlState === "sending" ? "One moment…" : "Join the house list"}
+                    <svg width="20" height="10" viewBox="0 0 20 10" fill="none" aria-hidden="true">
+                      <path d="M0 5h18M14 1l4 4-4 4" stroke="currentColor" strokeWidth="1.3" />
+                    </svg>
+                  </button>
+                </div>
+                {/* Honeypot. Hidden from sight and from assistive tech, and skipped by
+                    tabbing — a human never fills it, an automated submitter fills every
+                    field it finds. Kept in the DOM flow with no layout cost. */}
                 <input
-                  className="ft__input"
-                  type="email"
-                  required
-                  placeholder="Your email"
-                  aria-label="Your email address"
-                  autoComplete="email"
+                  type="text"
+                  name="company"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  style={{ position: "absolute", left: "-9999px", width: 1, height: 1 }}
                 />
-                <button className="ft__submit" type="submit">
-                  Join the house list
-                  <svg width="20" height="10" viewBox="0 0 20 10" fill="none" aria-hidden="true">
-                    <path d="M0 5h18M14 1l4 4-4 4" stroke="currentColor" strokeWidth="1.3" />
-                  </svg>
-                </button>
-              </div>
+                {nlState === "error" && (
+                  <p className="ft__nl-error" role="alert">{nlMessage}</p>
+                )}
+              </>
             )}
           </form>
         </div>
@@ -270,9 +325,13 @@ export default function Footer() {
         <span className="ft__copy">© 2026 Beyond The Body</span>
         <span className="ft__made">Built in India, with care, by Imperial Tech Innovations</span>
         <span className="ft__legal-links">
-          <a {...placeholderProps}>Privacy</a>
-          <a {...placeholderProps}>Terms</a>
-          <a {...placeholderProps}>Cookies</a>
+          {/* Real routes since S8. "Cookies" is gone rather than pointed somewhere: this
+              site sets no advertising or measurement cookie, so a cookie policy would be a
+              page about nothing. What it would have said lives under Privacy. */}
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+          <a href="/shipping">Shipping</a>
+          <a href="/refunds">Returns</a>
         </span>
       </div>
 

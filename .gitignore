@@ -32,6 +32,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...but the contract itself must be committed — it is how the next person (and the
+# client's ops team at handover) knows what to fill in. Real secrets stay ignored above.
+!.env.example
 
 # vercel
 .vercel
@@ -39,3 +42,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# client-uploaded product photography (UPLOAD_DIR). Runtime data, never build output —
+# see lib/uploads.ts. In production this must be a path that survives a deploy.
+/var/

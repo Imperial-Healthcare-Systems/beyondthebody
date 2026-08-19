@@ -78,11 +78,14 @@ export default function ProductTouch2() {
 
   return (
     <section className="p1" data-theme="dark" id="desir" ref={root}>
-      <img
-        className="p1__img"
-        src={BOTTLE}
-        alt="Desir — emerald faceted glass flacon with a gold cap, on a dark reflective surface with driftwood, foliage and a white blossom"
-      />
+      {/* Scene → PDP link, layout on the <a> — see ProductTouch1.tsx / product1.css. */}
+      <a className="p1__imglink" href="/fragrance/desir">
+        <img
+          className="p1__img"
+          src={BOTTLE}
+          alt="Desir — emerald faceted glass flacon with a gold cap, on a dark reflective surface with driftwood, foliage and a white blossom"
+        />
+      </a>
 
       <p className="p1__eyebrow">— Beyond the body</p>
 

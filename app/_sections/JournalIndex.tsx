@@ -16,7 +16,25 @@ import { JOURNAL_INDEX, ESSAYS } from "./journal-data";
 import "./journalindex.css";
 import { revealTl } from "../_components/reveal-tempo";
 
-export default function JournalIndex() {
+/* Only the fields this list renders — so the server can pass posts from the database
+   without the client component needing to know anything about how they are stored. */
+export type IndexEssay = {
+  slug: string;
+  num: string;
+  title: string;
+  standfirst: string;
+  img: string;
+  imgAlt: string;
+};
+
+export default function JournalIndex({
+  /* Falls back to the frozen copy in journal-data.ts: keeps the /preview isolation route
+     working (it renders sections with no server data) and keeps the page rendering if
+     the database is unreachable. */
+  essays = ESSAYS,
+}: {
+  essays?: IndexEssay[];
+} = {}) {
   const root = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -103,7 +121,7 @@ export default function JournalIndex() {
         </header>
 
         <div className="jx__list">
-          {ESSAYS.map((e, i) => (
+          {essays.map((e, i) => (
             <a
               key={e.slug}
               className="jx__essay"
